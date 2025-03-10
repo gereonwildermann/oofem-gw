@@ -387,8 +387,24 @@ py::object isoHeat(py::args args, py::kwargs kw) { return createMaterialOfType("
 py::object j2mat(py::args args, py::kwargs kw) { return createMaterialOfType("j2mat",args,kw); }
 py::object steel1(py::args args, py::kwargs kw) { return createMaterialOfType("steel1",args,kw); }
 py::object upm(py::args args, py::kwargs kw) { return createMaterialOfType("upm",args,kw); }
-
-
+py::object misesmat(py::args args, py::kwargs kw) { return createMaterialOfType("misesmat",args,kw); }
+py::object mps(py::args args, py::kwargs kw) {
+    if (kw.contains("w_c")) {
+        kw["w/c"] = kw["w_c"];  // Rename w_c to w/c
+        kw.attr("pop")("w_c");  // Remove original w_c
+    }
+    if (kw.contains("a_c")) {
+        kw["a/c"] = kw["a_c"];  // Rename a_c to a/c
+        kw.attr("pop")("a_c");  // Remove original a_c
+    }
+    return createMaterialOfType("mps", args, kw);
+}
+py::object ec2creepmat(py::args args, py::kwargs kw) { return createMaterialOfType("ec2creepmat",args,kw); }
+py::object concreteDPM(py::args args, py::kwargs kw) { return createMaterialOfType("concretedpm",args,kw); }
+py::object mazarsmodel(py::args args, py::kwargs kw) { return createMaterialOfType("mazarsmodel",args,kw); }
+py::object steelrelaxmat(py::args args, py::kwargs kw) { return createMaterialOfType("steelrelaxmat",args,kw); }
+py::object concreteFcm(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcm",args,kw); }
+py::object concreteFcmViscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcmViscoelastic",args,kw); }
 /*****************************************************
 * CrossSection
 *****************************************************/

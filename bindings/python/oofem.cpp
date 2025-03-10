@@ -1227,6 +1227,7 @@ PYBIND11_MODULE(oofempy, m) {
         .def("giveStatus", &oofem::Material::giveStatus, py::return_value_policy::reference)
         .def("CreateStatus", &oofem::Material::CreateStatus, py::return_value_policy::reference)
         .def("giveIPValue", &oofem::Material::giveIPValue)
+        .def("initializeFrom", &oofem::Material::initializeFrom)
     ;
 
     py::class_<oofem::StructuralMaterial, oofem::Material, PyStructuralMaterial<>>(m, "StructuralMaterial")
@@ -1820,11 +1821,21 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("nodalLoad", &nodalLoad, py::return_value_policy::move);
     m.def("structTemperatureLoad", &structTemperatureLoad, py::return_value_policy::move);
     m.def("structEigenstrainLoad", &structEigenstrainLoad, py::return_value_policy::move);
+
     m.def("isoLE", &isoLE, py::return_value_policy::move);
     m.def("idm1", &idm1, py::return_value_policy::move);
     m.def("isoHeat", &isoHeat, py::return_value_policy::move);
     m.def("j2mat", &j2mat, py::return_value_policy::move);
     m.def("steel1", &steel1, py::return_value_policy::move);
+    m.def("misesmat", &misesmat, py::return_value_policy::move);
+    m.def("mps", &mps, py::return_value_policy::move);
+    m.def("ec2creepmat", &ec2creepmat, py::return_value_policy::move);
+    m.def("concreteDPM", &concreteDPM, py::return_value_policy::move);
+    m.def("mazarsmodel", &mazarsmodel, py::return_value_policy::move);
+    m.def("steelrelaxmat", &steelrelaxmat, py::return_value_policy::move);
+    m.def("concreteFcm", &concreteFcm, py::return_value_policy::move);
+    m.def("concreteFcmViscoelastic", &concreteFcmViscoelastic, py::return_value_policy::move);
+
 
     m.def("simpleCS", &simpleCS, py::return_value_policy::move);
     m.def("simpleTransportCS", &simpleTransportCS, py::return_value_policy::move);
@@ -1874,6 +1885,7 @@ PYBIND11_MODULE(oofempy, m) {
         .def(py::init<int, int, double>(), py::arg().noconvert(), py::arg().noconvert(), py::arg("octreeOriginShift") = 0.0)
         .def("addVertex", &oofem::UnstructuredGridField::addVertex)
         .def("setVertexValue", &oofem::UnstructuredGridField::setVertexValue)
+        .def("addCell", &oofem::UnstructuredGridField::addCell)
         ;
     
     py::class_<oofem::DofManValueField, oofem::Field,  std::shared_ptr<oofem::DofManValueField>>(m, "DofManValueField")
