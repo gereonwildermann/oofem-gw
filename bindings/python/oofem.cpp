@@ -1749,6 +1749,7 @@ PYBIND11_MODULE(oofempy, m) {
 
     m.def("linearStatic", &linearStatic, py::return_value_policy::move);
     m.def("staticStructural", &staticStructural, py::return_value_policy::move);
+    m.def("nonlinearstatic", &nonlinearStatic, py::return_value_policy::move);
     m.def("transientTransport", &transientTransport, py::return_value_policy::move);
     m.def("dummyProblem", &dummyProblem, py::return_value_policy::move);
     m.def("domain", &domain, py::return_value_policy::move);

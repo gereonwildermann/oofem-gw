@@ -182,6 +182,8 @@ py::object linearStatic(py::args args, py::kwargs kw) { return createEngngModelO
 
 py::object staticStructural(py::args args, py::kwargs kw) { return createEngngModelOfType("staticstructural", args, kw); }
 
+py::object nonlinearStatic(py::args args, py::kwargs kw) { return createEngngModelOfType("nonlinearstatic", args, kw); }
+
 py::object transientTransport(py::args args, py::kwargs kw) { return createEngngModelOfType("transienttransport", args, kw); }
 
 py::object dummyProblem(py::args args, py::kwargs kw) { return createEngngModelOfType("dummy", args, kw); }
