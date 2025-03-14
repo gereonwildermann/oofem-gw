@@ -1807,8 +1807,11 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("qbrick1ht", &qBrick1ht, py::return_value_policy::move);
     m.def("qbrick1mt", &qBrick1mt, py::return_value_policy::move);
     m.def("qbrick1hmt", &qBrick1hmt, py::return_value_policy::move);
-    
+
+    // nodes
     m.def("node", &node, py::return_value_policy::move);
+    m.def("hangingnode", &hangingnode, py::return_value_policy::move);           
+               
     m.def("boundaryCondition", &boundaryCondition, py::return_value_policy::move);
     m.def("initialCondition", &initialCondition, py::return_value_policy::move);
     m.def("constantEdgeLoad", &constantEdgeLoad, py::return_value_policy::move);
