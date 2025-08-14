@@ -253,6 +253,7 @@ py::object truss2d(py::args args, py::kwargs &kw) { return createElementOfType("
 py::object truss3d(py::args args, py::kwargs &kw) { return createElementOfType("truss3d",args,kw); }
 py::object beam2d(py::args args, py::kwargs &kw) { return createElementOfType("beam2d",args,kw); }
 py::object beam3d(py::args args, py::kwargs &kw) { return createElementOfType("beam3d",args,kw); }
+py::object libeam3d(py::args args, py::kwargs &kw) { return createElementOfType("libeam3d",args,kw); }
 py::object lattice2d(py::args args, py::kwargs &kw) { return createElementOfType("lattice2d",args,kw); }
 py::object lattice2dboundary(py::args args, py::kwargs &kw) { return createElementOfType("lattice2dboundary",args,kw); }
 py::object lattice3d(py::args args, py::kwargs &kw) { return createElementOfType("lattice3d",args,kw); }
@@ -278,7 +279,9 @@ py::object qspace(py::args args, py::kwargs &kw) { return createElementOfType("q
 py::object ltrspace(py::args args, py::kwargs &kw) { return createElementOfType("ltrspace",args,kw); }
 py::object qTRSpace(py::args args, py::kwargs &kw) { return createElementOfType("qtrspace",args,kw); } 
 py::object lWedge(py::args args, py::kwargs &kw) { return createElementOfType("lwedge",args,kw); }
-py::object qWedge(py::args args, py::kwargs &kw) { return createElementOfType("qwedge",args,kw); } 
+py::object qWedge(py::args args, py::kwargs &kw) { return createElementOfType("qwedge",args,kw); }
+py::object IntELPoint(py::args args, py::kwargs &kw) { return createElementOfType("IntELPoint",args,kw); } 
+py::object bondlink3d(py::args args, py::kwargs &kw) { return createElementOfType("bondlink3d",args,kw); }
 //transport elements
 py::object line1ht(py::args args, py::kwargs &kw) { return createElementOfType("line1ht",args,kw); }
 py::object line1mt(py::args args, py::kwargs &kw) { return createElementOfType("line1mt",args,kw); }
@@ -408,6 +411,8 @@ py::object mazarsmodel(py::args args, py::kwargs kw) { return createMaterialOfTy
 py::object steelrelaxmat(py::args args, py::kwargs kw) { return createMaterialOfType("steelrelaxmat",args,kw); }
 py::object concreteFcm(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcm",args,kw); }
 py::object concreteFcmViscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcmViscoelastic",args,kw); }
+py::object bondceb(py::args args, py::kwargs kw) { return createMaterialOfType("bondceb",args,kw); }
+
 /*****************************************************
 * CrossSection
 *****************************************************/
@@ -424,7 +429,7 @@ py::object createCrossSectionOfType(const char* type, py::args args, py::kwargs 
 
 py::object simpleCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("simplecs",args,kw); }
 py::object simpleTransportCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("simpletransportcs",args,kw); }
-
+py::object InterfaceCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("InterfaceCS",args,kw); }
 
 
 /*****************************************************

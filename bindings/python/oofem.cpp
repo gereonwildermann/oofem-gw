@@ -1759,6 +1759,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("truss3d", &truss3d, py::return_value_policy::move);
     m.def("beam2d", &beam2d, py::return_value_policy::move);
     m.def("beam3d", &beam3d, py::return_value_policy::move);
+    m.def("libeam3d", &libeam3d, py::return_value_policy::move);
     m.def("lattice2d", &lattice2d, py::return_value_policy::move);
     m.def("lattice2dboundary", &lattice2dboundary, py::return_value_policy::move);
     m.def("lattice3d", &lattice3d, py::return_value_policy::move);
@@ -1786,6 +1787,8 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("qtrspace", &qTRSpace, py::return_value_policy::move);
     m.def("lwedge", &lWedge, py::return_value_policy::move);
     m.def("qwedge", &qWedge, py::return_value_policy::move);
+    m.def("IntELPoint", &IntELPoint, py::return_value_policy::move);
+    m.def("bondlink3d", &bondlink3d, py::return_value_policy::move);
     //transport elements
     m.def("line1ht", &line1ht, py::return_value_policy::move);
     m.def("line1mt", &line1mt, py::return_value_policy::move);
@@ -1836,10 +1839,13 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("steelrelaxmat", &steelrelaxmat, py::return_value_policy::move);
     m.def("concreteFcm", &concreteFcm, py::return_value_policy::move);
     m.def("concreteFcmViscoelastic", &concreteFcmViscoelastic, py::return_value_policy::move);
+    m.def("bondceb", &bondceb, py::return_value_policy::move);
 
 
     m.def("simpleCS", &simpleCS, py::return_value_policy::move);
     m.def("simpleTransportCS", &simpleTransportCS, py::return_value_policy::move);
+    m.def("InterfaceCS", &InterfaceCS, py::return_value_policy::move);
+    
     m.def("peakFunction", &peakFunction, py::return_value_policy::move);
     m.def("constantFunction", &constantFunction, py::return_value_policy::move);
     m.def("piecewiseLinFunction", &piecewiseLinFunction, py::return_value_policy::move);

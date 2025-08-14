@@ -1,7 +1,6 @@
 {
     "files.associations": {
         "*.py": "python",
-        "classfactory.C": "cpp",
-        "dofmanager.C": "cpp"
+        "system_error": "cpp"
     }
 }
