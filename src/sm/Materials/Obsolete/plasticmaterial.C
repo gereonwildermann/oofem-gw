@@ -82,7 +82,7 @@ void
 PlasticMaterial :: giveRealStressVector(FloatArray &answer,
                                         GaussPoint *gp,
                                         const FloatArray &totalStrain,
-                                        TimeStep *tStep)
+                                        TimeStep *tStep) const
 //
 // returns real stress vector in 3d stress space of receiver according to
 // previous level of stress and current
@@ -157,7 +157,7 @@ PlasticMaterial :: giveRealStressVector(FloatArray &answer,
                                       fullStressVector, * fullStressSpaceHardeningVars);
 
         // obtain increment to consistency parameter
-        helpMtrx.initFromVector(* gradientVectorR, 1);
+        helpMtrx=FloatMatrix::fromArray(* gradientVectorR, 1);
         helpMtrx2.beProductOf(helpMtrx, consistentModuli);
         helpVec.beProductOf(helpMtrx2, * gradientVectorR);
         helpVal1 = helpVec.at(1);

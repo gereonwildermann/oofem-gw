@@ -71,18 +71,18 @@ void dnTaN::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, Tim
     FloatMatrix dndx;
     this->testField->interpolation->evaldNdx(dndx, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     this->field->interpolation->evalN(n, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
-    FloatMatrix nm(n, true), anm;
+    FloatMatrix nm=FloatMatrix::fromArray(n, true), anm;
     int nsd = this->field->interpolation->giveNsd(e.giveGeometryType());
     FloatMatrix am(nsd,1);
     //a.at(2,1)=1.0; // assume 2d flow for now
     //a.at(1,1)=sqrt(0.5); a.at(2,1)=sqrt(0.5); 
     lc = gp->giveNaturalCoordinates();
-    e.getGeometryInterpolation().local2global(gc, lc, FEIElementGeometryWrapper(&e));
+    e.getGeometryInterpolation()->local2global(gc, lc, FEIElementGeometryWrapper(&e));
     this->velocity->evaluateAt(a, gc, VM_Total, tstep);
     for (int i=1; i<=nsd; i++) {
         am.at(i,1)=a.at(i);
     }
-    anm.beProductOf(a, nm);
+    anm.beProductOf(FloatMatrix::fromArray(a), nm);
     answer.beProductOf(dndx, anm);
 }
 

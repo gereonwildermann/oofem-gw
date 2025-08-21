@@ -53,6 +53,8 @@
 #include "mathfem.h"
 #include "classfactory.h"
 #include "connectivitytable.h"
+#include "parametermanager.h"
+#include "paramkey.h"
 
 
 #ifdef __OOFEG
@@ -64,6 +66,8 @@
 
 namespace oofem {
 REGISTER_Element(MITC4Shell);
+ParamKey MITC4Shell::IPK_MITC4Shell_nipZ("nipz");
+ParamKey MITC4Shell::IPK_MITC4Shell_directorType("directortype");
 
 FEI2dQuadLin MITC4Shell::interp_lin(1, 2);
 
@@ -75,6 +79,7 @@ MITC4Shell::MITC4Shell(int n, Domain *aDomain) :
 {
     numberOfDofMans = 4;
     numberOfGaussPoints = nPointsXY * nPointsZ;
+    directorType = 0; // default
 }
 
 
@@ -278,17 +283,13 @@ MITC4Shell::giveLocalCoordinates(const FloatArrayF< 3 > &global)
 }
 
 void
-MITC4Shell::initializeFrom(InputRecord &ir)
+MITC4Shell::initializeFrom(InputRecord &ir, int priority)
 {
-    StructuralElement::initializeFrom(ir);
-
-    IR_GIVE_OPTIONAL_FIELD(ir, nPointsXY, _IFT_Element_nip);
-    IR_GIVE_OPTIONAL_FIELD(ir, nPointsZ, _IFT_MITC4Shell_nipZ);
-    //@todo: extend for nonlinear geometry
-    //IR_GIVE_OPTIONAL_FIELD(ir, nlGeometry, _IFT_NLStructuralElement_nlgeoflag);
-
-    directorType = 0; // default
-    IR_GIVE_OPTIONAL_FIELD(ir, directorType, _IFT_MITC4Shell_directorType);
+    StructuralElement::initializeFrom(ir, priority);
+    ParameterManager &ppm = this->giveDomain()->elementPPM;
+    PM_UPDATE_PARAMETER(nPointsXY, ppm, ir, this->number, IPK_Element_nip, priority);
+    PM_UPDATE_PARAMETER(nPointsZ, ppm, ir, this->number, IPK_MITC4Shell_nipZ, priority);
+    PM_UPDATE_PARAMETER(directorType, ppm, ir, this->number, IPK_MITC4Shell_directorType, priority);
 }
 
 
@@ -751,12 +752,12 @@ MITC4Shell::giveCharacteristicTensor(CharTensor type, GaussPoint *gp, TimeStep *
         this->computeStrainVector(localStrain, gp, tStep);
         this->computeStressVector(localStress, localStrain, gp, tStep);
         auto stress = mat->transformStressVectorTo(GtoLRotationMatrix, localStress, false);
-        return from_voigt_stress(stress);
+        return from_voigt_stress_6(stress);
     } else if ( type == GlobalStrainTensor ) {
         FloatArray localStrain;
         this->computeStrainVector(localStrain, gp, tStep);
         auto strain = mat->transformStrainVectorTo(GtoLRotationMatrix, localStrain, false);
-        return from_voigt_strain(strain);
+        return from_voigt_strain_6(strain);
     } else {
         throw std::runtime_error("unsupported tensor mode");
     }
@@ -880,7 +881,7 @@ MITC4Shell::givedNdx(const FloatArrayF< 3 > &coords)
     auto dn = interp_lin.evaldNdxi(coords [ { 0, 1 } ]);
     auto J = this->giveJacobian(coords);
     auto invJ = inv(J);
-    auto invJ2 = invJ({ 0, 1 }, { 0, 1 });
+    FloatMatrixF<2,2> invJ2 = invJ({ 0, 1 }, { 0, 1 });
     auto dndx = dot(invJ2, dn);
 
     auto hkx = dndx.row< 0 >();
@@ -899,11 +900,11 @@ MITC4Shell::giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType ty
 {
     if ( type == IST_StrainTensor ) {
         auto globTensor = this->giveCharacteristicTensor(GlobalStrainTensor, gp, tStep);
-        answer = to_voigt_strain(globTensor);
+        answer = to_voigt_strain_33(globTensor);
         return 1;
     } else if ( type == IST_StressTensor ) {
         auto globTensor = this->giveCharacteristicTensor(GlobalForceTensor, gp, tStep);
-        answer = to_voigt_stress(globTensor);
+        answer = to_voigt_stress_33(globTensor);
         return 1;
     } else if ( type == IST_ShellMomentTensor || type == IST_ShellForceTensor || type == IST_CurvatureTensor || type == IST_ShellStrainTensor ) {
         int gpnXY = ( gp->giveNumber() - 1 ) / 2;
@@ -1075,7 +1076,7 @@ double
 MITC4Shell::computeEdgeVolumeAround(GaussPoint *gp, int iEdge)
 {
     auto lcF = this->giveNodeCoordinates();
-    std::vector< FloatArray >lc;
+    std::vector< FloatArray > lc(4);
     lc [ 0 ] = lcF [ 0 ];
     lc [ 1 ] = lcF [ 1 ];
     lc [ 2 ] = lcF [ 2 ];

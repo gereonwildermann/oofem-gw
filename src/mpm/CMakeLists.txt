@@ -19,6 +19,7 @@ set (mpm_element
     set (mpm_problems
     mpmproblem.C
     dg.C
+    mpmsemodels.C
     )
 
 set (mpm
@@ -32,4 +33,3 @@ add_library (mpm
     ${mpm}
     )
 
-add_dependencies(mpm version)

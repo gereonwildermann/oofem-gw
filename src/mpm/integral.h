@@ -53,11 +53,12 @@ namespace oofem {
         int setIndex=0;
         const Term *term;
         Domain *domain;
+        double factor;
         /// @brief Constructor, creates an integral of given term over entities in given set 
         /// @param d
         /// @param s 
         /// @param t 
-        Integral (Domain* d, Set* set, const Term* t ) : set(set), term(t) {
+        Integral (Domain* d, Set* set, const Term* t ) : set(set), term(t), factor(1.0) {
             this->domain = d;
         }   
         void initializeFrom (InputRecord &ir, EngngModel *emodel);
@@ -73,12 +74,12 @@ namespace oofem {
         } 
         // evaluate term contribution to weak form on given cell at given point 
         void assemble_lhs (SparseMtrx& dest, const UnknownNumberingScheme &s, TimeStep* tStep) const {
-            FloatMatrix contrib;
             IntArray locr, locc;
 
             for (auto i: this->set->giveElementList()) { // loop over elements
                 MPElement *e = dynamic_cast<MPElement*>(this->domain->giveElement(i));
                 if (e) {
+                    FloatMatrix contrib;
                     this->getElementTermCodeNumbers(locr, locc, e, *this->term, s);
                     // determine integration rule (this has to be set up on element, as we need to track history there)
                     // the IR is created by term.initialize, we just need mechanism to get this IR
@@ -87,66 +88,80 @@ namespace oofem {
                     // ->need to querry/store/identify element IR based on NIP.
                     IntegrationRule* ir =  this->term->giveElementIntegrationRule(e);
                     e->integrateTerm_dw(contrib, *this->term, ir, tStep); // @todo IR 
+                    contrib.times(this->factor);
                     // assemble
                     dest.assemble (locr, locc, contrib);
                 }
             }
         }
         // evaluate contribution (all vars known) on given cell
-        void assemble_rhs (FloatArray& dest, const UnknownNumberingScheme &s, TimeStep* tstep) {
-            FloatArray contrib;
-            IntArray locr, locc;
+        void assemble_rhs (FloatArray& dest, const UnknownNumberingScheme &s, TimeStep* tstep, FloatArray* eNorms=NULL ) const {
+            IntArray locr, locc, dofIDs;
 
             for (auto i: this->set->giveElementList()) { // loop over elements
                 MPElement *e = dynamic_cast<MPElement*>(this->domain->giveElement(i));
                 if (e) {
-                    this->getElementTermCodeNumbers(locr, locc, e, *this->term, s);
+                    FloatArray contrib;
+                    this->getElementTermCodeNumbers(locr, locc, e, *this->term, s, &dofIDs);
                     // determine integration rule (this has to be set up on element, as we need to track history there)
                     // the IR is created by term.initialize, we just need mechanism to get this IR
                     // specific terms can have specific integration requirements (reduced integration, etc)
                     // at the same time same rules should be shared between terms->
                     // ->need to querry/store/identify element IR based on NIP.
                     IntegrationRule* ir =  this->term->giveElementIntegrationRule(e);
-                    e->integrateTerm_c(contrib, *this->term, ir, tstep); // @todo IR 
+                    e->integrateTerm_c(contrib, *this->term, ir, tstep); // @todo IR
+                    contrib.times(this->factor); 
                     // assemble
                     dest.assemble (contrib, locr);
+                    if ( eNorms ) {
+                        eNorms->assembleSquared(contrib, dofIDs);
+                    }
                 }
             }
            
 
         }
-        void getElementTermCodeNumbers (IntArray &locr, IntArray &locc, Element* e, const Term& t, const UnknownNumberingScheme &s) const {
-            IntArray nodes, internalDofMans, loc;
+        void getElementTermCodeNumbers (IntArray &locr, IntArray &locc, Element* e, const Term& t, const UnknownNumberingScheme &s, IntArray* rowDofIDs=NULL) const {
+            IntArray nodes, internalDofMans, loc, masterDofIDs;
             locr.resize(0);
             locc.resize(0);
-            // term.field and its interpolation determines row code numbers
+            // term.field and its interpolation determines column code numbers
             // from interpolation get node and internalDofMan lists
             t.field->interpolation->giveCellDofMans(nodes, internalDofMans, e);
             // loop over dof managers to get code numbers
             for (int i: nodes) {
                 // get mode dofID mask
                 e->giveDofManager(i)->giveLocationArray(t.field->getDofManDofIDs(), loc, s);
-                locr.followedBy(loc);
+                locc.followedBy(loc);
             }
             for (int i: internalDofMans) {
                 e->giveInternalDofManager(i)->giveLocationArray(t.field->getDofManDofIDs(), loc, s);
-                locr.followedBy(loc);
+                locc.followedBy(loc);
             }
 
-            // term.testField and its interpolation determines column code numbers
+            if ( rowDofIDs ) {
+                rowDofIDs->clear();
+            }
+            // term.testField and its interpolation determines row code numbers
             // from interpolation get node and internalDofMan lists
             t.testField->interpolation->giveCellDofMans(nodes, internalDofMans, e);
             // loop over dof managers to get code numbers
             for (int i: nodes) {
                 // get mode dofID mask
-                e->giveDofManager(i)->giveLocationArray(t.field->getDofManDofIDs(), loc, s);
-                locc.followedBy(loc);
+                e->giveDofManager(i)->giveLocationArray(t.testField->getDofManDofIDs(), loc, s);
+                locr.followedBy(loc);
+                if ( rowDofIDs ) {
+                    e->giveDofManager(i)->giveMasterDofIDArray(t.testField->getDofManDofIDs(), masterDofIDs);
+                    rowDofIDs->followedBy(masterDofIDs);
+                }
             }
             for (int i: internalDofMans) {
-
-
-                e->giveInternalDofManager(i)->giveLocationArray(t.field->getDofManDofIDs(), loc, s);
-                locc.followedBy(loc);
+                e->giveInternalDofManager(i)->giveLocationArray(t.testField->getDofManDofIDs(), loc, s);
+                locr.followedBy(loc);
+                if ( rowDofIDs ) {
+                    e->giveInternalDofManager(i)->giveMasterDofIDArray(t.testField->getDofManDofIDs(), masterDofIDs);
+                    rowDofIDs->followedBy(masterDofIDs);
+                }
             }
         }
    };

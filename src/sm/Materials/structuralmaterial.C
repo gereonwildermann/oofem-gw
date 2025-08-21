@@ -62,6 +62,7 @@ std::array< std::array< int, 3 >, 3 >StructuralMaterial::svIndex = {{
 }};
 
 
+
 StructuralMaterial::StructuralMaterial(int n, Domain *d) : Material(n, d) { }
 
 
@@ -79,14 +80,23 @@ void
 StructuralMaterial::giveCharacteristicMatrix(FloatMatrix &answer, MatResponseMode type, GaussPoint* gp, TimeStep *tStep) const
 {
     if (type == TangentStiffness) {
-        return this->giveStiffnessMatrix(answer, MatResponseMode::TangentStiffness, gp, tStep);
+        this->giveStiffnessMatrix(answer, MatResponseMode::TangentStiffness, gp, tStep);
     } else {
         OOFEM_ERROR("Not implemented");
     }
 }
 
+void 
+StructuralMaterial::giveCharacteristicVector(FloatArray &answer, FloatArray& flux, MatResponseMode type, GaussPoint* gp, TimeStep *tStep) const {
+    if (type == Stress) {
+        return this->giveRealStressVector(answer, gp, flux, tStep);
+    } else {
+        OOFEM_ERROR("Not implemented");
+    } 
+}
+
 void
-StructuralMaterial::giveRealStressVector(FloatArray &answer, GaussPoint *gp, const FloatArray &reducedStrain, TimeStep *tStep)
+StructuralMaterial::giveRealStressVector(FloatArray &answer, GaussPoint *gp, const FloatArray &reducedStrain, TimeStep *tStep) const
 {
     ///@todo Move this to StructuralCrossSection ?
     MaterialMode mode = gp->giveMaterialMode();
@@ -324,16 +334,16 @@ StructuralMaterial::giveFirstPKStressVector_3d(const FloatArrayF< 9 > &vF, Gauss
     // 2) Treat stress as second Piola-Kirchhoff stress and convert to first Piola-Kirchhoff stress.
     // 3) Set state variables F, P
 
-    auto F = from_voigt_form(vF);
+    auto F = from_voigt_form_9(vF);
     auto E = 0.5 * ( Tdot(F, F) - eye< 3 >() );
-    auto vE = to_voigt_strain(E);
+    auto vE = to_voigt_strain_33(E);
     auto vS = this->giveRealStressVector_3d(vE, gp, tStep);
 
     // Compute first PK stress from second PK stress
     auto status = static_cast< StructuralMaterialStatus * >( this->giveStatus(gp) );
-    auto S = from_voigt_stress(vS);
+    auto S = from_voigt_stress_6(vS);
     auto P = dot(F, S);
-    auto vP = to_voigt_form(P);
+    auto vP = to_voigt_form_33(P);
     status->letTempPVectorBe(vP);
     status->letTempFVectorBe(vF);
 
@@ -707,7 +717,7 @@ StructuralMaterial::givePlaneStressStiffnessMatrix_dPdF(MatResponseMode mode,
 {
     auto m3d = this->give3dMaterialStiffnessMatrix_dPdF(mode, gp, tStep);
     auto c3d = inv(m3d);
-    return inv(c3d({ 0, 1, 5, 8 }, { 0, 1, 5, 8 }) );
+    return inv( FloatMatrixF<4,4>(c3d({ 0, 1, 5, 8 }, { 0, 1, 5, 8 })));
 }
 
 
@@ -1024,7 +1034,7 @@ StructuralMaterial::givePlaneStressStiffMtrx(MatResponseMode mode,
 {
     auto m3d = this->give3dMaterialStiffnessMatrix(mode, gp, tStep);
     auto c3d = inv(m3d);
-    return inv(c3d({ 0, 1, 5 }, { 0, 1, 5 }) );
+    return inv(FloatMatrixF<3,3>(c3d({ 0, 1, 5 }, { 0, 1, 5 })));
 }
 
 FloatMatrixF< 4, 4 >
@@ -1056,7 +1066,7 @@ StructuralMaterial::give2dBeamLayerStiffMtrx(MatResponseMode mode,
 {
     auto m3d = this->give3dMaterialStiffnessMatrix(mode, gp, tStep);
     auto c3d = inv(m3d);
-    return inv(c3d({ 0, 4 }, { 0, 4 }) );
+    return inv(FloatMatrixF<2,2>(c3d({ 0, 4 }, { 0, 4 })));
 }
 
 
@@ -1067,7 +1077,7 @@ StructuralMaterial::givePlateLayerStiffMtrx(MatResponseMode mode,
 {
     auto m3d = this->give3dMaterialStiffnessMatrix(mode, gp, tStep);
     auto c3d = inv(m3d);
-    return inv(c3d({ 0, 1, 3, 4, 5 }, { 0, 1, 3, 4, 5 }) );
+    return inv(FloatMatrixF<5,5>(c3d({ 0, 1, 3, 4, 5 }, { 0, 1, 3, 4, 5 })));
 }
 
 FloatMatrixF< 3, 3 >
@@ -1077,7 +1087,7 @@ StructuralMaterial::giveFiberStiffMtrx(MatResponseMode mode,
 {
     auto m3d = this->give3dMaterialStiffnessMatrix(mode, gp, tStep);
     auto c3d = inv(m3d);
-    return inv(c3d({ 0, 4, 5 }, { 0, 4, 5 }) );
+    return inv(FloatMatrixF<3,3>(c3d({ 0, 4, 5 }, { 0, 4, 5 })));
 }
 
 

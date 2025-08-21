@@ -57,10 +57,10 @@ void TMBTSigTerm::evaluate (FloatArray& answer, MPElement& cell, GaussPoint* gp,
 void TMBTSigTerm::computeTMgeneralizedStrain (FloatArray& answer, FloatMatrix& B, MPElement& cell, const FloatArray& lcoords, MaterialMode mmode, TimeStep* tstep) const {
     FloatArray u, gradT;
     FloatMatrix dndx ;
-    answer.resize(0);
     cell.getUnknownVector(u, this->field, VM_TotalIntrinsic, tstep);
     this->grad(B, this->field, this->field->interpolation, cell, lcoords, mmode);
-    answer.beProductOf(B, u);
+    FloatArray Bu;
+    Bu.beProductOf(B, u);
 
     FloatArray rt, Nt;
     cell.getUnknownVector(rt, temperatureField, VM_TotalIntrinsic, tstep);
@@ -71,8 +71,7 @@ void TMBTSigTerm::computeTMgeneralizedStrain (FloatArray& answer, FloatMatrix& B
     // evaluate temperature at given point
     this->temperatureField->interpolation->evalN(Nt, lcoords, FEIElementGeometryWrapper(&cell));
     double t = Nt.dotProduct(rt);
-    answer.append(gradT); // construct generalized strain vector
-    answer.append(t); // add temperature
+    answer=FloatArray::fromConcatenated({Bu,gradT,Vec1(t)});
 }
 
 TMgNTfTerm::TMgNTfTerm (const Variable *testField, const Variable* unknownField, MatResponseMode lhsType, MatResponseMode rhsType) : gNTfTerm(testField, unknownField, lhsType, rhsType) {}
@@ -114,7 +113,7 @@ void BDalphaPiTerm::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint*
 
     DaPI.beProductOf(D, alphaPi);
     BDaPI.beTProductOf(B,DaPI);
-    FloatMatrix Ntm(Nt, true);
+    FloatMatrix Ntm=FloatMatrix::fromArray(Nt, true);
     answer.beProductOf(BDaPI,Ntm);
 
 }
@@ -140,7 +139,7 @@ void BTdSigmadT::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp
     e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicMatrix(D, DSigmaDT, gp, tstep);
     this->field->interpolation->evalN(Nt, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     evalB(B, this->testField, this->testField->interpolation, e, gp->giveNaturalCoordinates(), gp->giveMaterialMode());
-    FloatMatrix Ntm(Nt, true);
+    FloatMatrix Ntm=FloatMatrix::fromArray(Nt, true);
     DB.beProductOf(D, Ntm);
     //answer.plusProductSymmUpper(B, DB, 1.0);
     answer.beTProductOf(B,DB);
@@ -186,7 +185,7 @@ void NTaTmTe::evaluate (FloatArray& answer, MPElement& e, GaussPoint* gp, TimeSt
         coords = gp->giveNaturalCoordinates();
     } else {
         //this->computeSurfIpGlobalCoords(gcoords, gp->giveNaturalCoordinates(), iSurf);
-        e.getGeometryInterpolation().boundarySurfaceLocal2global(coords, this->boundaryID, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
+        e.getGeometryInterpolation()->boundarySurfaceLocal2global(coords, this->boundaryID, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     }
     this->bl->computeValues(Te, tstep, coords, this->field->dofIDs, VM_TotalIntrinsic);
     answer *= this->bl->giveProperty('a', tstep)*(t-Te.at(1));

@@ -36,9 +36,17 @@
 #include "termlibrary.h"
 #include "element.h"
 #include "material.h"
+#include "materialmode.h"
 #include "crosssection.h"
 
 namespace oofem {
+
+REGISTER_Term(BTamNTerm)
+REGISTER_Term(NTamTBTerm)
+REGISTER_Term(NTcN)
+
+
+
 
 BTSigTerm::BTSigTerm (const Variable *testField, const Variable* unknownField) : Term(testField, unknownField) {}
 
@@ -145,15 +153,16 @@ void gNTfTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolatio
 
 // BTamN Term (Qp)
 
-BTamNTerm::BTamNTerm (const Variable *testField, const Variable* unknownField) : Term(testField, unknownField) {}
+BTamNTerm::BTamNTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at) : MPMSymbolicTerm(testField, unknownField, _Unknown), aType(at) {}
 
 void BTamNTerm::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatMatrix B, mn;
     FloatArray m({1,1,1,0,0,0}), Np;
+    MaterialMode mmode = (mode==0)?gp->giveMaterialMode():mode;
     this->field->interpolation->evalN(Np, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
-    m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(BiotConstant, gp, tstep));
+    m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(aType, gp, tstep));
     mn.beDyadicProductOf(m, Np);
-    this->grad(B, this->testField, this->testField->interpolation, e, gp->giveNaturalCoordinates(), gp->giveMaterialMode());
+    this->grad(B, this->testField, this->testField->interpolation, e, gp->giveNaturalCoordinates(), mmode);
     answer.beTProductOf(B, mn);
 }
 
@@ -170,7 +179,6 @@ void BTamNTerm::getDimensions(Element& cell) const  {
     //int ndofs = v.size;
     //return nnodes*ndofs;
 }
-void BTamNTerm::initializeCell(Element& cell) const  {}
 
 void BTamNTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolation* interpol, const Element& cell, const FloatArray& coords, const MaterialMode mmode) const {
  FloatMatrix dndx;
@@ -179,7 +187,7 @@ void BTamNTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolati
     // evaluate matrix of derivatives, the member at i,j position contains value of dNi/dxj
     interpol->evaldNdx(dndx, coords, FEIElementGeometryWrapper(&cell));
 
-    if (mmode == _3dUP) {
+    if ((mmode == _3dUP) || (mmode == _3dMat)) {
         // 3D mode only now
         answer.resize(6, nnodes*ndofs);
         for (int i = 0; i< nnodes; i++) {
@@ -196,7 +204,7 @@ void BTamNTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolati
             answer(5, i*ndofs+0) = dndx(i, 1);
             answer(5, i*ndofs+1) = dndx(i, 0);
         }
-    } else if (mmode == _2dUP) {
+    } else if ((mmode == _2dUP)||(mmode == _PlaneStress)||(mmode == _PlaneStrain)) {
         answer.resize(6, nnodes*ndofs);
         for (int i = 0; i< nnodes; i++) {
             answer(0, i*ndofs+0) = dndx(i, 0);
@@ -210,23 +218,24 @@ void BTamNTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolati
 
 // NTamTBTerm Term (Q^T du/dt)
 
-NTamTBTerm::NTamTBTerm (const Variable *testField, const Variable* unknownField) : Term(testField, unknownField) {}
+NTamTBTerm::NTamTBTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at, ValueModeType ufieldVM) : MPMSymbolicTerm(testField, unknownField, _Unknown), aType(at), unknownFieldVMT(ufieldVM) {}
 
 void NTamTBTerm::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatMatrix B, mb;
     FloatArray m({1,1,1,0,0,0}), Np;
+    MaterialMode mmode = (mode==0)?gp->giveMaterialMode():mode;
     this->testField->interpolation->evalN(Np, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
-    m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(BiotConstant, gp, tstep));
-    this->grad(B, this->field, this->field->interpolation, e, gp->giveNaturalCoordinates(), gp->giveMaterialMode());
-    mb.beTProductOf(m, B);
-    FloatMatrix Npm(Np);
+    m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(aType, gp, tstep));
+    this->grad(B, this->field, this->field->interpolation, e, gp->giveNaturalCoordinates(), mmode);
+    mb.beTProductOf(FloatMatrix::fromArray(m), B);
+    FloatMatrix Npm=FloatMatrix::fromArray(Np);
     answer.beProductOf(Npm, mb);
 }
 
 void NTamTBTerm::evaluate (FloatArray& answer, MPElement& cell, GaussPoint* gp, TimeStep* tstep) const  {
     FloatArray ut;
     FloatMatrix Q;
-    cell.getUnknownVector(ut, this->field, VM_Velocity ,tstep);
+    cell.getUnknownVector(ut, this->field, unknownFieldVMT ,tstep);
     this->evaluate_lin (Q, cell,gp, tstep);
     answer.beProductOf(Q,ut);
 }
@@ -236,7 +245,6 @@ void NTamTBTerm::getDimensions(Element& cell) const  {
     //int ndofs = v.size;
     //return nnodes*ndofs;
 }
-void NTamTBTerm::initializeCell(Element& cell) const  {}
 
 void NTamTBTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolation* interpol, const Element& cell, const FloatArray& coords, const MaterialMode mmode) const {
  FloatMatrix dndx;
@@ -245,7 +253,7 @@ void NTamTBTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolat
     // evaluate matrix of derivatives, the member at i,j position contains value of dNi/dxj
     interpol->evaldNdx(dndx, coords, FEIElementGeometryWrapper(&cell));
 
-    if (mmode == _3dUP) {
+    if ((mmode == _3dUP) || (mmode == _3dMat)) {
         // 3D mode only now
         answer.resize(6, nnodes*ndofs);
         for (int i = 0; i< nnodes; i++) {
@@ -262,7 +270,7 @@ void NTamTBTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolat
             answer(5, i*ndofs+0) = dndx(i, 1);
             answer(5, i*ndofs+1) = dndx(i, 0);
         }
-    } else if (mmode == _2dUP) {
+    } else if ((mmode == _2dUP) || (mmode == _PlaneStress)||(mmode == _PlaneStrain)) {
         answer.resize(6, nnodes*ndofs);
         for (int i = 0; i< nnodes; i++) {
             answer(0, i*ndofs+0) = dndx(i, 0);
@@ -277,7 +285,7 @@ void NTamTBTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolat
 
 // NTcN Term (S(dp/dt))
 
-NTcN::NTcN (const Variable *testField, const Variable* unknownField, MatResponseMode ctype) : Term(testField, unknownField), ctype(ctype) {}
+NTcN::NTcN (const Variable *testField, const Variable* unknownField, MatResponseMode ctype, ValueModeType uFieldVMT) : MPMSymbolicTerm(testField, unknownField, _Unknown), ctype(ctype), unknownFieldVMT(uFieldVMT) {}
 
 void NTcN::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatArray Np;
@@ -289,7 +297,7 @@ void NTcN::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, Time
 void NTcN::evaluate (FloatArray& answer, MPElement& cell, GaussPoint* gp, TimeStep* tstep) const  {
     FloatArray p;
     FloatMatrix S;
-    cell.getUnknownVector(p, this->field, VM_Velocity, tstep);
+    cell.getUnknownVector(p, this->field, unknownFieldVMT, tstep);
     this->evaluate_lin (S, cell,gp, tstep);
     answer.beProductOf(S,p);
 }
@@ -299,7 +307,6 @@ void NTcN::getDimensions(Element& cell) const  {
     //int ndofs = v.size;
     //return nnodes*ndofs;
 }
-void NTcN::initializeCell(Element& cell) const  {}
 
 // A external flux term $S=(N)^T f$, where $f$ is functor evaluating the flux. 
 NTf_Surface::NTf_Surface (const Variable *testField, const NTfFunctor& f, int surf) : Term (testField, testField), f(f), isurf(surf) {}

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to OOFEM Theory manual!
+Theory manual
 ===============================================
 
 .. toctree::
@@ -12,10 +12,12 @@ Welcome to OOFEM Theory manual!
 
    introduction
    general
-   problems
+   problemformulations
+   solutionprocedures
    elements
    materials 
-   terms 
+   
+   symbolicmpm
 
 * :download:`How to contribute <docs/Introduction/Adding_documentation/Readme.pdf>`
   
