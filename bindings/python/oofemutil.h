@@ -415,9 +415,6 @@ py::object idm1(py::args args, py::kwargs kw) { return createMaterialOfType("idm
 py::object isoHeat(py::args args, py::kwargs kw) { return createMaterialOfType("isoheat",args,kw); }
 py::object j2mat(py::args args, py::kwargs kw) { return createMaterialOfType("j2mat",args,kw); }
 py::object steel1(py::args args, py::kwargs kw) { return createMaterialOfType("steel1",args,kw); }
-py::object concreteFcmViscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("concretefcmviscoelastic",args,kw); }
-py::object mps(py::args args, py::kwargs kw) { return createMaterialOfType("mps",args,kw); }
-
 py::object upm(py::args args, py::kwargs kw) { return createMaterialOfType("upm",args,kw); }
 py::object misesmat(py::args args, py::kwargs kw) { return createMaterialOfType("misesmat",args,kw); }
 py::object mps(py::args args, py::kwargs kw) {
