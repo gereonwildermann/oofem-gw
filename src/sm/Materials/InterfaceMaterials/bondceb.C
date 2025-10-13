@@ -41,6 +41,11 @@
 #include "contextioerr.h"
 #include "classfactory.h"
 #include "dynamicinputrecord.h"
+#include "fieldmanager.h"
+#include "field.h"
+#include "domain.h"
+#include "engngm.h"
+
 
 namespace oofem {
 REGISTER_Material(BondCEBMaterial);
@@ -77,8 +82,22 @@ BondCEBMaterial :: giveEngTraction_3d(const FloatArrayF<3> &jump, GaussPoint *gp
     double tempKappa = status->giveKappa() + dKappa;
 
     // maximum allowed norm of shear traction
-    double smax = evaluateBondStress(tempKappa);
+    // get corrosion mass loss from the field
+    FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
+    FieldPtr cf;
+    double smax;
+    if ( (cf = fm->giveField(FT_CorrosionFraction))) {
+        double Qc = const_cast<BondCEBMaterial*>(this)->giveCrossSectionReduction(gp, tStep, VM_Total);
+        double seq = 0.0136*Qc; // EC2020 13.6 mm*Qc with stirups
+        double smax1 = evaluateBondStress(tempKappa); 
+        double smax2 = evaluateBondStress(tempKappa+seq);
+        smax = std::min(smax1, smax2);
+        std::cout << "BondCEBMaterial" << " Qc: " << Qc << " smax1: " << smax1 << " smax2: " << smax2 << " smax: " << smax << std::endl;
 
+    }else {
+        smax = evaluateBondStress(tempKappa);
+    }
+    smax = evaluateBondStress(tempKappa);
     // reduce shear tractions, if needed
     if ( s > smax ) {
         for ( int i = 2; i <= 3; i++ ) {
@@ -100,6 +119,32 @@ BondCEBMaterial :: give3dStiffnessMatrix_Eng(MatResponseMode rMode, GaussPoint *
 {
     ///@todo Only elastic tangent supported
     return diag<3>({kn, ks, ks});
+}
+
+double 
+BondCEBMaterial :: giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, ValueModeType mode)
+{
+    double diameter_0 = diameter;
+    // get corrosion mass loss from the field
+    FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
+    FieldPtr cf;
+    if ( (cf = fm->giveField(FT_CorrosionMassLoss))) {
+        FloatArray mloss, mloss1, mloss2;
+        DofManager *dm1 = this->domain->giveDofManager(1);
+        DofManager *dm2 = this->domain->giveDofManager(2);
+        cf->evaluateAt(mloss1, dm1, mode, tStep);
+        cf->evaluateAt(mloss2, dm2, mode, tStep);
+        mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
+        double density = 7850; // density of steel in kg/m3
+        double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
+        double Q_c = 4.0 * (x / diameter_0- std::pow(x / diameter_0, 2.0));
+        // Clamp Q_c to the range [0, 1]
+        Q_c = std::min(std::max(Q_c, 0.0), 1.0);
+        std::cout << "BondCEBMaterial" << " Q_c: " << Q_c << std::endl;
+        std::cout << "BondCEBMaterial" << " mloss: " << mloss1.at(1) << " " << mloss2.at(1) << std::endl;
+        return Q_c;
+        }
+    return 0.0;
 }
 
 double
@@ -146,6 +191,7 @@ BondCEBMaterial :: initializeFrom(InputRecord &ir)
     // optional parameters
     IR_GIVE_OPTIONAL_FIELD(ir, tauf, _IFT_BondCEBMaterial_tauf);
     IR_GIVE_OPTIONAL_FIELD(ir, alpha, _IFT_BondCEBMaterial_al);
+    IR_GIVE_OPTIONAL_FIELD(ir, diameter, _IFT_BondCEBMaterial_diameter);
 
     // dependent parameter
     //@todo: why not simply if ks <taumax/s1 choose ks = taumax/s1

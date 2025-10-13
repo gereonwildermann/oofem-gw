@@ -37,6 +37,7 @@
 
 #include "structuralinterfacematerial.h"
 #include "structuralinterfacematerialstatus.h"
+#include "valuemodetype.h"
 
 ///@name Input fields for BondCEBMaterial
 //@{
@@ -49,6 +50,7 @@
 #define _IFT_BondCEBMaterial_al "al"
 #define _IFT_BondCEBMaterial_taumax "taumax"
 #define _IFT_BondCEBMaterial_tauf "tauf"
+#define _IFT_BondCEBMaterial_diameter "diameter"
 //@}
 
 namespace oofem {
@@ -114,6 +116,8 @@ protected:
     double s0 = 0., s1 = 0., s2 = 0., s3 = 0.;
     /// Exponent.
     double alpha = 0.4;
+    /// Diameter of the reinforcement bar (not necessary as attribute)
+    double diameter = 0.0;
 
 public:
     /// Constructor
@@ -136,6 +140,8 @@ public:
 
 protected:
     double evaluateBondStress(const double kappa) const;
+    double giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, ValueModeType mode = VM_Total);
+
 };
 } // end namespace oofem
 #endif // bondceb_h
