@@ -24,6 +24,7 @@ set (sm_element
     Bars/truss1d.C 
     Bars/truss2d.C 
     Bars/truss3d.C
+    Bars/rebar3d.C
     Bars/truss3dnl.C
     Bars/truss3dnl2.C
     Bars/qtruss1d.C 
