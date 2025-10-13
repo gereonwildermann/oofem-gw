@@ -273,6 +273,7 @@ py::object createElementOfType(const char* type, py::args args, py::kwargs kw)
 py::object truss1d(py::args args, py::kwargs &kw) { return createElementOfType("truss1d",args,kw); }
 py::object truss2d(py::args args, py::kwargs &kw) { return createElementOfType("truss2d",args,kw); }
 py::object truss3d(py::args args, py::kwargs &kw) { return createElementOfType("truss3d",args,kw); }
+py::object rebar3d(py::args args, py::kwargs &kw) { return createElementOfType("rebar3d",args,kw); }
 py::object beam2d(py::args args, py::kwargs &kw) { return createElementOfType("beam2d",args,kw); }
 py::object beam3d(py::args args, py::kwargs &kw) { return createElementOfType("beam3d",args,kw); }
 py::object libeam3d(py::args args, py::kwargs &kw) { return createElementOfType("libeam3d",args,kw); }
@@ -451,6 +452,7 @@ py::object createCrossSectionOfType(const char* type, py::args args, py::kwargs 
 }
 
 py::object simpleCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("simplecs",args,kw); }
+py::object rebarCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("rebarCS",args,kw); }
 py::object simpleTransportCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("simpletransportcs",args,kw); }
 py::object InterfaceCS(py::args args, py::kwargs kw) { return createCrossSectionOfType("InterfaceCS",args,kw); }
 

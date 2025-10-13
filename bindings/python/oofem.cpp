@@ -150,6 +150,8 @@
 
 #ifdef __SM_MODULE
     #include "Elements/structuralelement.h"
+    #include "Elements/Bars/rebar3d.h"
+    #include "Elements/3D/lspace.h"
     #include "Materials/structuralmaterial.h"
     #include "Materials/structuralms.h"
 #endif
@@ -1221,7 +1223,7 @@ PYBIND11_MODULE(oofempy, m) {
     ;
 
     /*
-        Element
+        Elements
     */
 
     py::class_<oofem::Element, oofem::FEMComponent, PyElement<>>(m, "Element")
@@ -1262,6 +1264,15 @@ PYBIND11_MODULE(oofempy, m) {
         .def("getActivityTimeFunctionNumber", &oofem::Element::getActivityTimeFunctionNumber)
         .def("setActivityTimeFunctionNumber", &oofem::Element::setActivityTimeFunctionNumber)
     ;
+
+    py::class_<oofem::Rebar3d, oofem::Element, PyElement<oofem::Rebar3d>>(m, "Rebar3d")
+        .def("computeMassCorroded", &oofem::Rebar3d::computeMassCorroded)
+    ;
+
+    py::class_<oofem::LSpace, oofem::Element, PyElement<oofem::LSpace>>(m, "LSpace")
+        .def("computeVolumeAround", &oofem::LSpace::computeVolumeAround)
+    ;
+
 
 #ifdef __SM_MODULE
     py::class_<oofem::StructuralElement, oofem::Element, PyStructuralElement<>>(m, "StructuralElement")
@@ -1566,6 +1577,9 @@ PYBIND11_MODULE(oofempy, m) {
         .value("FT_TransportProblemUnknowns", oofem::FieldType::FT_TransportProblemUnknowns)
         .value("FT_TemperatureAmbient", oofem::FieldType::FT_TemperatureAmbient)
         .value("FT_EigenStrain", oofem::FieldType::FT_EigenStrain)
+        .value("FT_VOF", oofem::FieldType::FT_VOF)
+        .value("FT_CorrosionMassLoss", oofem::FieldType::FT_CorrosionMassLoss)
+        .value("FT_CorrosionFraction", oofem::FieldType::FT_CorrosionFraction)
     ;
 
 
@@ -1930,6 +1944,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("truss1d", &truss1d, py::return_value_policy::move);
     m.def("truss2d", &truss2d, py::return_value_policy::move);
     m.def("truss3d", &truss3d, py::return_value_policy::move);
+    m.def("rebar3d", &rebar3d, py::return_value_policy::move);
     m.def("beam2d", &beam2d, py::return_value_policy::move);
     m.def("beam3d", &beam3d, py::return_value_policy::move);
     m.def("libeam3d", &libeam3d, py::return_value_policy::move);
@@ -2015,6 +2030,7 @@ PYBIND11_MODULE(oofempy, m) {
 
 
     m.def("simpleCS", &simpleCS, py::return_value_policy::move);
+    m.def("rebarCS", &rebarCS, py::return_value_policy::move);
     m.def("simpleTransportCS", &simpleTransportCS, py::return_value_policy::move);
     m.def("InterfaceCS", &InterfaceCS, py::return_value_policy::move);
     
