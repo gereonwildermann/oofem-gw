@@ -700,6 +700,7 @@ public:
     friend class StructuralCrossSection;
     friend class SimpleCrossSection;
     friend class LayeredCrossSection;
+    friend class RebarCrossSection;
 };
 } // end namespace oofem
 #endif // structuralmaterial_h

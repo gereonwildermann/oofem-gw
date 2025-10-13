@@ -2243,7 +2243,7 @@ StructuralMaterial::computeStressIndependentStrainVector(GaussPoint *gp, TimeSte
         FloatArray gcoords, eigStrain;
         int err;
         elem->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
-        if ( ( err = tf->evaluateAt(eigStrain, gcoords, mode, tStep) ) ) {
+        if ( ( err = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep) ) ) {
             OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), err);
         }
         if ( answer.giveSize() ) {
@@ -2327,7 +2327,7 @@ StructuralMaterial::computeStressIndependentStrainVector_3d(GaussPoint *gp, Time
         FloatArray gcoords, eigStrain;
         int err;
         elem->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
-        if ( ( err = tf->evaluateAt(eigStrain, gcoords, mode, tStep) ) ) {
+        if ( ( err = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep) ) ) {
             OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), err);
         }
         if ( answer.giveSize() ) {
