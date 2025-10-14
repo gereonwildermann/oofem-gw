@@ -840,6 +840,7 @@ double Rebar3d::giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Value
         mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
         double density = this->giveCrossSection()->giveMaterial(gp)->give('d', gp);
         double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
+        x = std::min(x, diameter_0/2.0); // clamp to max corrosion depth of radius
         std::cout << "Rebar3d::giveCrossSectionReduction: x = " << x << " at element " << this->giveNumber() << std::endl;
         double Q_c = 4.0 * (x / diameter_0- std::pow(x / diameter_0, 2.0));
         std::cout << "Rebar3d::giveCrossSectionReduction: diameter_0 = " << diameter_0 << " at element " << this->giveNumber() << std::endl;

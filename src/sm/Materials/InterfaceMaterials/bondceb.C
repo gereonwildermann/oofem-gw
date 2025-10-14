@@ -137,6 +137,7 @@ BondCEBMaterial :: giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Va
         mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
         double density = 7850; // density of steel in kg/m3
         double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
+        x = std::min(x, diameter_0/2.0); // clamp to max corrosion depth of radius
         double Q_c = 4.0 * (x / diameter_0- std::pow(x / diameter_0, 2.0));
         // Clamp Q_c to the range [0, 1]
         Q_c = std::min(std::max(Q_c, 0.0), 1.0);
