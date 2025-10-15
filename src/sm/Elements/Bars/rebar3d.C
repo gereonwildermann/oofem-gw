@@ -835,19 +835,13 @@ double Rebar3d::giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Value
         DofManager *dm2 = this->domain->giveDofManager(2);
         cf->evaluateAt(mloss1, dm1, mode, tStep);
         cf->evaluateAt(mloss2, dm2, mode, tStep);
-        std::cout << "Rebar3d::giveCrossSectionReduction: mloss1 = " << mloss1 << " at node " << this->giveNode(1)->giveNumber() << std::endl;
-        std::cout << "Rebar3d::giveCrossSectionReduction: mloss2 = " << mloss2 << " at node " << this->giveNode(2)->giveNumber() << std::endl;
         mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
         double density = this->giveCrossSection()->giveMaterial(gp)->give('d', gp);
         double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
         x = std::min(x, diameter_0/2.0); // clamp to max corrosion depth of radius
-        std::cout << "Rebar3d::giveCrossSectionReduction: x = " << x << " at element " << this->giveNumber() << std::endl;
         double Q_c = 4.0 * (x / diameter_0- std::pow(x / diameter_0, 2.0));
-        std::cout << "Rebar3d::giveCrossSectionReduction: diameter_0 = " << diameter_0 << " at element " << this->giveNumber() << std::endl;
-        std::cout << "Rebar3d::giveCrossSectionReduction: Q_c = " << Q_c << " at element " << this->giveNumber() << std::endl;
         // Clamp Q_c to the range [0, 1]
         Q_c = std::min(std::max(Q_c, 0.0), 1.0);
-        std::cout << "Rebar3d::giveCrossSectionReduction: Q_c = " << Q_c << " at element " << this->giveNumber() << std::endl;
         return Q_c;
         }
     return 0.0;

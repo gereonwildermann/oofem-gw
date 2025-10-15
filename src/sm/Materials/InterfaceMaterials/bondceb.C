@@ -92,7 +92,6 @@ BondCEBMaterial :: giveEngTraction_3d(const FloatArrayF<3> &jump, GaussPoint *gp
         double smax1 = evaluateBondStress(tempKappa); 
         double smax2 = evaluateBondStress(tempKappa+seq);
         smax = std::min(smax1, smax2);
-        std::cout << "BondCEBMaterial" << " Qc: " << Qc << " smax1: " << smax1 << " smax2: " << smax2 << " smax: " << smax << std::endl;
 
     }else {
         smax = evaluateBondStress(tempKappa);
@@ -141,8 +140,6 @@ BondCEBMaterial :: giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Va
         double Q_c = 4.0 * (x / diameter_0- std::pow(x / diameter_0, 2.0));
         // Clamp Q_c to the range [0, 1]
         Q_c = std::min(std::max(Q_c, 0.0), 1.0);
-        std::cout << "BondCEBMaterial" << " Q_c: " << Q_c << std::endl;
-        std::cout << "BondCEBMaterial" << " mloss: " << mloss1.at(1) << " " << mloss2.at(1) << std::endl;
         return Q_c;
         }
     return 0.0;
