@@ -1,6 +1,6 @@
 [project]
 name = 'oofem'
-requires-python = '>=3.11'
+requires-python = '>=3.9'
 readme='README.md'
 license={'file'='COPYING.LGPLv2.1'}
 dynamic=['version']
