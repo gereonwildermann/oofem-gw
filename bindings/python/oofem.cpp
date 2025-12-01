@@ -1267,6 +1267,7 @@ PYBIND11_MODULE(oofempy, m) {
 
     py::class_<oofem::Rebar3d, oofem::Element, PyElement<oofem::Rebar3d>>(m, "Rebar3d")
         .def("computeMassCorroded", &oofem::Rebar3d::computeMassCorroded)
+        .def("giveCrossSectionReduction", &oofem::Rebar3d::giveCrossSectionReduction)
     ;
 
     py::class_<oofem::LSpace, oofem::Element, PyElement<oofem::LSpace>>(m, "LSpace")
