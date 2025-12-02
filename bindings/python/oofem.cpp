@@ -1977,6 +1977,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("lwedge", &lWedge, py::return_value_policy::move);
     m.def("qwedge", &qWedge, py::return_value_policy::move);
     m.def("IntELPoint", &IntELPoint, py::return_value_policy::move);
+    m.def("intElSurfQuad1", &intElSurfQuad1, py::return_value_policy::move);
     m.def("bondlink3d", &bondlink3d, py::return_value_policy::move);
     //transport elements
     m.def("line1ht", &line1ht, py::return_value_policy::move);
@@ -2028,7 +2029,9 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("concreteFcm", &concreteFcm, py::return_value_policy::move);
     m.def("concreteFcmViscoelastic", &concreteFcmViscoelastic, py::return_value_policy::move);
     m.def("bondceb", &bondceb, py::return_value_policy::move);
-
+    m.def("intMatIsoDamage", &intMatIsoDamage, py::return_value_policy::move);
+    m.def("intMatCoulombContact", &intMatCoulombContact, py::return_value_policy::move);
+    m.def("cohInt", &cohInt, py::return_value_policy::move);
 
     m.def("simpleCS", &simpleCS, py::return_value_policy::move);
     m.def("rebarCS", &rebarCS, py::return_value_policy::move);
