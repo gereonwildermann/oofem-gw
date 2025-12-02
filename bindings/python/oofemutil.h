@@ -420,6 +420,7 @@ py::object j2mat(py::args args, py::kwargs kw) { return createMaterialOfType("j2
 py::object steel1(py::args args, py::kwargs kw) { return createMaterialOfType("steel1",args,kw); }
 py::object upm(py::args args, py::kwargs kw) { return createMaterialOfType("upm",args,kw); }
 py::object misesmat(py::args args, py::kwargs kw) { return createMaterialOfType("misesmat",args,kw); }
+py::object druckerprager(py::args args, py::kwargs kw) { return createMaterialOfType("druckerprager",args,kw); }
 py::object mps(py::args args, py::kwargs kw) {
     if (kw.contains("w_c")) {
         kw["w/c"] = kw["w_c"];  // Rename w_c to w/c

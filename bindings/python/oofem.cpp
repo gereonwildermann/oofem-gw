@@ -2022,6 +2022,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("j2mat", &j2mat, py::return_value_policy::move);
     m.def("steel1", &steel1, py::return_value_policy::move);
     m.def("misesmat", &misesmat, py::return_value_policy::move);
+    m.def("druckerprager", &druckerprager, py::return_value_policy::move);
     m.def("mps", &mps, py::return_value_policy::move);
     m.def("ec2creepmat", &ec2creepmat, py::return_value_policy::move);
     m.def("concreteDPM", &concreteDPM, py::return_value_policy::move);
