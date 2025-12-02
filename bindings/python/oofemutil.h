@@ -303,7 +303,9 @@ py::object ltrspace(py::args args, py::kwargs &kw) { return createElementOfType(
 py::object qTRSpace(py::args args, py::kwargs &kw) { return createElementOfType("qtrspace",args,kw); } 
 py::object lWedge(py::args args, py::kwargs &kw) { return createElementOfType("lwedge",args,kw); }
 py::object qWedge(py::args args, py::kwargs &kw) { return createElementOfType("qwedge",args,kw); }
-py::object IntELPoint(py::args args, py::kwargs &kw) { return createElementOfType("IntELPoint",args,kw); } 
+py::object IntELPoint(py::args args, py::kwargs &kw) { return createElementOfType("intELPoint",args,kw); }
+py::object IntElLine1(py::args args, py::kwargs &kw) { return createElementOfType("intElLine1",args,kw); }
+py::object IntElSurfQuad1(py::args args, py::kwargs &kw) { return createElementOfType("intElSurfQuad1",args,kw); } 
 py::object bondlink3d(py::args args, py::kwargs &kw) { return createElementOfType("bondlink3d",args,kw); }
 //transport elements
 py::object line1ht(py::args args, py::kwargs &kw) { return createElementOfType("line1ht",args,kw); }
@@ -436,6 +438,9 @@ py::object steelrelaxmat(py::args args, py::kwargs kw) { return createMaterialOf
 py::object concreteFcm(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcm",args,kw); }
 py::object concreteFcmViscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcmViscoelastic",args,kw); }
 py::object bondceb(py::args args, py::kwargs kw) { return createMaterialOfType("bondceb",args,kw); }
+py::object intMatIsoDamage(py::args args, py::kwargs kw) { return createMaterialOfType("intMatIsoDamage",args,kw); }
+py::object intMatCoulombContact(py::args args, py::kwargs kw) { return createMaterialOfType("intMatCoulombContact",args,kw); }
+py::object cohInt(py::args args, py::kwargs kw) { return createMaterialOfType("cohInt",args,kw); }
 
 /*****************************************************
 * CrossSection

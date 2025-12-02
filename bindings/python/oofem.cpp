@@ -1977,7 +1977,8 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("lwedge", &lWedge, py::return_value_policy::move);
     m.def("qwedge", &qWedge, py::return_value_policy::move);
     m.def("IntELPoint", &IntELPoint, py::return_value_policy::move);
-    m.def("intElSurfQuad1", &intElSurfQuad1, py::return_value_policy::move);
+    m.def("IntElLine1", &IntElLine1, py::return_value_policy::move);
+    m.def("IntElSurfQuad1", &IntElSurfQuad1, py::return_value_policy::move);
     m.def("bondlink3d", &bondlink3d, py::return_value_policy::move);
     //transport elements
     m.def("line1ht", &line1ht, py::return_value_policy::move);
