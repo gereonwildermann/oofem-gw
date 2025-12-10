@@ -123,6 +123,8 @@ public:
      */
     virtual int evaluateAt(FloatArray &answer, DofManager *dman,
                            ValueModeType mode, TimeStep *tStep) = 0;
+    virtual int evaluateAt(FloatArray &answer, Element *elem,
+                           ValueModeType mode, TimeStep *tStep) { return 1; } 
 
     /// Returns the type of receiver
     FieldType giveType() { return type; }
