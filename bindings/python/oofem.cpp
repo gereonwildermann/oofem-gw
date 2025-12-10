@@ -1036,11 +1036,11 @@ PYBIND11_MODULE(oofempy, m) {
     ;
 
 
-    py::class_<oofem::InputRecord>(m, "InputRecord")
+    py::class_<oofem::InputRecord,std::shared_ptr<InputRecord>>(m, "InputRecord")
     ;
 
     typedef const char *InputFieldType;
-    py::class_<oofem::DynamicInputRecord, oofem::InputRecord>(m, "DynamicInputRecord")
+    py::class_<oofem::DynamicInputRecord, oofem::InputRecord,std::shared_ptr<DynamicInputRecord>>(m, "DynamicInputRecord")
         .def(py::init<std::string, int>(), py::arg("answer") = "", py::arg("value")=0)
         .def("finish", &oofem::DynamicInputRecord::finish, py::arg("wrn")=true)
         .def("setRecordKeywordField", &oofem::DynamicInputRecord::setRecordKeywordField)
@@ -1057,7 +1057,7 @@ PYBIND11_MODULE(oofempy, m) {
         .def("setField", (void (oofem::DynamicInputRecord::*)(InputFieldType)) &oofem::DynamicInputRecord::setField)
     ;
 
-    py::class_<oofem::OOFEMTXTInputRecord, oofem::InputRecord>(m, "OOFEMTXTInputRecord")
+    py::class_<oofem::OOFEMTXTInputRecord, oofem::InputRecord, std::shared_ptr<OOFEMTXTInputRecord>>(m, "OOFEMTXTInputRecord")
         .def(py::init<>())
         .def(py::init<int, std::string>())
         .def("finish", &oofem::OOFEMTXTInputRecord::finish, py::arg("wrn")=true)
@@ -1942,6 +1942,8 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("nonlinearstatic", &nonlinearStatic, py::return_value_policy::move);
     m.def("transientTransport", &transientTransport, py::return_value_policy::move);
     m.def("dummyProblem", &dummyProblem, py::return_value_policy::move);
+    m.def("mpmProblem", &mpmProblem, py::return_value_policy::move);
+
     m.def("domain", &domain, py::return_value_policy::move);
     //structural elements
     m.def("truss1d", &truss1d, py::return_value_policy::move);
@@ -2042,6 +2044,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("rebarCS", &rebarCS, py::return_value_policy::move);
     m.def("simpleTransportCS", &simpleTransportCS, py::return_value_policy::move);
     m.def("InterfaceCS", &InterfaceCS, py::return_value_policy::move);
+    m.def("dummyCS", &dummyCS, py::return_value_policy::move);
     
     m.def("peakFunction", &peakFunction, py::return_value_policy::move);
     m.def("constantFunction", &constantFunction, py::return_value_policy::move);
@@ -2056,6 +2059,7 @@ PYBIND11_MODULE(oofempy, m) {
     // mpm experimental
     m.def("skyline", &skyline, py::return_value_policy::move);
     m.def("ldltfactorization", &ldltFactorization, py::return_value_policy::move);
+    m.def("upquad11", &upQuad11, py::return_value_policy::move);
     m.def("q1", &q1, py::return_value_policy::move);
     m.def("l1", &l1, py::return_value_policy::move);
 

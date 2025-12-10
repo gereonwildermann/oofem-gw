@@ -892,7 +892,7 @@ MITC4Shell::givedNdx(const FloatArrayF< 3 > &coords)
 void
 MITC4Shell::setupIRForMassMtrxIntegration(IntegrationRule &iRule)
 {
-    iRule.setUpIntegrationPoints(this->giveIntegrationDomain(), nPointsXY, nPointsZ, this->giveMaterialMode() );
+    this->giveCrossSection()->setupIntegrationPoints(iRule, nPointsXY, nPointsZ, this);
 }
 
 int
@@ -1136,7 +1136,7 @@ void
 MITC4Shell::computeSurfaceNMatrixAt(FloatMatrix &answer, int iSurf, GaussPoint *sgp)
 {
     const auto &coords2 = sgp->giveNaturalCoordinates();
-    FloatArray coords = { coords2 [ 0 ], coords2 [ 1 ], 0. };
+    FloatArray coords = Vec3( coords2 [ 0 ], coords2 [ 1 ], 0. );
     this->computeNmatrixAt(coords, answer);
 }
 
