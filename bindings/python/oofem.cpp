@@ -2103,6 +2103,7 @@ PYBIND11_MODULE(oofempy, m) {
         .def("addNode", &oofem::DofManValueField::addNode )
         .def("addElement", &oofem::DofManValueField::addElement )
         .def("setDofManValue", &oofem::DofManValueField::setDofManValue )
+        .def("stashCurrentValues", &oofem::DofManValueField::stashCurrentValues )
         .def("getNodeCoordinates", &oofem::DofManValueField::getNodeCoordinates )
         ;
 

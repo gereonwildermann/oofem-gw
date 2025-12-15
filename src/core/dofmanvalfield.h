@@ -67,6 +67,10 @@ protected:
     Domain *domain;
     /// Array of dofman values
     std::vector< FloatArray >dmanvallist;
+    /// Array of dofman values from previous step (for incremental queries)
+    std::vector< FloatArray >prevDmanValList;
+    /// Flag indicating if previous values are available
+    bool hasPrevValues = false;
     /// Pointer to engineering model
     std::unique_ptr< EngngModel >eModel;
     /// Pointer to single cross-section;
@@ -119,6 +123,9 @@ public:
      * Sets the value associated to given dofManager
      */
     void setDofManValue(int dofMan, FloatArray value);
+
+    /// Stash the current nodal values as "previous" so VM_Incremental returns increments on the next update.
+    void stashCurrentValues();
 
     /**
      * Obtain coordinates of a node

@@ -54,6 +54,7 @@ DofManValueField::DofManValueField(FieldType ft, Domain *d) : Field(ft), dmanval
     int ndofman = d->giveNumberOfDofManagers();
     this->domain = d;
     this->dmanvallist.resize(ndofman);
+    this->prevDmanValList.resize(ndofman);
 }
 
 DofManValueField::DofManValueField(FieldType ft, int nNodes, int nElements, const std::string engngModel = "transienttransport", const std::string domainDofsDefaults = "heattransfer") : Field(ft), dmanvallist()
@@ -69,6 +70,7 @@ DofManValueField::DofManValueField(FieldType ft, int nNodes, int nElements, cons
     this->domain->dofManagerList.clear();
     this->domain->dofManagerList.resize(nNodes);
     dmanvallist.resize(nNodes);
+    prevDmanValList.resize(nNodes);
     this->domain->elementList.clear();
     this->domain->elementList.resize(nElements);
     this->crossSect = classFactory.createCrossSection("emptycs", 1, this->domain);//create one dummy cross-section
@@ -113,6 +115,7 @@ DofManValueField::evaluateAt(FloatArray &answer, const FloatArray &coords, Value
     int result = 0; // assume ok
     FloatArray lc, n;
     answer.resize(0);
+    FloatArray prevAnswer;
     
     // request element containing target point
     Element *elem = this->domain->giveSpatialLocalizer()->giveElementContainingPoint(coords);
@@ -127,6 +130,14 @@ DofManValueField::evaluateAt(FloatArray &answer, const FloatArray &coords, Value
                 for ( int i = 1; i <= n.giveSize(); i++ ) {
                     // multiply nodal value by value of corresponding shape function and add this to answer
                     answer.add(n.at(i), this->dmanvallist [ elem->giveDofManagerNumber(i) - 1 ]);
+                }
+
+                if ( mode == VM_Incremental && this->hasPrevValues ) {
+                    prevAnswer.resize(0);
+                    for ( int i = 1; i <= n.giveSize(); i++ ) {
+                        prevAnswer.add(n.at(i), this->prevDmanValList [ elem->giveDofManagerNumber(i) - 1 ]);
+                    }
+                    answer.subtract(prevAnswer);
                 }
             } else { // mapping from global to local coordinates failed
                 OOFEM_ERROR("Error in mapping from global to local coordinates\n");
@@ -145,6 +156,9 @@ int
 DofManValueField::evaluateAt(FloatArray &answer, DofManager *dman, ValueModeType mode, TimeStep *tStep)
 {
     answer = this->dmanvallist [ dman->giveNumber() - 1 ];
+    if ( mode == VM_Incremental && this->hasPrevValues ) {
+        answer.subtract(this->prevDmanValList [ dman->giveNumber() - 1 ]);
+    }
     return 1;
 }
 
@@ -152,6 +166,13 @@ void
 DofManValueField::setDofManValue(int dofMan, FloatArray value)
 {
     this->dmanvallist [ dofMan - 1 ] = std::move(value);
+}
+
+void
+DofManValueField::stashCurrentValues()
+{
+    this->prevDmanValList = this->dmanvallist;
+    this->hasPrevValues = true;
 }
 
 const FloatArray &DofManValueField::getNodeCoordinates(int i)
