@@ -32,7 +32,7 @@ exclude = ['**/_build','.*']
 [tool.py-build-cmake.cmake]
 minimum_version="3.17"
 build_type="Release"
-options = {'USE_PYBIND_BINDINGS'='1','USE_SHARED_LIB'='0','USE_SM'='1','USE_FM'='1','USE_TM'='1','USE_MPM'='1','USE_OOFEM_EXE'='0'}
+options = {'USE_PYBIND_BINDINGS'='1','USE_SHARED_LIB'='0','USE_SM'='1','USE_FM'='1','USE_TM'='1','USE_MPM'='1','USE_DSS'='1','USE_OOFEM_EXE'='0'}
 install_components=['python_module']
 # https://github.com/pypa/cibuildwheel/issues/643
 # use Ninja everywhere (including windows), where it needs compiler paths to be set up (done via setup-msvc-dev in cibuildwheel.yml)
@@ -49,6 +49,7 @@ USE_SM=1
 USE_FM=1
 USE_TM=1
 USE_MPM=1
+USE_DSS=1
 USE_OOFEM_EXE=0
 
 [[tool.scikit-build.overrides]]
