@@ -96,7 +96,7 @@ BondCEBMaterial :: giveEngTraction_3d(const FloatArrayF<3> &jump, GaussPoint *gp
     }else {
         smax = evaluateBondStress(tempKappa);
     }
-    smax = evaluateBondStress(tempKappa);
+    // smax = evaluateBondStress(tempKappa);
     // reduce shear tractions, if needed
     if ( s > smax ) {
         for ( int i = 2; i <= 3; i++ ) {
