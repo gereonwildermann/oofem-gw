@@ -51,6 +51,7 @@ USE_TM=1
 USE_MPM=1
 USE_DSS=1
 USE_OOFEM_EXE=0
+USE_OPENMP_PARALLEL = 1
 
 [[tool.scikit-build.overrides]]
 if.platform-system='win32'
