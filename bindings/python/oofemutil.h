@@ -377,6 +377,7 @@ py::object createGeneralBoundaryConditionOfType(const char* type, py::args args,
 
 py::object boundaryCondition(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("boundarycondition",args,kw); }
 py::object constantEdgeLoad(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("constantedgeload",args,kw); }
+py::object linearEdgeLoad(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("linearedgeload",args,kw); }
 py::object nodalLoad(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("nodalload",args,kw); }
 py::object structTemperatureLoad(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("structtemperatureload",args,kw); }
 py::object structEigenstrainLoad(py::args args, py::kwargs kw) { return createGeneralBoundaryConditionOfType("structEigenstrainLoad",args,kw); }
@@ -422,7 +423,12 @@ py::object hydratingConcreteMat(py::args args, py::kwargs kw) { return createMat
 py::object j2mat(py::args args, py::kwargs kw) { return createMaterialOfType("j2mat",args,kw); }
 py::object steel1(py::args args, py::kwargs kw) { return createMaterialOfType("steel1",args,kw); }
 py::object upm(py::args args, py::kwargs kw) { return createMaterialOfType("upm",args,kw); }
-py::object misesmat(py::args args, py::kwargs kw) { return createMaterialOfType("misesmat",args,kw); }
+py::object misesmat(py::args args, py::kwargs kw) {
+    if (kw.contains("h")) {
+        kw["h(eps)"] = kw["h"];  // Rename h to h(eps)
+        kw.attr("pop")("h");  // Remove original h
+    }
+    return createMaterialOfType("misesmat",args,kw); }
 py::object druckerprager(py::args args, py::kwargs kw) { return createMaterialOfType("druckerprager",args,kw); }
 py::object mps(py::args args, py::kwargs kw) {
     if (kw.contains("w_c")) {
@@ -435,12 +441,26 @@ py::object mps(py::args args, py::kwargs kw) {
     }
     return createMaterialOfType("mps", args, kw);
 }
+py::object mpsDamMat(py::args args, py::kwargs kw) {
+    if (kw.contains("w_c")) {
+        kw["w/c"] = kw["w_c"];  // Rename w_c to w/c
+        kw.attr("pop")("w_c");  // Remove original w_c
+    }
+    if (kw.contains("a_c")) {
+        kw["a/c"] = kw["a_c"];  // Rename a_c to a/c
+        kw.attr("pop")("a_c");  // Remove original a_c
+    }
+    return createMaterialOfType("mpsdammat", args, kw); 
+}
 py::object ec2creepmat(py::args args, py::kwargs kw) { return createMaterialOfType("ec2creepmat",args,kw); }
 py::object concreteDPM(py::args args, py::kwargs kw) { return createMaterialOfType("concretedpm",args,kw); }
 py::object mazarsmodel(py::args args, py::kwargs kw) { return createMaterialOfType("mazarsmodel",args,kw); }
 py::object steelrelaxmat(py::args args, py::kwargs kw) { return createMaterialOfType("steelrelaxmat",args,kw); }
 py::object concreteFcm(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcm",args,kw); }
 py::object concreteFcmViscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("concreteFcmViscoelastic",args,kw); }
+// py::object degredationisoLE(py::args args, py::kwargs kw) { return createMaterialOfType("degredationisole",args,kw); }
+py::object degredationconcretefcm(py::args args, py::kwargs kw) { return createMaterialOfType("degredationconcretefcm",args,kw); }
+py::object degredationconcretefcmviscoelastic(py::args args, py::kwargs kw) { return createMaterialOfType("degredationconcretefcmviscoelastic",args,kw); }
 py::object bondceb(py::args args, py::kwargs kw) { return createMaterialOfType("bondceb",args,kw); }
 py::object intMatIsoDamage(py::args args, py::kwargs kw) { return createMaterialOfType("intMatIsoDamage",args,kw); }
 py::object intMatCoulombContact(py::args args, py::kwargs kw) { return createMaterialOfType("intMatCoulombContact",args,kw); }
