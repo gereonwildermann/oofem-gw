@@ -60,7 +60,8 @@ namespace oofem {
     ENUM_ITEM_WITH_VALUE(FT_EigenStrain, 9) \
     ENUM_ITEM_WITH_VALUE(FT_VOF, 10) \
     ENUM_ITEM_WITH_VALUE(FT_CorrosionMassLoss, 11) \
-    ENUM_ITEM_WITH_VALUE(FT_CorrosionFraction, 12)
+    ENUM_ITEM_WITH_VALUE(FT_CorrosionFraction, 12) \
+    ENUM_ITEM_WITH_VALUE(FT_DegreeOfDegradation, 13)
 
 /// Physical type of field.
 enum FieldType {
