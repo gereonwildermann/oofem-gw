@@ -88,7 +88,7 @@ BondCEBMaterial :: giveEngTraction_3d(const FloatArrayF<3> &jump, GaussPoint *gp
     double smax;
     if ( (cf = fm->giveField(FT_CorrosionFraction))) {
         double Qc = const_cast<BondCEBMaterial*>(this)->giveCrossSectionReduction(gp, tStep, VM_Total);
-        double seq = 0.0136*Qc; // EC2020 13.6 mm*Qc with stirups
+        double seq = 0.0029*Qc; // EC2020 13.6 mm*Qc with stirups, 2.9 mm without stirups
         double smax1 = evaluateBondStress(tempKappa); 
         double smax2 = evaluateBondStress(tempKappa+seq);
         smax = std::min(smax1, smax2);
