@@ -25,6 +25,8 @@ set (sm_material
     ConcreteMaterials/compodamagemat.C
     ConcreteMaterials/concretefcm.C
     ConcreteMaterials/concretefcmviscoelastic.C
+    ConcreteMaterials/degredationconcretefcm.C 
+    ConcreteMaterials/degredationconcretefcmviscoelastic.C
     ConcreteMaterials/frcfcm.C
     ConcreteMaterials/frcfcmnl.C
     RheoChainMaterials/rheoChM.C 
