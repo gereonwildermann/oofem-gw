@@ -41,6 +41,7 @@
 #include "datastream.h"
 #include "classfactory.h"
 #include "function.h"
+#include <iostream>
 
 namespace oofem {
 REGISTER_Material(MPSMaterial);
@@ -665,7 +666,6 @@ MPSMaterial::computeCharTimes()
 
     //first retardation time found in given by formula 0.3 * begOfTimeOfInterest
     double Tau1 = 0.3 * this->begOfTimeOfInterest;
-
     //last retardation time has to be bigger than 0.5 * endOfTimeOfInterest
     this->endOfTimeOfInterest = RheoChainMaterial::giveEndOfTimeOfInterest();
 
@@ -675,7 +675,6 @@ MPSMaterial::computeCharTimes()
     }
 
     this->nUnits = j;
-
     this->charTimes.resize(this->nUnits);
     this->charTimes.zero();
 
