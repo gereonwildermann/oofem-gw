@@ -1271,6 +1271,7 @@ PYBIND11_MODULE(oofempy, m) {
         .def("computeMassCorroded", &oofem::Rebar3d::computeMassCorroded)
         .def("giveCrossSectionReduction", &oofem::Rebar3d::giveCrossSectionReduction)
         .def("giveLocalCoordinateSystem", &oofem::Rebar3d::giveLocalCoordinateSystem)
+        .def("computeLength", &oofem::Rebar3d::computeLength)
     ;
 
     py::class_<oofem::LSpace, oofem::Element, PyElement<oofem::LSpace>>(m, "LSpace")
@@ -1584,6 +1585,7 @@ PYBIND11_MODULE(oofempy, m) {
         .value("FT_VOF", oofem::FieldType::FT_VOF)
         .value("FT_CorrosionMassLoss", oofem::FieldType::FT_CorrosionMassLoss)
         .value("FT_CorrosionFraction", oofem::FieldType::FT_CorrosionFraction)
+        .value("FT_DegreeOfDegradation", oofem::FieldType::FT_DegreeOfDegradation)
     ;
 
 
@@ -2015,6 +2017,7 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("boundaryCondition", &boundaryCondition, py::return_value_policy::move);
     m.def("initialCondition", &initialCondition, py::return_value_policy::move);
     m.def("constantEdgeLoad", &constantEdgeLoad, py::return_value_policy::move);
+    m.def("linearEdgeLoad", &linearEdgeLoad, py::return_value_policy::move);
     m.def("constantSurfaceLoad", &constantSurfaceLoad, py::return_value_policy::move);
     m.def("DeadWeight", &deadWeight, py::return_value_policy::move);
     m.def("nodalLoad", &nodalLoad, py::return_value_policy::move);
@@ -2030,12 +2033,16 @@ PYBIND11_MODULE(oofempy, m) {
     m.def("misesmat", &misesmat, py::return_value_policy::move);
     m.def("druckerprager", &druckerprager, py::return_value_policy::move);
     m.def("mps", &mps, py::return_value_policy::move);
+    m.def("mpsDamMat", &mpsDamMat, py::return_value_policy::move);
     m.def("ec2creepmat", &ec2creepmat, py::return_value_policy::move);
     m.def("concreteDPM", &concreteDPM, py::return_value_policy::move);
     m.def("mazarsmodel", &mazarsmodel, py::return_value_policy::move);
     m.def("steelrelaxmat", &steelrelaxmat, py::return_value_policy::move);
     m.def("concreteFcm", &concreteFcm, py::return_value_policy::move);
     m.def("concreteFcmViscoelastic", &concreteFcmViscoelastic, py::return_value_policy::move);
+    // m.def("degredationisoLE", &degredationisoLE, py::return_value_policy::move);
+    m.def("degredationconcretefcm", &degredationconcretefcm, py::return_value_policy::move);
+    m.def("degredationconcretefcmviscoelastic", &degredationconcretefcmviscoelastic, py::return_value_policy::move);
     m.def("bondceb", &bondceb, py::return_value_policy::move);
     m.def("intMatIsoDamage", &intMatIsoDamage, py::return_value_policy::move);
     m.def("intMatCoulombContact", &intMatCoulombContact, py::return_value_policy::move);
