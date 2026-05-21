@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -208,11 +208,11 @@ IntElPoint :: computeGaussPoints()
 
 
 int
-IntElPoint :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+IntElPoint :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     answer = this->giveNode(1)->giveCoordinates();
-    answer.add(this->giveNode(2)->giveCoordinates());
-    answer.times(0.5);
+    answer+= this->giveNode(2)->giveCoordinates();
+    answer*=0.5;
     return 1;
 }
 
@@ -233,7 +233,7 @@ IntElPoint :: computeAreaAround(GaussPoint *gp)
 
 
 void
-IntElPoint :: initializeFrom(InputRecord &ir, int priority)
+IntElPoint :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     // Initialize the receiver from the given input record.
     bool flag;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -50,7 +50,7 @@ Particle :: Particle(int n, Domain *aDomain) : Node(n, aDomain)
 
 
 void
-Particle :: initializeFrom(InputRecord &ir, int priority)
+Particle :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm =  domain->dofmanPPM;
 

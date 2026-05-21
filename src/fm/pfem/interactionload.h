@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,7 +71,7 @@ public:
     void computeValueAt(FloatArray &answer, TimeStep *tStep, const FloatArray &coords, ValueModeType mode) override;
 
     int giveApproxOrder() override { return 1; }
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     bcGeomType giveBCGeoType() const override { return EdgeLoadBGT; }
     FormulationType giveFormulationType() override { return formulation; }

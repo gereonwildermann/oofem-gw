@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ DruckerPragerCutMat :: hasMaterialModeCapability(MaterialMode mode) const
 
 // reads the model parameters from the input file
 void
-DruckerPragerCutMat :: initializeFrom(InputRecord &ir)
+DruckerPragerCutMat :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
     linearElasticMaterial->initializeFrom(ir); // takes care of elastic constants

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,11 +63,11 @@ FEI3dQuadLin :: evaldNdxi(FloatMatrix &answer, const FloatArray &lcoords, const 
 
 
 void
-FEI3dQuadLin :: local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+FEI3dQuadLin :: local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     FloatArray n;
     this->evalN(n, lcoords, cellgeo);
-    answer.resize(0);
+    answer.zero();
     for ( int i = 1; i <= 4; ++i ) {
         answer.add( n.at(i), cellgeo.giveVertexCoordinates(i) );
     }
@@ -75,7 +75,7 @@ FEI3dQuadLin :: local2global(FloatArray &answer, const FloatArray &lcoords, cons
 
 #define POINT_TOL 1.e-3
 int
-FEI3dQuadLin :: global2local(FloatArray &answer, const FloatArray &gcoords, const FEICellGeometry &cellgeo) const
+FEI3dQuadLin :: global2local(FloatArray &answer, const Coordinates &gcoords, const FEICellGeometry &cellgeo) const
 {
     OOFEM_ERROR("FEI3dQuadLin :: global2local - Not supported");
     //return -1;
@@ -123,14 +123,14 @@ FEI3dQuadLin :: edgeEvaldNdxi(FloatArray &answer, int iedge, const FloatArray &l
 }
 
 void
-FEI3dQuadLin :: edgeLocal2global(FloatArray &answer, int iedge,
+FEI3dQuadLin :: edgeLocal2global(Coordinates &answer, int iedge,
                                 const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     FloatArray N;
     const auto &edgeNodes = this->computeLocalEdgeMapping(iedge);
     this->edgeEvalN(N, iedge, lcoords, cellgeo);
 
-    answer.resize(0);
+    answer.zero();
     for ( int i = 0; i < N.giveSize(); ++i ) {
         answer.add( N[i], cellgeo.giveVertexCoordinates( edgeNodes[i] ) );
     }
@@ -208,14 +208,42 @@ FEI3dQuadLin :: surfaceEvaldNdxi(FloatMatrix &answer, const FloatArray &lcoords)
 
 
 void
-FEI3dQuadLin :: surfaceLocal2global(FloatArray &answer, int isurf,
+FEI3dQuadLin :: surfaceEvald2Ndxi2(FloatMatrix &answer, const FloatArray &lcoords) const
+{
+
+    answer.resize(4, 3);
+    // d2n/dxidxi
+    answer.at(1, 1) = 0.;
+    answer.at(2, 1) = 0.;
+    answer.at(3, 1) = 0.;
+    answer.at(4, 1) = 0.;
+
+    // d2n/detadeta
+    answer.at(1, 2) = 0.;
+    answer.at(2, 2) = 0.;
+    answer.at(3, 2) = 0.;
+    answer.at(4, 2) = 0.;
+
+    // d2n/dxideta
+    answer.at(1, 3) = 0.25;
+    answer.at(2, 3) = -0.25;
+    answer.at(3, 3) = 0.25;
+    answer.at(4, 3) = -0.25;
+
+
+}
+  
+
+
+void
+FEI3dQuadLin :: surfaceLocal2global(Coordinates &answer, int isurf,
                                    const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     //Note: This gives the coordinate in the reference system
     FloatArray N;
     this->surfaceEvalN(N, isurf, lcoords, cellgeo);
 
-    answer.resize(0);
+    answer.zero();
     for ( int i = 1; i <= N.giveSize(); ++i ) {
         answer.add( N.at(i), cellgeo.giveVertexCoordinates(i) );
     }
@@ -286,7 +314,8 @@ IntArray
 FEI3dQuadLin :: computeLocalSurfaceMapping(int isurf) const
 {
     //surfNodes.setValues(3, 1, 2, 3);
-    return computeLocalEdgeMapping(isurf);
+    //return computeLocalEdgeMapping(isurf);
+    return {1,2,3,4};
 
 }
 

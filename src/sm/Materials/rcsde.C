@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -252,7 +252,7 @@ RCSDEMaterial :: computeCurrEquivStrain(GaussPoint *gp, const FloatArray &reduce
 
 
 void
-RCSDEMaterial :: initializeFrom(InputRecord &ir)
+RCSDEMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RCM2Material :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, SDTransitionCoeff, _IFT_RCSDEMaterial_sdtransitioncoeff);

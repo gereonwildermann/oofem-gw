@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -49,7 +49,7 @@ TutorialMaterial :: TutorialMaterial(int n, Domain *d) : StructuralMaterial(n, d
 
 
 void
-TutorialMaterial :: initializeFrom(InputRecord &ir)
+TutorialMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 

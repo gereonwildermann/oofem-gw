@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -115,7 +115,7 @@ Quad10_2D_SUPG :: giveInternalDofManDofIDMask(int i, IntArray &answer) const
 
 
 void
-Quad10_2D_SUPG :: initializeFrom(InputRecord &ir, int priority)
+Quad10_2D_SUPG :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     this->pressureNode.initializeFrom(ir, priority);
 
@@ -557,10 +557,10 @@ Quad10_2D_SUPG :: giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateT
         if ( mi ) {
             FloatArray val;
             mi->giveElementMaterialMixture( val, gp->giveElement()->giveNumber() );
-            answer = FloatArray{val.at(1)};
+            answer = Vec1(val.at(1));
             return 1;
         } else {
-            answer = FloatArray{1.0};
+            answer = Vec1(1.0);
             return 1;
         }
     } else {

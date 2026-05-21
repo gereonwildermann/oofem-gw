@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -112,7 +112,7 @@ class FRCFCM : public ConcreteFCM
 public:
     FRCFCM(int n, Domain *d);
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     std::unique_ptr<MaterialStatus> CreateStatus(GaussPoint *gp) const override { return std::make_unique<FRCFCMStatus>(gp); }
 

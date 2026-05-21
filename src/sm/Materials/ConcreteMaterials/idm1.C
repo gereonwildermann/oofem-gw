@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -83,7 +83,7 @@ IsotropicDamageMaterial1 :: ~IsotropicDamageMaterial1()
 }
 
 void
-IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
+IsotropicDamageMaterial1 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     int equivStrainTypeRecord;
     IsotropicDamageMaterial :: initializeFrom(ir);
@@ -127,10 +127,10 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
     //applies only in this class
     switch ( damageLaw ) {
     case 0:     // exponential softening - default
-        if ( ir.hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
+        if ( ir->hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
             this->softType = ST_Exponential_Cohesive_Crack;
             IR_GIVE_FIELD(ir, wf, _IFT_IsotropicDamageMaterial1_wf);
-        } else if ( ir.hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
+        } else if ( ir->hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
             this->softType = ST_Exponential_Cohesive_Crack;
             IR_GIVE_FIELD(ir, gf, _IFT_IsotropicDamageMaterial1_gf);
         } else {
@@ -140,10 +140,10 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
 
         break;
     case 1:     // linear softening law
-        if ( ir.hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
+        if ( ir->hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
             this->softType = ST_Linear_Cohesive_Crack;
             IR_GIVE_FIELD(ir, wf, _IFT_IsotropicDamageMaterial1_wf);
-        } else if ( ir.hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
+        } else if ( ir->hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
             this->softType = ST_Linear_Cohesive_Crack;
             IR_GIVE_FIELD(ir, gf, _IFT_IsotropicDamageMaterial1_gf);
         } else {
@@ -159,13 +159,13 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
         wf  = 0.;
         wk  = 0.;
         sk  = 0.;
-        if ( ir.hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
+        if ( ir->hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
             this->softType = ST_BiLinear_Cohesive_Crack;
             IR_GIVE_FIELD(ir, gf, _IFT_IsotropicDamageMaterial1_gf);
             // Gft is for the bilinear law, and corresponds to the total energy required to fail the specimen
             IR_GIVE_FIELD(ir, gft, _IFT_IsotropicDamageMaterial1_gft);
 
-            if ( ir.hasField(_IFT_IsotropicDamageMaterial1_ek) ) {
+            if ( ir->hasField(_IFT_IsotropicDamageMaterial1_ek) ) {
                 // ek is for the bilinear law, and corresponds to the strain at the knee point
                 IR_GIVE_FIELD(ir, ek, _IFT_IsotropicDamageMaterial1_ek);
             } else {
@@ -186,7 +186,7 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
                 gf = 0.;
                 gft = 0.;
             }
-        } else if ( ir.hasField(_IFT_IsotropicDamageMaterial1_wk) ) {
+        } else if ( ir->hasField(_IFT_IsotropicDamageMaterial1_wk) ) {
             double E;
 
             this->softType = ST_BiLinear_Cohesive_Crack;
@@ -203,7 +203,7 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
             if ( sk < 0.0 || sk > e0 * E ) {
                 throw ValueInputException(ir, _IFT_IsotropicDamageMaterial1_sk, "Bilinear softening: sk must be in interval <0;ft>");
             }
-        } else if ( ir.hasField(_IFT_IsotropicDamageMaterial1_wkwf) ) {
+        } else if ( ir->hasField(_IFT_IsotropicDamageMaterial1_wkwf) ) {
             double dummy, E;
             this->softType = ST_BiLinear_Cohesive_Crack;
             IR_GIVE_FIELD(ir, wf, _IFT_IsotropicDamageMaterial1_wf);
@@ -251,9 +251,9 @@ IsotropicDamageMaterial1 :: initializeFrom(InputRecord &ir)
         IR_GIVE_OPTIONAL_FIELD(ir, c1, _IFT_IsotropicDamageMaterial1_c1);
         c2 = 6.93;
         IR_GIVE_OPTIONAL_FIELD(ir, c2, _IFT_IsotropicDamageMaterial1_c2);
-        if ( ir.hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
+        if ( ir->hasField(_IFT_IsotropicDamageMaterial1_wf) ) {
             IR_GIVE_FIELD(ir, wf, _IFT_IsotropicDamageMaterial1_wf);
-        } else if ( ir.hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
+        } else if ( ir->hasField(_IFT_IsotropicDamageMaterial1_gf) ) {
             IR_GIVE_FIELD(ir, gf, _IFT_IsotropicDamageMaterial1_gf);
             double E;
             IR_GIVE_FIELD(ir, E, _IFT_IsotropicLinearElasticMaterial_e);
@@ -934,7 +934,7 @@ IsotropicDamageMaterial1 :: computeDamageParamForCohesiveCrack(double kappa, Gau
             OOFEM_WARNING("damage parameter is %f, which is greater than 1, snap-back problems", omega);
             omega = maxOmega;
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         }
 
@@ -942,7 +942,7 @@ IsotropicDamageMaterial1 :: computeDamageParamForCohesiveCrack(double kappa, Gau
             OOFEM_WARNING("damage parameter is %f, which is smaller than 0, snap-back problems", omega);
             omega = 0.0;
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         }
     }
@@ -1223,7 +1223,7 @@ IsotropicDamageMaterial1 :: initDamaged(double kappa, FloatArray &strainVector, 
 
         // Use orientation of the worst inclusion for Griffith criterion in compression.
         if ( this->equivStrainType == EST_Griffith ) {
-            FloatArray stress, fullStress, principalStress, crackV(3), crackPlaneN(3);
+            FloatArray stress, fullStress, principalStress, crackV(3); // , crackPlaneN(3);
             FloatMatrix de;
             LinearElasticMaterial *lmat = this->linearElasticMaterial;
             lmat->giveStiffnessMatrix( de, SecantStiffness, gp, domain->giveEngngModel()->giveCurrentStep() );
@@ -1247,7 +1247,7 @@ IsotropicDamageMaterial1 :: initDamaged(double kappa, FloatArray &strainVector, 
                 double psi = acos(twoPsi) / 2.;
                 for ( int i = 1; i <= 3; i++ ) {
                     crackV.at(i) = principalDir.at(i, indexMin);
-                    crackPlaneN = principalDir.at(i, indexMax);
+                    // crackPlaneN = Vec1(principalDir.at(i, indexMax));
                 }
 
                 //rotate around indexMid axis
@@ -1304,17 +1304,17 @@ IsotropicDamageMaterial1 :: initDamaged(double kappa, FloatArray &strainVector, 
         if ( this->gf != 0. && e0 >= ( wf / le ) ) { // case for a given fracture energy
             OOFEM_WARNING("Fracturing strain %e is lower than the elastic strain e0=%e, possible snap-back. Element number %d, wf %e, le %e", wf / le, e0, gp->giveElement()->giveLabel(), wf, le);
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         } else if ( wf == 0. && e0 >= ef ) {
             OOFEM_WARNING( "Fracturing strain ef=%e is lower than the elastic strain e0=%f, possible snap-back. Increase fracturing strain to %f. Element number %d", ef, e0, e0, gp->giveElement()->giveLabel() );
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         } else if ( ef == 0. && e0 * le >= wf ) {
             OOFEM_WARNING( "Crack opening at zero stress wf=%f is lower than the elastic displacement w0=%f, possible snap-back. Increase crack opening wf to %f. Element number %d", wf, e0 * le, e0 * le, gp->giveElement()->giveLabel() );
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         }
     }
@@ -1360,7 +1360,7 @@ IsotropicDamageMaterial1::saveContext(DataStream &stream, ContextMode mode)
     if ( ( mode & CM_Definition ) ) {
         DynamicInputRecord input;
         this->giveInputRecord(input);
-        if ( !stream.write(input.giveRecordAsString()
+        if ( !stream.write(input.giveRecordInTXTFormat()
                            ) ) {
             THROW_CIOERR(CIO_IOERR);
         }
@@ -1376,7 +1376,7 @@ IsotropicDamageMaterial1::restoreContext(DataStream &stream, ContextMode mode)
         if ( !stream.read(input) ) {
             THROW_CIOERR(CIO_IOERR);
         }
-        OOFEMTXTInputRecord ir(0, input);
+        auto ir=std::make_shared<OOFEMTXTInputRecord>(0,input);
         this->initializeFrom(ir);
     }
 }

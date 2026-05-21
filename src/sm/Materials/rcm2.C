@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -780,7 +780,7 @@ RCM2Material :: updateActiveCrackMap(GaussPoint *gp, const IntArray *activatedCr
 
 
 void
-RCM2Material :: initializeFrom(InputRecord &ir)
+RCM2Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, Gf, _IFT_RCM2Material_gf);
     IR_GIVE_FIELD(ir, Ft, _IFT_RCM2Material_ft);

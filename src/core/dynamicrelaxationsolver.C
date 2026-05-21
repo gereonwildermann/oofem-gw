@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -57,7 +57,7 @@ DynamicRelaxationSolver :: DynamicRelaxationSolver(Domain *d, EngngModel *m) : N
 
 
 void
-DynamicRelaxationSolver :: initializeFrom(InputRecord &ir)
+DynamicRelaxationSolver :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     NRSolver :: initializeFrom(ir);
 }

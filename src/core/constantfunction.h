@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -65,12 +65,12 @@ public:
     /// @return Value of receiver.
     double giveValue() { return value; }
 
-    void evaluate(FloatArray &answer, const std :: map< std :: string, FunctionArgument > &valDict, GaussPoint *gp=nullptr, double param=0.) override { answer = FloatArray{this->giveValue()}; }
+    void evaluate(FloatArray &answer, const std :: map< std :: string, FunctionArgument > &valDict, GaussPoint *gp=nullptr, double param=0.) override { answer = Vec1(this->giveValue()); }
     double evaluateAtTime(double t) override { return this->giveValue(); }
     double evaluateVelocityAtTime(double t) override { return 0.; }
     double evaluateAccelerationAtTime(double t) override { return 0.; }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
 
     const char *giveClassName() const override { return "ConstantFunction"; }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -94,7 +94,7 @@ void DepositedHeatSource :: computeValueAt(FloatArray &answer, TimeStep *tStep, 
     }
 }
 
-void DepositedHeatSource::initializeFrom(InputRecord &ir)
+void DepositedHeatSource::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     GeneralBoundaryCondition::initializeFrom(ir);
     IR_GIVE_FIELD (ir, depositedMaterialID, _IFT_DepositedHeatSource_depositedmaterialid);

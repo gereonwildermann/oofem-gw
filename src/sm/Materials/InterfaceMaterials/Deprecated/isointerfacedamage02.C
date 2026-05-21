@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -165,7 +165,7 @@ IsoInterfaceDamageMaterial_2 :: giveIPValue(FloatArray &answer, GaussPoint *gp, 
 
 
 void
-IsoInterfaceDamageMaterial_2 :: initializeFrom(InputRecord &ir)
+IsoInterfaceDamageMaterial_2 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

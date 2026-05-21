@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -118,7 +118,7 @@ IntElLine2 :: giveInterpolation() const
 
 
 void
-IntElLine2 :: initializeFrom(InputRecord &ir, int priority)
+IntElLine2 :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     IntElLine1 :: initializeFrom(ir, priority);
     ParameterManager &ppm = domain->elementPPM;

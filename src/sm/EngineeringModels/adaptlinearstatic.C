@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -134,7 +134,7 @@ void AdaptiveLinearStatic :: restoreContext(DataStream &stream, ContextMode mode
 }
 
 void
-AdaptiveLinearStatic :: initializeFrom(InputRecord &ir)
+AdaptiveLinearStatic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LinearStatic :: initializeFrom(ir);
 

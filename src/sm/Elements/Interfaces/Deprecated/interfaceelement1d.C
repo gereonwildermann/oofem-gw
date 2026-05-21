@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -93,7 +93,7 @@ InterfaceElem1d :: computeStressVector(FloatArray &answer, const FloatArray &str
 {
     setCoordMode();
     switch ( mode ) {
-        case ie1d_1d: answer = FloatArray{static_cast< StructuralInterfaceCrossSection* >(this->giveCrossSection())->giveEngTraction_1d(strain.at(1), gp, tStep)}; return;
+        case ie1d_1d: answer = Vec1(static_cast< StructuralInterfaceCrossSection* >(this->giveCrossSection())->giveEngTraction_1d(strain.at(1), gp, tStep)); return;
         case ie1d_2d: answer = static_cast< StructuralInterfaceCrossSection* >(this->giveCrossSection())->giveEngTraction_2d(strain, gp, tStep); return;
         case ie1d_3d: answer = static_cast< StructuralInterfaceCrossSection* >(this->giveCrossSection())->giveEngTraction_3d(strain, gp, tStep); return;
     }
@@ -254,7 +254,7 @@ InterfaceElem1d :: computeGaussPoints()
 
 
 int
-InterfaceElem1d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+InterfaceElem1d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     answer = this->giveNode(1)->giveCoordinates();
 
@@ -263,7 +263,7 @@ InterfaceElem1d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray
 
 
 bool
-InterfaceElem1d :: computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords)
+InterfaceElem1d :: computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords)
 {
     OOFEM_ERROR("Not implemented");
     //return false;
@@ -279,7 +279,7 @@ InterfaceElem1d :: computeVolumeAround(GaussPoint *gp)
 
 
 void
-InterfaceElem1d :: initializeFrom(InputRecord &ir, int priority)
+InterfaceElem1d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm =  this->giveDomain()->elementPPM;
     StructuralElement :: initializeFrom(ir, priority);

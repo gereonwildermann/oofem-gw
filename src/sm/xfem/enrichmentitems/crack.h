@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -36,13 +36,13 @@
 
 #include "xfem/enrichmentitem.h"
 #include "xfem/hybridei.h"
+#include "inputrecord.h"
 
 #define _IFT_Crack_Name "crack"
 
 namespace oofem {
 class XfemManager;
 class Domain;
-class InputRecord;
 class GaussPoint;
 class GnuplotExportModule;
 
@@ -58,7 +58,7 @@ public:
 
     const char *giveClassName() const override { return "Crack"; }
     const char *giveInputRecordName() const override { return _IFT_Crack_Name; }
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     void AppendCohesiveZoneGaussPoint(GaussPoint *ipGP);
     void ClearCohesiveZoneGaussPoints() {mCohesiveZoneGaussPoints.clear(); mCohesiveZoneArcPositions.clear();}
@@ -68,8 +68,8 @@ public:
     const std :: vector< GaussPoint * > &giveCohesiveZoneGaussPoints() const { return mCohesiveZoneGaussPoints; }
     const std :: vector< double > &giveCohesiveZoneArcPositions() const { return mCohesiveZoneArcPositions; }
 
-    void computeCrackIntersectionPoints(Crack &iCrack, std :: vector< FloatArray > &oIntersectionPoints, std :: vector< double > &oArcPositions);
-    void computeArcPoints(const std :: vector< FloatArray > &iIntersectionPoints, std :: vector< double > &oArcPositions);
+    void computeCrackIntersectionPoints(Crack &iCrack, std :: vector< Coordinates > &oIntersectionPoints, std :: vector< double > &oArcPositions);
+    void computeArcPoints(const std :: vector< Coordinates > &iIntersectionPoints, std :: vector< double > &oArcPositions);
     double computeLength();
     int giveDofPoolSize() const override;
 

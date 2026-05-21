@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -66,7 +66,7 @@ Pdelta :: Pdelta(int i, EngngModel *_master) : LinearStatic(i, _master)
 }
 
 void
-Pdelta :: initializeFrom(InputRecord &ir)
+Pdelta :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LinearStatic :: initializeFrom(ir);
 

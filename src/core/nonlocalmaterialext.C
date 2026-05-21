@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -154,7 +154,7 @@ NonlocalMaterialExtensionInterface :: buildNonlocalPointTable(GaussPoint *gp) co
 
     auto iList = statusExt->giveIntegrationDomainList();
 
-    FloatArray gpCoords, jGpCoords, shiftedGpCoords;
+    Coordinates gpCoords, jGpCoords, shiftedGpCoords;
     if ( gp->giveElement()->computeGlobalCoordinates( gpCoords, gp->giveNaturalCoordinates() ) == 0 ) {
         OOFEM_ERROR("computeGlobalCoordinates of target failed");
     }
@@ -249,7 +249,7 @@ void
         // no element table provided, use standard method
       this->buildNonlocalPointTable(gp);
     } else {
-        FloatArray gpCoords, jGpCoords;
+        Coordinates gpCoords, jGpCoords;
         int _size = contributingElems->giveSize();
         if ( gp->giveElement()->computeGlobalCoordinates( gpCoords, gp->giveNaturalCoordinates() ) == 0 ) {
             OOFEM_ERROR("computeGlobalCoordinates of target failed");
@@ -314,7 +314,7 @@ void
   NonlocalMaterialExtensionInterface :: modifyNonlocalWeightFunctionAround(GaussPoint *gp) const
 {
     Element *elem = gp->giveElement();
-    FloatArray coords;
+    Coordinates coords;
     // Grid on which the eikonal equation will be solved (used by eikonal nonlocal models)
     Grid grid(2 *gridSize + 1, 2 *gridSize + 1);
     // Auxiliary matrix to store minimum distances of grid points from Gauss points
@@ -344,7 +344,7 @@ void
 
     auto *list = this->giveIPIntegrationList(gp);
     Element *ngpElem;
-    FloatArray ngpCoords(2);
+    Coordinates ngpCoords;
 
     // This is the proper initialization for a truly eikonal damage model
 
@@ -463,7 +463,7 @@ NonlocalMaterialExtensionInterface :: modifyNonlocalWeightFunction_1D_Around(Gau
     }
 
     Element *elem = gp->giveElement();
-    FloatArray coords;
+    Coordinates coords;
     elem->computeGlobalCoordinates( coords, gp->giveNaturalCoordinates() );
     double xtarget = coords.at(1);
 
@@ -763,9 +763,9 @@ NonlocalMaterialExtensionInterface :: evaluateSupportRadius(double cl) const
 
 
 void
-NonlocalMaterialExtensionInterface :: initializeFrom(InputRecord &ir)
+NonlocalMaterialExtensionInterface :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
-    if ( ir.hasField(_IFT_NonlocalMaterialExtensionInterface_regionmap) ) {
+    if ( ir->hasField(_IFT_NonlocalMaterialExtensionInterface_regionmap) ) {
         IR_GIVE_FIELD(ir, regionMap, _IFT_NonlocalMaterialExtensionInterface_regionmap);
         if ( regionMap.giveSize() != this->giveDomain()->giveNumberOfRegions() ) {
             OOFEM_ERROR("regionMap size mismatch");

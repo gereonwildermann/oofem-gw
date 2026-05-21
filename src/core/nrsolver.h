@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -175,7 +175,7 @@ public:
                     int &nite, TimeStep *) override;
     void printState(FILE *outputStream) override;
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     const char *giveClassName() const override { return "NRSolver"; }
     virtual const char *giveInputRecordName() const { return _IFT_NRSolver_Name; }
 

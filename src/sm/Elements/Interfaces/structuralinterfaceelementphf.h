@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -134,7 +134,7 @@ public:
     void updateInternalState(TimeStep *tStep) override;
     void updateYourself(TimeStep *tStep) override;
     //int checkConsistency() override;
-    //void initializeFrom(InputRecord &ir) override;
+    //void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     //void giveInputRecord(DynamicInputRecord &input) override;
     const char *giveClassName() const override { return "StructuralInterfaceElementPhF"; };
 

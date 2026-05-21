@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -110,7 +110,7 @@ DofManValueField::addElement(int i, const char *name, const IntArray &nodes) {
 
 
 int
-DofManValueField::evaluateAt(FloatArray &answer, const FloatArray &coords, ValueModeType mode, TimeStep *tStep)
+DofManValueField::evaluateAt(FloatArray &answer, const Coordinates &coords, ValueModeType mode, TimeStep *tStep)
 {
     int result = 0; // assume ok
     FloatArray lc, n;

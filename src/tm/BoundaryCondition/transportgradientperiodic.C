@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -103,12 +103,12 @@ void TransportGradientPeriodic :: findSlaveToMasterMap()
         OOFEM_ERROR("Only 3d implemented yet!");
     }
     jumps.emplace_back(jump);
-    jumps.emplace_back(FloatArray{jump.at(1), jump.at(2), 0.});
-    jumps.emplace_back(FloatArray{jump.at(1), 0., jump.at(3)});
-    jumps.emplace_back(FloatArray{0., jump.at(2), jump.at(3)});
-    jumps.emplace_back(FloatArray{jump.at(1), 0., 0.});
-    jumps.emplace_back(FloatArray{0., jump.at(2), 0.});
-    jumps.emplace_back(FloatArray{0., 0., jump.at(3)});
+    jumps.emplace_back(Vec3(jump.at(1), jump.at(2), 0.));
+    jumps.emplace_back(Vec3(jump.at(1), 0., jump.at(3)));
+    jumps.emplace_back(Vec3(0., jump.at(2), jump.at(3)));
+    jumps.emplace_back(Vec3(jump.at(1), 0., 0.));
+    jumps.emplace_back(Vec3(0., jump.at(2), 0.));
+    jumps.emplace_back(Vec3(0., 0., jump.at(3)));
 
     double maxdist = jump.computeNorm()*1e-5;
 
@@ -398,13 +398,13 @@ bool TransportGradientPeriodic :: isGradDof(Dof *dof)
 }
 
 
-void TransportGradientPeriodic :: initializeFrom(InputRecord &ir)
+void TransportGradientPeriodic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
     //PrescribedGradientHomogenization::initializeFrom(ir);
 
     IR_GIVE_FIELD(ir, this->mGradient, _IFT_TransportGradientPeriodic_gradient)
-    this->mCenterCoord = {0., 0., 0.};
+    this->mCenterCoord = Vec3(0., 0., 0.);
     IR_GIVE_OPTIONAL_FIELD(ir, this->mCenterCoord, _IFT_TransportGradientPeriodic_centerCoords)
 
     IR_GIVE_FIELD(ir, this->masterSet, _IFT_TransportGradientPeriodic_masterSet)

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -67,7 +67,7 @@ public:
      */
     SimpleTransportCrossSection(int n, Domain * d);
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
 
     /// Temporary function that hands out the material. Must be removed for future layered support, but input files will still look the same.

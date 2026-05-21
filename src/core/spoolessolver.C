@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -94,7 +94,7 @@ SpoolesSolver :: ~SpoolesSolver()
 }
 
 void
-SpoolesSolver :: initializeFrom(InputRecord &ir)
+SpoolesSolver :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     int val;
     std :: string msgFileName;

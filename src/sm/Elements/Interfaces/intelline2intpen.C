@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -54,7 +54,7 @@ IntElLine2IntPen::IntElLine2IntPen(int n, Domain * d):IntElLine2(n, d)
 
 
 void
-IntElLine2IntPen :: initializeFrom(InputRecord &ir, int priority)
+IntElLine2IntPen :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralInterfaceElement :: initializeFrom(ir, priority);
     ParameterManager &ppm = giveDomain()->elementPPM;
@@ -69,7 +69,7 @@ IntElLine2IntPen :: computeCovarBaseVectorAt(IntegrationPoint *ip) const
 
     // Since we are averaging over the whole element, always evaluate the base vectors at xi = 0.
 
-	FloatArray xi_0 = {0.0};
+	FloatArray xi_0 = Vec1(0.0);
 
     FEInterpolation *interp = this->giveInterpolation();
     FloatMatrix dNdxi;

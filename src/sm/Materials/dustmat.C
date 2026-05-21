@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -144,7 +144,7 @@ DustMaterial :: DustMaterial(int n, Domain *d) : StructuralMaterial(n, d),
 
 
 void
-DustMaterial :: initializeFrom(InputRecord &ir)
+DustMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // call the corresponding service of structural material
     StructuralMaterial :: initializeFrom(ir);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -368,7 +368,7 @@ bool PrescribedGradientBCPeriodic :: isStrainDof(Dof *dof)
 }
 
 
-void PrescribedGradientBCPeriodic :: initializeFrom(InputRecord &ir)
+void PrescribedGradientBCPeriodic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
     PrescribedGradientHomogenization::initializeFrom(ir);

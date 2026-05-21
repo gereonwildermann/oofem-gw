@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -97,7 +97,7 @@ SparseLinearSystemNM *LinearStability :: giveNumericalMethodForLinStaticProblem(
 
 
 void
-LinearStability :: initializeFrom(InputRecord &ir)
+LinearStability :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     //StructuralEngngModel::instanciateFrom(ir);
     IR_GIVE_FIELD(ir, numberOfRequiredEigenValues, _IFT_LinearStability_nroot);
@@ -120,7 +120,7 @@ LinearStability :: initializeFrom(InputRecord &ir)
 
     nMetaSteps = 0;
 
-    suppressOutput = ir.hasField(_IFT_EngngModel_suppressOutput);
+    suppressOutput = ir->hasField(_IFT_EngngModel_suppressOutput);
 
     if (suppressOutput) {
         printf("Suppressing output.\n");

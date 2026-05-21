@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2024   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -87,7 +87,7 @@ UsrDefBoundaryLoad :: computeValueAt(FloatArray &answer, TimeStep *tStep, const 
 
 
 void
-UsrDefBoundaryLoad :: initializeFrom(InputRecord &ir)
+UsrDefBoundaryLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     BoundaryLoad :: initializeFrom(ir);
 

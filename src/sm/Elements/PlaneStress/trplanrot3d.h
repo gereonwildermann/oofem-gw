@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -74,8 +74,8 @@ protected:
      */
     FloatMatrix GtoLRotationMatrix;
 
-    void giveLocalCoordinates(FloatArray &answer, const FloatArray &global);
-    void giveNodeCoordinates(FloatArray &x, FloatArray &y) override;
+    void giveLocalCoordinates(Coordinates &answer, const Coordinates &global);
+    void giveNodeCoordinates(Coordinates &x, Coordinates &y) override;
 
     double computeVolumeAround(GaussPoint *gp) override;
     void giveCharacteristicTensor(FloatMatrix &answer, CharTensor type, GaussPoint *gp, TimeStep *tStep);

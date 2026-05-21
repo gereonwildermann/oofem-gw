@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -68,7 +68,7 @@ namespace oofem {
 REGISTER_BoundaryCondition(TransportGradientDirichlet);
 
 
-void TransportGradientDirichlet :: initializeFrom(InputRecord &ir)
+void TransportGradientDirichlet :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     GeneralBoundaryCondition :: initializeFrom(ir);
 
@@ -77,7 +77,7 @@ void TransportGradientDirichlet :: initializeFrom(InputRecord &ir)
     mCenterCoord.resize(3);
     IR_GIVE_OPTIONAL_FIELD(ir, mCenterCoord, _IFT_TransportGradientDirichlet_centerCoords);
 
-    this->tractionControl = ir.hasField(_IFT_TransportGradientDirichlet_tractionControl);
+    this->tractionControl = ir->hasField(_IFT_TransportGradientDirichlet_tractionControl);
     if ( this->tractionControl ) {
         IR_GIVE_FIELD(ir, surfSets, _IFT_TransportGradientDirichlet_surfSets);
         //IR_GIVE_FIELD(ir, edgeSets, _IFT_TransportGradientDirichlet_edgeSets);
@@ -507,7 +507,7 @@ void TransportGradientDirichlet :: computeXi()
         for ( int n : setPointer.giveNodeList() ) {
             int eq = eqs[n];
             if ( eq > 0 ) {
-                this->xis[n] = {x.at(eq, 1), x.at(eq, 2), x.at(eq, 3)};
+                this->xis[n] = Vec3(x.at(eq, 1), x.at(eq, 2), x.at(eq, 3));
             }
         }
     }
@@ -630,7 +630,7 @@ void TransportGradientDirichlet :: computeXi()
         for ( int n : setPointer->giveNodeList() ) {
             int eq = eqs[n];
             if ( eq > 0 ) {
-                this->xis[n] = {x.at(eq, 1), x.at(eq, 2), x.at(eq, 3)};
+                this->xis[n] = Vec3(x.at(eq, 1), x.at(eq, 2), x.at(eq, 3));
             }
         }
 

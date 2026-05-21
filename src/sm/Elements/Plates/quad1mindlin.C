@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -175,7 +175,7 @@ Quad1Mindlin::computeConstitutiveMatrixAt(FloatMatrix &answer, MatResponseMode r
 
 
 void
-Quad1Mindlin::initializeFrom(InputRecord &ir, int priority)
+Quad1Mindlin::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     PM_CHECK_FLAG_AND_REPORT(ppm, ir, this->number, IPK_Quad1Mindlin_reducedIntegration, priority, reducedIntegrationFlag);

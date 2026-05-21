@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -131,7 +131,7 @@ std::vector<std::unique_ptr<EnrichmentItem>> NCPrincipalStress::nucleateEnrichme
 
 
 								// Create geometry
-								FloatArray pc = Vec2(gp->giveGlobalCoordinates()(0), gp->giveGlobalCoordinates()(1));
+								FloatArray pc = Vec2(gp->giveGlobalCoordinates()[0], gp->giveGlobalCoordinates()[1]);
 		//						printf("Global coord: "); pc.printYourself();
 
 
@@ -287,7 +287,7 @@ std::vector<std::unique_ptr<EnrichmentItem>> NCPrincipalStress::nucleateEnrichme
 }
 
 
-void NCPrincipalStress::initializeFrom(InputRecord &ir)
+void NCPrincipalStress::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     NucleationCriterion::initializeFrom(ir);
 

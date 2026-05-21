@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,7 +48,7 @@ GeometryGenerator :: ~GeometryGenerator()
 { }
 
 void
-GeometryGenerator :: initializeParticleGenerator(InputRecord &ir)
+GeometryGenerator :: initializeParticleGenerator(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, maxNumOfParticles, _IFT_GeometryGenerator_numOfParticles);
     IR_GIVE_FIELD(ir, maxNumOfIterations, _IFT_GeometryGenerator_numOfIterations);
@@ -163,7 +163,7 @@ GeometryGenerator :: loadParticles()
 {}
 
 void
-GeometryGenerator :: initializeLinkGenerator(InputRecord &ir)
+GeometryGenerator :: initializeLinkGenerator(const std::shared_ptr<InputRecord> &ir)
 {
 }
 

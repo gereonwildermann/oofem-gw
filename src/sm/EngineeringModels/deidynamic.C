@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -59,7 +59,7 @@ NumericalMethod *DEIDynamic :: giveNumericalMethod(MetaStep *mStep)
 
 
 void
-DEIDynamic :: initializeFrom(InputRecord &ir)
+DEIDynamic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralEngngModel :: initializeFrom(ir);
 

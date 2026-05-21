@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ IsotropicLinearElasticMaterial :: IsotropicLinearElasticMaterial(int n, Domain *
 
 
 void
-IsotropicLinearElasticMaterial :: initializeFrom(InputRecord &ir)
+IsotropicLinearElasticMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LinearElasticMaterial :: initializeFrom(ir);
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -81,7 +81,7 @@ Q4Axisymm :: giveInterpolation() const
 
 
 void
-Q4Axisymm :: initializeFrom(InputRecord &ir, int priority)
+Q4Axisymm :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
     // Initialize the receiver from the input record ir.
     // The priority is used to resolve conflicts in the input record
     // (e.g. when two elements are defined in the same input record).
@@ -105,7 +105,7 @@ Q4Axisymm :: computeBmatrixAt(GaussPoint *gp, FloatMatrix &answer, int li, int u
     if ( numberOfFiAndShGaussPoints == 1 ) { // Reduced integration
         FEInterpolation *interp = this->giveInterpolation();
         
-        FloatArray N, NRed, redCoord = {0.0, 0.0}; // eval in centroid
+        FloatArray N, NRed, redCoord = Vec2(0.0, 0.0); // eval in centroid
         interp->evalN( N, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(this) );
         interp->evalN( NRed, redCoord, FEIElementGeometryWrapper(this) );
         

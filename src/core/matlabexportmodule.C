@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -96,23 +96,23 @@ MatlabExportModule :: ~MatlabExportModule()
 
 
 void
-MatlabExportModule :: initializeFrom(InputRecord &ir)
+MatlabExportModule :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule :: initializeFrom(ir);
 
-    exportMesh = ir.hasField(_IFT_MatlabExportModule_mesh);
+    exportMesh = ir->hasField(_IFT_MatlabExportModule_mesh);
     
-    exportData = ir.hasField(_IFT_MatlabExportModule_data);
+    exportData = ir->hasField(_IFT_MatlabExportModule_data);
     if ( exportData ) {
         IR_GIVE_OPTIONAL_FIELD(ir, this->dataNodeSet, _IFT_MatlabExportModule_DataNodeSet);
     }
     
-    exportArea = ir.hasField(_IFT_MatlabExportModule_area);
-    exportSpecials = ir.hasField(_IFT_MatlabExportModule_specials);
-    exportHomogenizeIST = ir.hasField(_IFT_MatlabExportModule_homogenizeInternalVars);
+    exportArea = ir->hasField(_IFT_MatlabExportModule_area);
+    exportSpecials = ir->hasField(_IFT_MatlabExportModule_specials);
+    exportHomogenizeIST = ir->hasField(_IFT_MatlabExportModule_homogenizeInternalVars);
 
 
-    exportReactionForces = ir.hasField(_IFT_MatlabExportModule_ReactionForces);
+    exportReactionForces = ir->hasField(_IFT_MatlabExportModule_ReactionForces);
     reactionForcesDofManList.resize(0);
     if ( exportReactionForces ) {
         IR_GIVE_OPTIONAL_FIELD(ir, reactionForcesDofManList, _IFT_MatlabExportModule_DofManList);
@@ -120,7 +120,7 @@ MatlabExportModule :: initializeFrom(InputRecord &ir)
         IR_GIVE_OPTIONAL_FIELD(ir, this->reactionForcesNodeSet, _IFT_MatlabExportModule_ReactionForcesNodeSet);
     }
 
-    exportIntegrationPointFields = ir.hasField(_IFT_MatlabExportModule_IntegrationPoints);
+    exportIntegrationPointFields = ir->hasField(_IFT_MatlabExportModule_IntegrationPoints);
     elList.resize(0);
     IR_GIVE_OPTIONAL_FIELD(ir, internalVarsToExport, _IFT_MatlabExportModule_internalVarsToExport);
     if ( exportIntegrationPointFields ) {
@@ -129,7 +129,7 @@ MatlabExportModule :: initializeFrom(InputRecord &ir)
         IR_GIVE_OPTIONAL_FIELD(ir, IPFieldsElSet, _IFT_MatlabExportModule_IPFieldsElSet);
     }
 
-    noscaling = ir.hasField(_IFT_MatlabExportModule_noScaledHomogenization);
+    noscaling = ir->hasField(_IFT_MatlabExportModule_noScaledHomogenization);
 
 }
 
@@ -736,7 +736,7 @@ MatlabExportModule :: doOutputIntegrationPointFields(TimeStep *tStep,    FILE *F
                 fprintf( FID, "\tIntegrationPointFields.Elements{%i}.integrationRule{%i}.ip{%i}.coords = [",
                          ielem, i, ip->giveNumber());
 
-                FloatArray coords;
+                Coordinates coords;
                 el->computeGlobalCoordinates( coords, ip->giveNaturalCoordinates() );
                 for ( int ic = 1; ic <= coords.giveSize(); ic++ ) {
                     fprintf( FID, "%e ", coords.at(ic) );

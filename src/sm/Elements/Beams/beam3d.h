@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -118,7 +118,7 @@ public:
     void giveInternalForcesVector(FloatArray &answer, TimeStep *, int useUpdatedGpRecord = 0) override;
     void giveEndForcesVector(FloatArray &answer, TimeStep *tStep);
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
 
     int testElementExtension(ElementExtension ext) override {
@@ -177,7 +177,7 @@ public:
     // definition & identification
     const char *giveClassName() const override { return "Beam3d"; }
     const char *giveInputRecordName() const override { return _IFT_Beam3d_Name; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     ///@todo Introduce interpolator and remove these two:
     integrationDomain giveIntegrationDomain() const override { return _Line; }
@@ -236,7 +236,7 @@ protected:
     void computeInternalForcesFromBoundaryEdgeLoadVectorAtPoint(FloatArray &answer, BoundaryLoad *load, int edge, CharType type, ValueModeType mode,
                                                                 TimeStep *tStep, FloatArray &pointCoords, double ds, bool global);
     void computeInternalForcesFromBodyLoadVectorAtPoint(FloatArray &answer, Load *forLoad, TimeStep *tStep, ValueModeType mode, FloatArray &pointCoords, double ds);
-    virtual int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords, const FloatArray &point);
+    virtual int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords, const FloatArray &point);
 
 };
 } // end namespace oofem

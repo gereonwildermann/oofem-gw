@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -54,7 +54,7 @@ TwoFluidMaterial :: checkConsistency()
 
 
 void
-TwoFluidMaterial :: initializeFrom(InputRecord &ir)
+TwoFluidMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, this->slaveMaterial, _IFT_TwoFluidMaterial_mat);
     if ( this->slaveMaterial.giveSize() != 2 ) {

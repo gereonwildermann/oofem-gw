@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -61,8 +61,8 @@ public:
     double evaldNdx(FloatMatrix &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void evaldNdxi(FloatMatrix &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void giveJacobianMatrixAt(FloatMatrix &jacobianMatrix, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    int global2local(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    int global2local(FloatArray &answer, const Coordinates &gcoords, const FEICellGeometry &cellgeo) const override;
 
     void giveDerivativeXi(FloatArray &n, const FloatArray &lcoords) const ;
     void giveDerivativeEta(FloatArray &n, const FloatArray &lcoords) const ;
@@ -71,7 +71,7 @@ public:
     void edgeEvalN(FloatArray &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void edgeEvaldNdxi(FloatArray &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void edgeEvaldNdx(FloatMatrix &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void edgeLocal2global(FloatArray &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void edgeLocal2global(Coordinates &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double edgeGiveTransformationJacobian(int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     IntArray computeLocalEdgeMapping(int iedge) const override;
 
@@ -80,10 +80,11 @@ public:
     // Surface
     void surfaceEvalN(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void surfaceEvaldNdx(FloatMatrix &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void surfaceEvaldNdxi(FloatMatrix &answer, const FloatArray &lcoords) const ;
+    void surfaceEvaldNdxi(FloatMatrix &answer, const FloatArray &lcoords) const override;
+    void surfaceEvald2Ndxi2(FloatMatrix &answer, const FloatArray &lcoords) const override;
 
     double surfaceEvalNormal(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void surfaceLocal2global(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void surfaceLocal2global(Coordinates &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double surfaceGiveTransformationJacobian(int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     IntArray computeLocalSurfaceMapping(int iedge) const override;
     void surfaceEvalBaseVectorsAt(FloatArray &G1, FloatArray &G2, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const ;

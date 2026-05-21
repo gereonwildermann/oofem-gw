@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -61,7 +61,7 @@ IsotropicAsymmetric1DMaterial :: IsotropicAsymmetric1DMaterial(int n, Domain *d,
 
 
 void
-IsotropicAsymmetric1DMaterial :: initializeFrom(InputRecord &ir)
+IsotropicAsymmetric1DMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 
@@ -200,7 +200,7 @@ IsotropicAsymmetric1DMaterial::giveRealStressVector_1d(const FloatArrayF< 1 > &r
         s=(0.5*this->Et-0.5*this->Ec)*((log(cosh(this->m*eps)))/(this->m))+eps*(0.5*this->Ec+0.5*this->Et);
     }
 
-    status->letTempStressVectorBe({s});
+    status->letTempStressVectorBe(Vec1(s));
     status->letTempStrainVectorBe(reducedE);
 
     return {s};

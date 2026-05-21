@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,7 +71,7 @@
 #include "xfem/nucleationcriterion.h"
 #include "xfem/enrichmentfunction.h"
 #include "xfem/propagationlaw.h"
-#include "contact/contactmanager.h"
+#include "Contact/contactsurface.h"
 #include "bctracker.h"
 
 #include "boundarycondition.h"
@@ -140,8 +140,8 @@ Domain :: clear()
     crossSectionList.clear();
     nonlocalBarrierList.clear();
     setList.clear();
+    contactSurfaceList.clear();
     xfemManager = nullptr;
-    contactManager = nullptr;
     if ( connectivityTable ) {
         connectivityTable->reset();
     }
@@ -392,23 +392,6 @@ Domain :: hasXfemManager()
 }
 
 
-ContactManager *
-Domain :: giveContactManager()
-{
-#ifdef DEBUG
-    if ( !contactManager ) {
-        OOFEM_ERROR("undefined contact manager");
-    }
-#endif
-    return contactManager.get();
-}
-
-bool
-Domain :: hasContactManager()
-{
-    return contactManager.get() != NULL;
-}
-
 bool
 Domain :: hasFractureManager()
 {
@@ -444,6 +427,21 @@ Domain :: giveEngngModel()
     return engineeringModel;
 }
 
+
+ContactSurface *
+Domain::giveContactSurface(int n)
+{
+#ifdef DEBUG
+    if ( n < 1 || n > ( int ) contactSurfaceList.size() ) {
+        OOFEM_ERROR("undefined contact surface (%d)", n);
+    }
+#endif
+    return this->contactSurfaceList [ n - 1 ].get();
+}
+
+
+
+
 void Domain :: resizeDofManagers(int _newSize) { dofManagerList.resize(_newSize); }
 void Domain :: resizeElements(int _newSize) { elementList.resize(_newSize); }
 void Domain :: resizeCrossSectionModels(int _newSize) { crossSectionList.resize(_newSize); }
@@ -453,6 +451,7 @@ void Domain :: resizeBoundaryConditions(int _newSize) { bcList.resize(_newSize);
 void Domain :: resizeInitialConditions(int _newSize) { icList.resize(_newSize); }
 void Domain :: resizeFunctions(int _newSize) { functionList.resize(_newSize); }
 void Domain :: resizeSets(int _newSize) { setList.resize(_newSize); }
+void Domain :: resizeContactSurfaces(int _newSize) { contactSurfaceList.resize(_newSize); }
 
 void Domain :: py_setDofManager(int i, DofManager *obj) { dofManagerList[i-1].reset(obj); dofmanGlobal2LocalMap[obj->giveGlobalNumber()] = i;}
 void Domain :: py_setElement(int i, Element *obj) { elementList[i-1].reset(obj); elementGlobal2LocalMap[obj->giveGlobalNumber()] = i;}
@@ -479,11 +478,11 @@ void Domain :: clearBoundaryConditions() { bcList.clear(); }
 void Domain :: clearElements() { elementList.clear(); }
 
 int Domain::instanciateYourself(DataReader& dr){
-    auto &ir = dr.giveInputRecord(DataReader :: IR_domainRec, 1);
+    auto ir = dr.giveNextInputRecord(DataReader :: IR_domainRec);
     return this->instanciateYourself(dr,ir);
 }
 int
-Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
+Domain :: instanciateYourself(DataReader &dr, const std::shared_ptr<InputRecord>& irDomain)
 // Creates all objects mentioned in the data file.
 {
     int num;
@@ -509,26 +508,27 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     // read output manager record
     {
         std :: string tmp;
-        auto &ir = dr.giveInputRecord(DataReader :: IR_outManRec, 1);
-        ir.giveRecordKeywordField(tmp);
+        auto ir = dr.giveNextInputRecord(DataReader :: IR_outManRec);
+        ir->giveRecordKeywordField(tmp);
 
         if ( !giveEngngModel()->giveSuppressOutput() ) {
             outputManager->initializeFrom(ir);
         }
-        ir.finish();
+        ir->finish();
     }
 
     // XML format (and perhaps others) does not contain DomainComp nested group, rather nests everything under domain directly
-    std::shared_ptr<InputRecord> irdPtr(dr.hasFlattenedStructure()?irDomain.clone():dr.giveInputRecord(DataReader :: IR_domainCompRec, 1).clone());
-    IR_GIVE_OPTIONAL_FIELD(*irdPtr.get(), topologytype, _IFT_Domain_topology);
+
+    std::shared_ptr<InputRecord> irdPtr=(dr.hasFeature(DataReader::FormatFeature::NoDomainCompRec)?irDomain:dr.giveNextInputRecord(DataReader :: IR_domainCompRec));
+    IR_GIVE_OPTIONAL_FIELD(irdPtr, topologytype, _IFT_Domain_topology);
     this->nsd = -1; ///@todo Change this to default 0 when the domaintype record has been removed.
-    IR_GIVE_OPTIONAL_FIELD(*irdPtr.get(), this->nsd, _IFT_Domain_numberOfSpatialDimensions);
+    IR_GIVE_OPTIONAL_FIELD(irdPtr, this->nsd, _IFT_Domain_numberOfSpatialDimensions);
     this->axisymm = irdPtr->hasField(_IFT_Domain_axisymmetric);
 
 
     // read nodes
-    DataReader::GroupRecords dofManagerRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_ndofman,"Nodes",DataReader::IR_dofmanRec,/*optional*/false);
-    DataReader::RecordGuard scope(dr,irdPtr.get()); // till the end of the scope
+    DataReader::GroupRecords dofManagerRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_ndofman,DataReader::IR_dofmanRec,/*optional*/false);
+    DataReader::RecordGuard scope(dr,irdPtr); // till the end of the scope
     dofManagerList.clear();
     dofManagerList.resize(dofManagerRecs.size());
     int dofManagerIndex0=0;
@@ -546,18 +546,18 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
         dman->setGlobalNumber(num);    // set label
         dofManagerList[dofManagerIndex0] = std :: move(dman);
 
-        ir.finish();
+        ir->finish();
         dofManagerIndex0++;
     }
 
     #  ifdef VERBOSE
-        VERBOSE_PRINT0("Instantiated nodes & sides ", dofManagerList.size())
+        VERBOSE_PRINT0("Instantiated nodes & sides ", (int)dofManagerList.size())
     #  endif
 
     BuildDofManPlaceInArrayMap();
 
     // read elements
-    DataReader::GroupRecords elemRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nelem,"Elements",DataReader::IR_elemRec,/*optional*/false);
+    DataReader::GroupRecords elemRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nelem,DataReader::IR_elemRec,/*optional*/false);
     elementList.clear();
     elementList.resize(elemRecs.size());
     int elemIndex0=0;
@@ -569,12 +569,11 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
         if ( !elem ) {
             OOFEM_ERROR("Couldn't create element: %s", name.c_str());
         }
-
         elem->initializeFrom(ir, componentRecPriority);
         elem->setGlobalNumber(num);
         elementList[elemIndex0] = std :: move(elem);
 
-        ir.finish();
+        ir->finish();
         elemIndex0++;
     }
 
@@ -583,9 +582,9 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     // Support sets defined directly after the elements (special hack for backwards compatibility).
     setList.clear();
     if ( dr.peekNext("set") ) {
-        DataReader::GroupRecords setRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nset,"Sets",DataReader::IR_setRec,/*optional*/true);
+        DataReader::GroupRecords setRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nset,DataReader::IR_setRec,/*optional*/true);
         setList.resize(setRecs.size());
-        for(InputRecord& ir: setRecs){
+        for(const std::shared_ptr<InputRecord> ir: setRecs){
             // read type of set
             IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
             // Only one set for now (i don't see any need to ever introduce any other version)
@@ -607,7 +606,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
                 OOFEM_ERROR("Set entry already exist (num=%d)", num);
             }
 
-            ir.finish();
+            ir->finish();
         }
     }
     
@@ -615,11 +614,43 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
         VERBOSE_PRINT0("Instantiated elements ", elementList.size());
     #  endif
 
+	// read contact surfaces
+	DataReader::GroupRecords contactSurfRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_ncontactsurf,DataReader::IR_contactSurfaceRec,/*optional*/true);
+        contactSurfaceList.clear();
+	contactSurfaceList.resize(contactSurfRecs.size());
+
+	for(const std::shared_ptr<InputRecord>& ir: contactSurfRecs){
+	  // read type of contact surface
+	  IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
+	  
+	  std::unique_ptr< ContactSurface >surface(classFactory.createContactSurface(name.c_str(), num, this) );
+	  if ( !surface ) {
+            OOFEM_ERROR( "Couldn't create contact surface: %s", name.c_str() );
+	  }
+	  
+	  surface->initializeFrom(ir);
+	  
+	  // check number
+	  if ( num < 1 || num > (int)contactSurfRecs.size() ) {
+            OOFEM_ERROR("Invalid contact surface number (num=%d)", num);
+	  }
+	  
+	  if ( !contactSurfaceList [ num - 1 ] ) {
+            contactSurfaceList [ num - 1 ] = std::move(surface);
+	  } else {
+            OOFEM_ERROR("Contact surface entry already exist (num=%d)", num);
+	  }
+	  
+	  ir->finish();
+	}
+	
+
+
     // read cross sections
-    DataReader::GroupRecords csRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_ncrosssect,"CrossSections",DataReader::IR_crosssectRec,/*optional*/false);
+    DataReader::GroupRecords csRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_ncrosssect,DataReader::IR_crosssectRec,/*optional*/false);
     crossSectionList.clear();
     crossSectionList.resize(csRecs.size());
-    for(InputRecord& ir: csRecs){
+    for(const std::shared_ptr<InputRecord>& ir: csRecs){
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
         std :: unique_ptr< CrossSection >crossSection( classFactory.createCrossSection(name.c_str(), num, this) );
@@ -640,7 +671,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("crossSection entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -648,10 +679,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     #  endif
 
     // read materials
-    DataReader::GroupRecords matRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nmat,"Materials",DataReader::IR_matRec,/*optional*/false);
+    DataReader::GroupRecords matRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nmat,DataReader::IR_matRec,/*optional*/false);
     materialList.clear();
     materialList.resize(matRecs.size());
-    for(InputRecord& ir: matRecs){
+    for(const std::shared_ptr<InputRecord>& ir: matRecs){
         // read type of material
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
@@ -673,7 +704,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("material entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -681,10 +712,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     #  endif
 
     // read barriers
-    DataReader::GroupRecords barrRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nbarrier,"NonlocalBarriers",DataReader::IR_nlocBarRec,/*optional*/true);
+    DataReader::GroupRecords barrRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nbarrier,DataReader::IR_nlocBarRec,/*optional*/true);
     nonlocalBarrierList.clear();
     nonlocalBarrierList.resize(barrRecs.size());
-    for(InputRecord& ir: barrRecs){
+    for(const std::shared_ptr<InputRecord>& ir: barrRecs){
         // read type of load
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
@@ -706,7 +737,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("barrier entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -716,10 +747,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     #  endif
 
     // read boundary conditions
-    DataReader::GroupRecords bcRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nbc,"BoundaryConditions",DataReader::IR_bcRec,/*optional*/false);
+    DataReader::GroupRecords bcRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nbc,DataReader::IR_bcRec,/*optional*/false);
     bcList.clear();
     bcList.resize(bcRecs.size());
-    for(InputRecord& ir: bcRecs){
+    for(const std::shared_ptr<InputRecord>& ir: bcRecs){
         // read type of bc
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
@@ -741,7 +772,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("boundary condition entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -749,10 +780,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
     #  endif
 
     // read initial conditions
-    DataReader::GroupRecords icRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nic,"InitialConditions",DataReader::IR_icRec,/*optional*/false);
+    DataReader::GroupRecords icRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nic,DataReader::IR_icRec,/*optional*/true);
     icList.clear();
     icList.resize(icRecs.size());
-    for(InputRecord& ir: icRecs){
+    for(const std::shared_ptr<InputRecord>& ir: icRecs){
         // read type of load
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
@@ -774,7 +805,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("initial condition entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -783,10 +814,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
 
 
     // read load time functions
-    DataReader::GroupRecords ltfRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nfunct,"LoadTimeFunctions",DataReader::IR_funcRec,/*optional*/false);
+    DataReader::GroupRecords ltfRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nfunct,DataReader::IR_funcRec,/*optional*/false);
     functionList.clear();
     functionList.resize(ltfRecs.size());
-    for(InputRecord& ir: ltfRecs){
+    for(const std::shared_ptr<InputRecord>& ir: ltfRecs){
         // read type of func
         IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
 
@@ -808,7 +839,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
             OOFEM_ERROR("Function entry already exist (num=%d)", num);
         }
 
-        ir.finish();
+        ir->finish();
     }
 
     #  ifdef VERBOSE
@@ -817,9 +848,9 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
 
     // read sets
     if ( setList.size() == 0 ) {
-        DataReader::GroupRecords setRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nset,"Sets",DataReader::IR_setRec,/*optional*/true);
+        DataReader::GroupRecords setRecs=dr.giveGroupRecords(irdPtr,_IFT_Domain_nset,DataReader::IR_setRec,/*optional*/true);
         setList.resize(setRecs.size());
-        for(InputRecord& ir: setRecs){
+        for(const std::shared_ptr<InputRecord>& ir: setRecs){
             // read type of set
             IR_GIVE_RECORD_KEYWORD_FIELD(ir, name, num);
             // Only one set for now (i don't see any need to ever introduce any other version)
@@ -841,7 +872,7 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
                 OOFEM_ERROR("Set entry already exist (num=%d)", num);
             }
 
-            ir.finish();
+            ir->finish();
         }
     }
 
@@ -851,33 +882,19 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
         }
     #  endif
 
-    InputRecord* xfmIr=dr.giveChildRecord(irdPtr,_IFT_Domain_nxfemman,"XFEMManager",DataReader::IR_xfemManRec,/*optional*/true);
+    const std::shared_ptr<InputRecord> xfmIr=dr.giveChildRecord(irdPtr,_IFT_Domain_nxfemman,DataReader::IR_xfemManRec,/*optional*/true);
     if(xfmIr){
-        IR_GIVE_RECORD_KEYWORD_FIELD(*xfmIr, name, num);
+        DataReader::RecordGuard scope(dr,xfmIr);
+        IR_GIVE_RECORD_KEYWORD_FIELD(xfmIr, name, num);
         xfemManager = classFactory.createXfemManager(name.c_str(), this);
         if ( !xfemManager ) {
             OOFEM_ERROR("Couldn't create xfemmanager: %s", name.c_str());
         }
 
-        xfemManager->initializeFrom(*xfmIr);
+        xfemManager->initializeFrom(xfmIr);
         xfemManager->instanciateYourself(dr);
         #  ifdef VERBOSE
             VERBOSE_PRINT0("Instantiated xfem ", 1);
-        #  endif
-    }
-
-    InputRecord* cmanIr=dr.giveChildRecord(irdPtr,_IFT_Domain_ncontactman,"ContactManager",DataReader::IR_contactManRec,/*optional*/true);
-    if (cmanIr) {
-        IR_GIVE_RECORD_KEYWORD_FIELD(*cmanIr, name, num);
-        contactManager = classFactory.createContactManager(name.c_str(), this);
-        if ( !contactManager ) {
-            OOFEM_ERROR("Couldn't create contact manager: %s", name.c_str());
-        }
-
-        contactManager->initializeFrom(*cmanIr);
-        contactManager->instanciateYourself(dr);
-        #  ifdef VERBOSE
-            VERBOSE_PRINT0("Instantiated contact manager ", 1);
         #  endif
     }
 
@@ -895,10 +912,10 @@ Domain :: instanciateYourself(DataReader &dr, InputRecord& irDomain)
         #  endif
     }
 
-    InputRecord* fmanIr=dr.giveChildRecord(irdPtr,_IFT_Domain_nfracman,"FractureManager",DataReader::IR_fracManRec,/*optional*/true);
+    const std::shared_ptr<InputRecord> fmanIr=dr.giveChildRecord(irdPtr,_IFT_Domain_nfracman,DataReader::IR_fracManRec,/*optional*/true);
     if (fmanIr) {
         fracManager = std::make_unique<FractureManager>(this);
-        fracManager->initializeFrom(*fmanIr);
+        fracManager->initializeFrom(fmanIr);
         fracManager->instanciateYourself(dr);
         #  ifdef VERBOSE
             VERBOSE_PRINT0("Instantiated fracture manager ", 1);
@@ -981,7 +998,7 @@ Domain::initializeFinish() {
         Set *set = this->giveSet(i);
         std::string elemProps = set->giveElementProperties();
         if (!elemProps.empty()) {
-            OOFEMTXTInputRecord ir (-1, elemProps);
+            auto ir=std::make_shared<OOFEMTXTInputRecord>(-1,elemProps);
             for ( int ielem: set->giveElementList() ) {
                 Element *element = this->giveElement( ielem );
                 element->initializeFrom(ir, 1); // initialize with priority 1 (lower than component record priority)
@@ -989,7 +1006,7 @@ Domain::initializeFinish() {
         }
         std::string dofmanProps = set->giveDofManProperties();
         if (!dofmanProps.empty()) {
-            OOFEMTXTInputRecord ir (-1, dofmanProps);
+            auto ir=std::make_shared<OOFEMTXTInputRecord>(-1,dofmanProps);
             for ( int idofman: set->giveNodeList() ) {
                 DofManager *dofman = this->giveDofManager( idofman );
                 dofman->initializeFrom(ir, 1); // initialize with priority 1 (lower than component record priority)
@@ -1032,6 +1049,11 @@ Domain :: postInitialize()
     }
     //@TODO clear parameterPriorityManager
 
+    for ( auto &cs: contactSurfaceList ) {
+      cs->postInitialize();
+    }
+
+    
     for ( auto &bc: bcList ) {
         bc->postInitialize();
     }
@@ -1432,9 +1454,6 @@ Domain :: createDofs()
         xfemManager->createEnrichedDofs();
     }
 
-    if ( this->hasContactManager() ) {
-        contactManager->createContactDofs();
-    }
 }
 
 
@@ -1640,10 +1659,10 @@ Domain :: restoreContext(DataStream &stream, ContextMode mode)
         if ( serNum != this->giveSerialNumber() ) {
             // read corresponding domain
             OOFEM_LOG_INFO("restoring domain %d.%d\n", this->number, this->giveSerialNumber());
-            OOFEMTXTDataReader domainDr(this->engineeringModel->giveDomainFileName(1, this->giveSerialNumber()));
+            auto domainDr=DataReader::makeFromFilename(this->engineeringModel->giveDomainFileName(1, this->giveSerialNumber()));
             this->clear();
 
-            if ( !this->instanciateYourself(domainDr) ) {
+            if ( !this->instanciateYourself(*domainDr) ) {
                 OOFEM_ERROR("domain Instanciation failed");
             }
 

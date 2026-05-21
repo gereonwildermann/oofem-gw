@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -312,7 +312,7 @@ IntMatBilinearCZFagerstrom :: give3dStiffnessMatrix_dTdj(MatResponseMode rMode, 
 
 //const double tolerance = 1.0e-12; // small number
 void
-IntMatBilinearCZFagerstrom :: initializeFrom(InputRecord &ir)
+IntMatBilinearCZFagerstrom :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, kn0, _IFT_IntMatBilinearCZFagerstrom_kn);
     this->knc = kn0;                        // Defaults to the same stiffness in compression and tension

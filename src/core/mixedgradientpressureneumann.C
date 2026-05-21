@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -685,7 +685,7 @@ void MixedGradientPressureNeumann :: computeTangents(FloatMatrix &Ed, FloatArray
 }
 
 
-void MixedGradientPressureNeumann :: initializeFrom(InputRecord &ir)
+void MixedGradientPressureNeumann :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MixedGradientPressureBC :: initializeFrom(ir);
 }

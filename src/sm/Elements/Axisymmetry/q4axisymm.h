@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ public:
     const char *giveClassName() const override { return "Q4axisymm"; }
     Element_Geometry_Type giveGeometryType() const override {return EGT_quad_2;}
 
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
 
     void computeBmatrixAt(GaussPoint *gp, FloatMatrix &answer, int lowerIndx = 1, int upperIndx = ALL_STRAINS) override;
 

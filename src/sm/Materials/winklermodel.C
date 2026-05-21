@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2014   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -47,7 +47,7 @@ WinklerMaterial:: WinklerMaterial (int n, Domain* d): StructuralMaterial(n, d)
 
 
 void
-WinklerMaterial :: initializeFrom(InputRecord &ir)
+WinklerMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 

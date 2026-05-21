@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -94,7 +94,7 @@ protected:
     std::string dofmanprops; ///< Dof manager properties.
 #if 0
     /// receiver original input record
-    std::unique_ptr<InputRecord> inputRec;
+    std::unique_ptr<const std::shared_ptr<InputRecord>> inputRec;
 #endif
     bool nodalListInitialized = false;
 #ifdef _OPENMP
@@ -109,7 +109,7 @@ public:
     Set(int n, Domain * d) ;
     virtual ~Set() { }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     /**
      * Returns list of elements within set.

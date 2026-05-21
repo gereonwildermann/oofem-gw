@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -196,7 +196,7 @@ Lattice2d_mt :: giveDofManDofIDMask(int inode, IntArray &answer) const
 }
 
 void
-Lattice2d_mt :: initializeFrom(InputRecord &ir, int priority)
+Lattice2d_mt :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm =  this->giveDomain()->elementPPM;
 
@@ -334,19 +334,19 @@ Lattice2d_mt :: giveGpCoordinates(FloatArray &answer)
 }
 
 int
-Lattice2d_mt :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+Lattice2d_mt :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = this->gpCoords.at(1);
     answer.at(2) = this->gpCoords.at(2);
-
+    answer.at(3) = 0.;
     return 1;
 }
 
 #define POINT_TOL 1.e-3
 
 bool
-Lattice2d_mt :: computeLocalCoordinates(FloatArray &answer, const FloatArray &coords)
+Lattice2d_mt :: computeLocalCoordinates(FloatArray &answer, const Coordinates &coords)
 {
     answer.resize(1);
     answer.at(1) = 0.;

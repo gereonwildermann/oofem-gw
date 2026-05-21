@@ -70,7 +70,7 @@ SolutionbasedShapeFunction :: SolutionbasedShapeFunction(int n, Domain *d) : Act
 
 
 void
-SolutionbasedShapeFunction :: initializeFrom(InputRecord &ir)
+SolutionbasedShapeFunction :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
 
@@ -171,7 +171,8 @@ SolutionbasedShapeFunction :: computeCorrectionFactors(modeStruct &myMode, IntAr
 
         for ( auto &gp: *iRule ) {
             const FloatArray &lcoords = gp->giveNaturalCoordinates();
-            FloatArray gcoords, normal, N;
+            Coordinates gcoords;
+            FloatArray normal, N;
             FloatArray Phi;
 
             double detJ = fabs( geoInterpolation->boundaryGiveTransformationJacobian( Boundary, lcoords, FEIElementGeometryWrapper(thisElement) ) ) * gp->giveWeight();
@@ -359,9 +360,9 @@ SolutionbasedShapeFunction :: loadProblem()
         OOFEM_LOG_INFO("************************** Instanciating microproblem from file %s for dimension %u\n", filename.c_str(), i);
 
         // Set up and solve problem
-        OOFEMTXTDataReader drMicro( filename.c_str() );
-        auto myEngngModel = InstanciateProblem(drMicro, _processor, 0, NULL, false);
-        drMicro.finish();
+        auto drMicro=DataReader::makeFromFilename( filename );
+        auto myEngngModel = InstanciateProblem(*drMicro, _processor, 0, NULL, false);
+        drMicro->finish();
         myEngngModel->checkProblemConsistency();
         myEngngModel->initMetaStepAttributes( myEngngModel->giveMetaStep(1) );
         thisTimestep = myEngngModel->giveNextStep();
@@ -462,16 +463,16 @@ SolutionbasedShapeFunction :: updateModelWithFactors(modeStruct &m)
 void
 SolutionbasedShapeFunction :: setLoads(EngngModel &myEngngModel, int d)
 {
-    DynamicInputRecord ir;
+    auto ir=std::make_shared<DynamicInputRecord>();
     FloatArray gradP;
 
     gradP.resize( this->giveDomain()->giveNumberOfSpatialDimensions() );
     gradP.zero();
     gradP.at(d) = 1.0;
 
-    ir.setRecordKeywordField("deadweight", 1);
-    ir.setField(gradP, _IFT_Load_components);
-    ir.setField(1, _IFT_GeneralBoundaryCondition_timeFunct);
+    ir->setRecordKeywordField("deadweight", 1);
+    ir->setField(gradP, _IFT_Load_components);
+    ir->setField(1, _IFT_GeneralBoundaryCondition_timeFunct);
 
     int bcID = myEngngModel.giveDomain(1)->giveNumberOfBoundaryConditions() + 1;
     auto myBodyLoad = classFactory.createBoundaryCondition( "deadweight", bcID, myEngngModel.giveDomain(1) );
@@ -487,7 +488,7 @@ SolutionbasedShapeFunction :: setLoads(EngngModel &myEngngModel, int d)
 }
 
 void
-SolutionbasedShapeFunction :: computeBaseFunctionValueAt(FloatArray &answer, const FloatArray &coords, IntArray &dofIDs, EngngModel &myEngngModel)
+SolutionbasedShapeFunction :: computeBaseFunctionValueAt(FloatArray &answer, const Coordinates &coords, IntArray &dofIDs, EngngModel &myEngngModel)
 {
     answer.resize( dofIDs.giveSize() );
     answer.zero();
@@ -570,16 +571,17 @@ SolutionbasedShapeFunction :: computeBaseFunctionValueAt(FloatArray &answer, con
 }
 
 void
-SolutionbasedShapeFunction :: giveValueAtPoint(FloatArray &answer, const FloatArray &coords, IntArray &dofIDs, EngngModel &myEngngModel)
+SolutionbasedShapeFunction :: giveValueAtPoint(FloatArray &answer, const Coordinates &coords, IntArray &dofIDs, EngngModel &myEngngModel)
 {
     answer.resize( dofIDs.giveSize() );
 
-    FloatArray closest, lcoords, values;
-
+    Coordinates closest;
+    FloatArray values;
+    FloatArray lcoords;
     Element *elementAtCoords = myEngngModel.giveDomain(1)->giveSpatialLocalizer()->giveElementClosestToPoint(lcoords, closest, coords, 1);
     if ( elementAtCoords == NULL ) {
         OOFEM_WARNING("Cannot find element closest to point");
-        coords.pY();
+        //coords.pY();
         return;
     }
 
@@ -604,10 +606,10 @@ SolutionbasedShapeFunction :: setBoundaryConditionOnDof(Dof *d, double value)
     int bcID = d->giveBcId();
 
     if ( bcID == 0 ) {
-        DynamicInputRecord ir;
-        ir.setRecordKeywordField("boundarycondition", 1);
-        ir.setField(1, _IFT_GeneralBoundaryCondition_timeFunct);
-        ir.setField(value, _IFT_BoundaryCondition_PrescribedValue);
+        std::shared_ptr<DynamicInputRecord> ir=std::make_shared<DynamicInputRecord>();
+        ir->setRecordKeywordField("boundarycondition", 1);
+        ir->setField(1, _IFT_GeneralBoundaryCondition_timeFunct);
+        ir->setField(value, _IFT_BoundaryCondition_PrescribedValue);
 
         bcID = d->giveDofManager()->giveDomain()->giveNumberOfBoundaryConditions() + 1;
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -508,7 +508,7 @@ NLStructuralElement::computeStiffnessMatrix_withIRulesAsSubcells(FloatMatrix &an
 
 
 void
-NLStructuralElement::initializeFrom(InputRecord &ir, int priority)
+NLStructuralElement::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->domain->elementPPM;
     StructuralElement::initializeFrom(ir, priority);

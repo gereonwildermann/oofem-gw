@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -78,7 +78,7 @@ protected:
 public:
     IntElPoint(int n, Domain *d);
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     int computeNumberOfDofs() override;
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
@@ -87,7 +87,7 @@ public:
 
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_IntElPoint_Name; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }
 
@@ -102,7 +102,7 @@ public:
         } else if ( this->giveDomain()->giveNumberOfSpatialDimensions() == 2 ) {
             answer = this->giveInterfaceCrossSection()->giveEngTraction_2d(jump, gp, tStep);
         } else if ( this->giveDomain()->giveNumberOfSpatialDimensions() == 1 ) {
-            answer = {this->giveInterfaceCrossSection()->giveEngTraction_1d(jump.at(1), gp, tStep)};
+            answer = Vec1(this->giveInterfaceCrossSection()->giveEngTraction_1d(jump.at(1), gp, tStep));
         }
     }
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -102,7 +102,7 @@ public:
     {
 #ifndef NDEBUG
         if ( x.giveSize() != N ) {
-            OOFEM_ERROR("Can't convert dynamic float array of size %d to fixed size %d\n", x.giveSize(), N);
+            OOFEM_ERROR("Can't convert dynamic float array of size %d to fixed size %ld\n", x.giveSize(), N);
         }
 #endif
         std::copy_n(x.begin(), N, values.begin());
@@ -239,6 +239,16 @@ public:
     int givePackSize(DataStream &buff) const
     {
         return buff.givePackSizeOfDouble(this->size());
+    }
+
+    void zero() {
+        std::fill(this->begin(), this->end(), 0.0);
+    }
+
+    void add(double a, const FloatArrayF<N> &x) {
+        for ( std::size_t i = 0; i < N; ++i ) {
+            (*this)[i] += a * x[i];
+        }
     }
 
     //friend class FloatMatrixF;
@@ -541,14 +551,14 @@ FloatArrayF<N> zeros() {
 
 /// Computes the norm(a-b)^2
 template<std::size_t N>
-FloatArrayF<N> distance_squared(const FloatArrayF<N> &a, const FloatArrayF<N> &b)
+double distance_squared(const FloatArrayF<N> &a, const FloatArrayF<N> &b)
 {
     return norm_squared(a-b);
 }
 
 /// Computes the norm(a-b)
 template<std::size_t N>
-FloatArrayF<N> distance(const FloatArrayF<N> &a, const FloatArrayF<N> &b)
+double distance(const FloatArrayF<N> &a, const FloatArrayF<N> &b)
 {
     return norm(a-b);
 }

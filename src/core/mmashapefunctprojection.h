@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -90,13 +90,13 @@ public:
     MMAShapeFunctProjection(const MMAShapeFunctProjection &) = delete;
     MMAShapeFunctProjection &operator=(const MMAShapeFunctProjection &) = delete;
 
-    void __init(Domain *dold, IntArray &type, const FloatArray &coords, Set &sourceElemSet, TimeStep *tStep, bool iCohesiveZoneGP = false) override;
+    void __init(Domain *dold, IntArray &type, const Coordinates &coords, Set &sourceElemSet, TimeStep *tStep, bool iCohesiveZoneGP = false) override;
 
     void finish(TimeStep *tStep) override;
 
     int mapVariable(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
 
-    int __mapVariable(FloatArray &answer, const FloatArray &coords, InternalStateType type, TimeStep *tStep) override;
+    int __mapVariable(FloatArray &answer, const Coordinates &coords, InternalStateType type, TimeStep *tStep) override;
 
     int mapStatus(MaterialStatus &oStatus) const override;
 

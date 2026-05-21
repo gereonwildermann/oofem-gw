@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -58,7 +58,7 @@ class CohesiveSurface3d : public StructuralElement
 {
 protected:
     double area, length;
-    FloatArray center; ///< Coordinates of the center of the cohesive surface.
+    Coordinates center; ///< Coordinates of the center of the cohesive surface.
     FloatMatrix lcs; ///< Matrix defining the local coordinate system.
 
     ///@name Shift constants of periodic particles (near boundary of periodic cell).
@@ -82,7 +82,7 @@ public:
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
     double giveLength();
     void computeNmatrixAt(const FloatArray &iLocCoord, FloatMatrix &answer) override { }
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     // definition & identification
     const char *giveClassName() const override { return "CohesiveSurface3d"; }
@@ -91,7 +91,7 @@ public:
 
 
     // input and output
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
 
 #ifdef __OOFEG

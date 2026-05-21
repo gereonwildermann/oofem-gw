@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -563,7 +563,7 @@ HuertaErrorEstimator :: giveRemeshingCrit()
 
 
 void
-HuertaErrorEstimator :: initializeFrom(InputRecord &ir)
+HuertaErrorEstimator :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     int n, level, wErrorFlag = 0;
 
@@ -975,7 +975,7 @@ HuertaRemeshingCriteria :: estimateMeshDensities(TimeStep *tStep)
 
 
 void
-HuertaRemeshingCriteria :: initializeFrom(InputRecord &ir)
+HuertaRemeshingCriteria :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     double coeff;
     int noRemeshFlag = 0, wErrorFlag = 0;

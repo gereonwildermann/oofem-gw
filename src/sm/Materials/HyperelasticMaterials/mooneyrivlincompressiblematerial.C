@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2020   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -88,7 +88,7 @@ MooneyRivlinCompressibleMaterial::CreateStatus(GaussPoint *gp) const
 
 
 void
-MooneyRivlinCompressibleMaterial::initializeFrom(InputRecord &ir)
+MooneyRivlinCompressibleMaterial::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial::initializeFrom(ir);
     BaseHyperElasticMaterial::initializeFrom(ir);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -684,7 +684,7 @@ Element :: giveCharacteristicValue(CharType mtrx, TimeStep *tStep)
 }
 
 void
-Element :: initializeFrom(InputRecord &ir, int priority)
+Element :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
 #  ifdef VERBOSE
     // VERBOSE_PRINT1("Instanciating element ",number);
@@ -1222,12 +1222,12 @@ Element :: giveCharacteristicLengthForAxisymmElements(const FloatArray &normalTo
 }
 
 int
-Element :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+Element :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     FEInterpolation *fei = this->giveInterpolation();
 #ifdef DEBUG
     if ( !fei ) {
-        answer.clear();
+        answer.zero();
         return false;
     }
 #endif
@@ -1237,7 +1237,7 @@ Element :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoord
 
 
 bool
-Element :: computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords)
+Element :: computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords)
 {
     FEInterpolation *fei = this->giveInterpolation();
     if ( fei ) {

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,6 +53,7 @@
 #include "integrationrule.h"
 #include "gaussintegrationrule.h"
 #include "classfactory.h"
+#include "enum.h"
 
 
 namespace oofem {
@@ -73,20 +74,22 @@ class EngngModel;
  * When test (dual) field, it keeps reference to its primary (unknown) variable.
  * @todo The history parameter determines how many time steps to remember. 
  */
-class Variable {
-    public:
-    enum VariableType {
-        scalar,
-        vector
-    };
 
-    enum VariableQuantity {
-        Displacement,
-        Velocity,
-        Temperature,
-        Pressure,
-        VolumeFraction
-    };
+#define ENUM_TYPE VariableType
+#define ENUM_DEF ENUM_ITEM(scalar) ENUM_ITEM(vector)
+#define ENUM_CLASS
+#include "enum-impl.h"
+
+#define ENUM_TYPE VariableQuantity
+#define ENUM_DEF ENUM_ITEM(Displacement) ENUM_ITEM(Velocity) ENUM_ITEM(Temperature) ENUM_ITEM(Pressure) ENUM_ITEM(VolumeFraction)
+#define ENUM_CLASS
+#include "enum-impl.h"
+
+
+class OOFEM_EXPORT Variable {
+    public:
+    typedef oofem::VariableType VariableType;
+    typedef oofem::VariableQuantity VariableQuantity;
 
     const FEInterpolation* interpolation;  
     Variable* dualVar; //? or just bool?
@@ -117,7 +120,7 @@ class Variable {
     /// Returns DodIF mask in node; need generalization (which dofMan)
     const IntArray& getDofManDofIDs () const {return this->dofIDs;}
 
-    void initializeFrom(InputRecord &ir); // enable instantiation from input record
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir); // enable instantiation from input record
 };
 
 
@@ -128,7 +131,7 @@ class Variable {
  * - evaluate_lin to evaluate the consistent linearization of the term, so if Term is T(u), depending on unknown u,
  *   this term evaluates dT/du, which typically contributes to the LHS. 
  */
-class Term {
+class OOFEM_EXPORT Term {
     public:
     const Variable* field;
     const Variable* testField;
@@ -146,124 +149,126 @@ class Term {
     virtual void initializeCell(Element& cell) const =0;
     virtual IntegrationRule* giveElementIntegrationRule(Element* e) const {return NULL;};
 
-    virtual void initializeFrom(InputRecord &ir, EngngModel* problem); // enable instantiation from input record
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir, EngngModel* problem); // enable instantiation from input record
 
 };
 
 
-    /**
-     * MPMSymbolic terms extend standard Terms to allow for cell initialization.
-     * The symbolic terms are assumed to be evaluated on generic cells (and not on problem-specific elements).
-     * Therefore the need to ensure that proper DOFs and integration rules are set-up.
-     */
-    class MPMSymbolicTerm : public Term {
-        protected:
-        int nip=0; // assumed order of interpolation for the term
-        public:
-        MPMSymbolicTerm() : Term() {}
-        MPMSymbolicTerm (const Variable *testField, const Variable* unknownField, MaterialMode m)  : Term(testField, unknownField, m) {};
-        void initializeFrom(InputRecord &ir, EngngModel* problem) override {
-            Term::initializeFrom(ir, problem);
-            IR_GIVE_OPTIONAL_FIELD(ir, nip, "nip");
-        }
-        void initializeCell(Element& cell) const override {
-            // initialize cell for interpolation use
-            // @TODO: prevent multiple initialization for same interpolation
-            this->field->interpolation->initializeCell(&cell);
-            this->testField->interpolation->initializeCell(&cell);
+/**
+ * MPMSymbolic terms extend standard Terms to allow for cell initialization.
+ * The symbolic terms are assumed to be evaluated on generic cells (and not on problem-specific elements).
+ * Therefore the need to ensure that proper DOFs and integration rules are set-up.
+ */
+class OOFEM_EXPORT GenericCellTerm : public Term {
+    protected:
+    int nip=0; // assumed order of interpolation for the term
+    public:
+    GenericCellTerm() : Term() {}
+    GenericCellTerm (const Variable *testField, const Variable* unknownField, MaterialMode m)  : Term(testField, unknownField, m) {};
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, EngngModel* problem) override {
+        Term::initializeFrom(ir, problem);
+        IR_GIVE_OPTIONAL_FIELD(ir, nip, "nip");
+    }
+    void initializeCell(Element& cell) const override {
+        // initialize cell for interpolation use
+        // @TODO: prevent multiple initialization for same interpolation
+        this->field->interpolation->initializeCell(&cell);
+        this->testField->interpolation->initializeCell(&cell);
 
-            // allocate necessary DOFs
-            IntArray enodes, einteranlnodes, dofIDs;
-            // process term field
-            dofIDs = this->field->getDofManDofIDs();
-            this->field->interpolation->giveCellDofMans(enodes, einteranlnodes, &cell);
-            for (auto i: enodes) {
-                DofManager* dman =  cell.giveDofManager(i);
-                for (auto d: dofIDs) {
-                    if (!dman->hasDofID((DofIDItem) d)) {
-                        // create a DOF
-                        MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
-                        dman->appendDof(dof);
-                    }
+        // allocate necessary DOFs
+        IntArray enodes, einteranlnodes, dofIDs;
+        // process term field
+        dofIDs = this->field->getDofManDofIDs();
+        this->field->interpolation->giveCellDofMans(enodes, einteranlnodes, &cell);
+        for (auto i: enodes) {
+            DofManager* dman =  cell.giveDofManager(i);
+            for (auto d: dofIDs) {
+                if (!dman->hasDofID((DofIDItem) d)) {
+                    // create a DOF
+                    MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
+                    dman->appendDof(dof);
                 }
-            }
-            for (auto i: einteranlnodes) {
-                DofManager* dman =  cell.giveInternalDofManager(i);
-                for (auto d: dofIDs) {
-                    if (!dman->hasDofID((DofIDItem) d)) {
-                        // create a DOF
-                        MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
-                        dman->appendDof(dof);
-                    }
-                }
-            }
-            // process testField
-            dofIDs = this->testField->getDofManDofIDs();
-            this->testField->interpolation->giveCellDofMans(enodes, einteranlnodes, &cell);
-            for (auto i: enodes) {
-                DofManager* dman =  cell.giveDofManager(i);
-                for (auto d: dofIDs) {
-                    if (!dman->hasDofID((DofIDItem)d)) {
-                        // create a DOF
-                        MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
-                        dman->appendDof(dof);
-                    }
-                }
-            }
-            for (auto i: einteranlnodes) {
-                DofManager* dman =  cell.giveInternalDofManager(i);
-                for (auto d: dofIDs) {
-                    if (!dman->hasDofID((DofIDItem)d)) {
-                        // create a DOF
-                        MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
-                        dman->appendDof(dof);
-                    }
-                }
-            }
-            // set up the integration rule on cell
-            // get required number of IPs
-            int myorder = this->field->interpolation->giveInterpolationOrder() *  this->testField->interpolation->giveInterpolationOrder(); 
-            GaussIntegrationRule ir(0, &cell);
-            int nip = ir.getRequiredNumberOfIntegrationPoints(cell.giveIntegrationDomain(), myorder);
-            if (this->nip>0) {
-                nip = this->nip;
-            }
-            // create nd insert it toelement if not exist yet.
-            std::vector< std :: unique_ptr< IntegrationRule > > &irvec = cell.giveIntegrationRulesArray();
-            bool found = false;
-            int size = irvec.size();
-            for (int i = 0; i< size; i++) {
-                if (irvec[i].get()->giveNumberOfIntegrationPoints() == nip) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                // need to insert right one
-                irvec.resize( size +1);
-                irvec [ size] = std::make_unique<GaussIntegrationRule>(size, &cell);
-                //irvec [ size ]->SetUpPointsOnSquare(nip, this->mode);
-                irvec[size]->setUpIntegrationPoints(cell.giveIntegrationDomain(), nip, this->mode);
-                OOFEM_LOG_INFO("Integration rule with %d nip created for cell %d\n",nip,cell.giveNumber());
             }
         }
-        IntegrationRule* giveElementIntegrationRule(Element* e) const override {
-            int myorder = this->field->interpolation->giveInterpolationOrder() *  this->testField->interpolation->giveInterpolationOrder(); 
-            GaussIntegrationRule ir(0, e);
-            int nip = ir.getRequiredNumberOfIntegrationPoints(e->giveIntegrationDomain(), myorder);
-            if (this->nip>0) {
-                nip = this->nip;
-            }
-            std::vector< std :: unique_ptr< IntegrationRule > > &irvec = e->giveIntegrationRulesArray();
-            int size = irvec.size();
-            for (int i = 0; i< size; i++) {
-                if (irvec[i].get()->giveNumberOfIntegrationPoints() == nip) {
-                    return irvec[i].get();
+        for (auto i: einteranlnodes) {
+            DofManager* dman =  cell.giveInternalDofManager(i);
+            for (auto d: dofIDs) {
+                if (!dman->hasDofID((DofIDItem) d)) {
+                    // create a DOF
+                    MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
+                    dman->appendDof(dof);
                 }
             }
-            return NULL;
         }
-    };
+        // process testField
+        dofIDs = this->testField->getDofManDofIDs();
+        this->testField->interpolation->giveCellDofMans(enodes, einteranlnodes, &cell);
+        for (auto i: enodes) {
+            DofManager* dman =  cell.giveDofManager(i);
+            for (auto d: dofIDs) {
+                if (!dman->hasDofID((DofIDItem)d)) {
+                    // create a DOF
+                    MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
+                    dman->appendDof(dof);
+                }
+            }
+        }
+        for (auto i: einteranlnodes) {
+            DofManager* dman =  cell.giveInternalDofManager(i);
+            for (auto d: dofIDs) {
+                if (!dman->hasDofID((DofIDItem)d)) {
+                    // create a DOF
+                    MasterDof* dof = new MasterDof(dman, (DofIDItem)d);
+                    dman->appendDof(dof);
+                }
+            }
+        }
+        // set up the integration rule on cell
+        // get required number of IPs
+        int myorder = this->field->interpolation->giveInterpolationOrder() *  this->testField->interpolation->giveInterpolationOrder(); 
+        GaussIntegrationRule ir(0, &cell);
+        int nip = ir.getRequiredNumberOfIntegrationPoints(cell.giveIntegrationDomain(), myorder);
+        if (this->nip>0) {
+            nip = this->nip;
+        }
+        // create nd insert it toelement if not exist yet.
+        std::vector< std :: unique_ptr< IntegrationRule > > &irvec = cell.giveIntegrationRulesArray();
+        bool found = false;
+        int size = irvec.size();
+        for (int i = 0; i< size; i++) {
+            if (irvec[i].get()->giveNumberOfIntegrationPoints() == nip) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            // need to insert right one
+            irvec.resize( size +1);
+            irvec [ size] = std::make_unique<GaussIntegrationRule>(size, &cell);
+            //irvec [ size ]->SetUpPointsOnSquare(nip, this->mode);
+            irvec[size]->setUpIntegrationPoints(cell.giveIntegrationDomain(), nip, this->mode);
+            OOFEM_LOG_INFO("Integration rule with %d nip created for cell %d\n",nip,cell.giveNumber());
+        }
+    }
+    IntegrationRule* giveElementIntegrationRule(Element* e) const override {
+        int myorder = this->field->interpolation->giveInterpolationOrder() *  this->testField->interpolation->giveInterpolationOrder(); 
+        GaussIntegrationRule ir(0, e);
+        int nip = ir.getRequiredNumberOfIntegrationPoints(e->giveIntegrationDomain(), myorder);
+        if (this->nip>0) {
+            nip = this->nip;
+        }
+        std::vector< std :: unique_ptr< IntegrationRule > > &irvec = e->giveIntegrationRulesArray();
+        int size = irvec.size();
+        for (int i = 0; i< size; i++) {
+            if (irvec[i].get()->giveNumberOfIntegrationPoints() == nip) {
+                return irvec[i].get();
+            }
+        }
+        return NULL;
+    }
+};
+
+
 
 /**
 * Element code sample:
@@ -276,7 +281,7 @@ class Term {
  * @brief Base class for elements based on mp (multi-physics) concept
  * 
  */
-class MPElement : public Element {
+class OOFEM_EXPORT MPElement : public Element {
    public:
 
     MPElement (int n, Domain * aDomain) : 

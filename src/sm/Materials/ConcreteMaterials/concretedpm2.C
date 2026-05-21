@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -486,7 +486,7 @@ ConcreteDPM2::hasMaterialModeCapability(MaterialMode mode) const
 
 
 void
-ConcreteDPM2::initializeFrom(InputRecord &ir)
+ConcreteDPM2::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // call the corresponding service for the linear elastic material
     StructuralMaterial::initializeFrom(ir);

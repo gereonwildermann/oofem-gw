@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,13 +64,13 @@ LatticeCrossSection :: checkConsistency()
 }
 
 void
-LatticeCrossSection :: initializeFrom(InputRecord &ir)
+LatticeCrossSection :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     CrossSection :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, this->materialNum, _IFT_LatticeCrossSection_Material);
 
     double thickness = 0.0;
-    if ( ir.hasField(_IFT_LatticeCrossSection_thickness) ) {
+    if ( ir->hasField(_IFT_LatticeCrossSection_thickness) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, thickness, _IFT_LatticeCrossSection_thickness);
         propertyDictionary.add(CS_Thickness, thickness);
     }

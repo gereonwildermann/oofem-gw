@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -454,7 +454,7 @@ Lattice3dBoundary ::   giveDofManDofIDMask(int inode, IntArray &answer) const
 }
 
 void
-Lattice3dBoundary :: initializeFrom(InputRecord &ir, int priority)
+Lattice3dBoundary :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     Lattice3d :: initializeFrom(ir, priority);

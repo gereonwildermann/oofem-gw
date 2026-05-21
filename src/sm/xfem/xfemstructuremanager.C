@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -60,7 +60,7 @@ XfemStructureManager :: XfemStructureManager(Domain *domain) :
 XfemStructureManager :: ~XfemStructureManager()
 {}
 
-void XfemStructureManager :: initializeFrom(InputRecord &ir)
+void XfemStructureManager :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     XfemManager :: initializeFrom(ir);
 
@@ -166,7 +166,7 @@ void XfemStructureManager :: splitCracks()
                 if ( crack_j ) {
                     // If so, find the arc length positions of the intersections on crack i ...
 
-                    std :: vector< FloatArray >intersectionPoints;
+                    std :: vector< Coordinates >intersectionPoints;
                     std :: vector< double >arcPositions_i, arcPositions_j;
                     crack_i->computeCrackIntersectionPoints(* crack_j, intersectionPoints, arcPositions_i);
                     crack_j->computeArcPoints(intersectionPoints, arcPositions_j);
@@ -201,7 +201,7 @@ void XfemStructureManager :: splitCracks()
                                 //                        EnrichmentItem *newEI_1 = new Crack(n1, this, this->giveDomain() );
                                 auto newCrack = std::make_unique<Crack>( n1, this, this->giveDomain() );
 
-                                auto &ir = dataReader.giveInputRecord(DataReader :: IR_enrichItemRec, i);
+                                auto ir = dataReader.giveNextInputRecord(DataReader :: IR_enrichItemRec);
                                 newCrack->initializeFrom(ir);
                                 newCrack->instanciateYourself(dataReader);
 

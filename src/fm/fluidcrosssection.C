@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -45,7 +45,7 @@ FluidCrossSection :: FluidCrossSection(int n, Domain *d) : CrossSection(n, d), m
 
 
 void
-FluidCrossSection :: initializeFrom(InputRecord &ir)
+FluidCrossSection :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     CrossSection :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, this->matNumber, _IFT_FluidCrossSection_material);

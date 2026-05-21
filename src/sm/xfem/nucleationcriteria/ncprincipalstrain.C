@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -124,13 +124,13 @@ std::vector<std::unique_ptr<EnrichmentItem>> NCPrincipalStrain::nucleateEnrichme
 								crackNormal.beColumnOf(principalDirs, 1);
 		//						printf("crackNormal: "); crackNormal.printYourself();
 
-								FloatArray crackTangent = {-crackNormal(1), crackNormal(0)};
+								FloatArray crackTangent = Vec2(-crackNormal(1), crackNormal(0));
 								crackTangent.normalize();
 		//						printf("crackTangent: "); crackTangent.printYourself();
 
 
 								// Create geometry
-								FloatArray pc = {gp->giveGlobalCoordinates()(0), gp->giveGlobalCoordinates()(1)};
+								FloatArray pc = Vec2(gp->giveGlobalCoordinates()[0], gp->giveGlobalCoordinates()[1]);
 		//						printf("Global coord: "); pc.printYourself();
 
 
@@ -156,7 +156,7 @@ std::vector<std::unique_ptr<EnrichmentItem>> NCPrincipalStrain::nucleateEnrichme
 									}
 								}
 
-								FloatArray points = {ps(0), ps(1), pc(0), pc(1), pe(0), pe(1)};
+								FloatArray points = Vec6(ps(0), ps(1), pc(0), pc(1), pe(0), pe(1));
 
 
 								// Check if nucleation is allowed, by checking for already existing cracks close to the GP.
@@ -247,7 +247,7 @@ std::vector<std::unique_ptr<EnrichmentItem>> NCPrincipalStrain::nucleateEnrichme
 }
 
 
-void NCPrincipalStrain::initializeFrom(InputRecord &ir)
+void NCPrincipalStrain::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     NucleationCriterion::initializeFrom(ir);
 

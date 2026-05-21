@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -148,6 +148,9 @@ public:
 
     virtual double giveDamage() const { return 0.0; }     // no default damage
     virtual double giveTempDamage() const { return 0.0; } // no default damage
+
+    FloatArray jumpTractionReduced(const FloatArrayF<3> &vec, GaussPoint *gp) const;
+
 };
 } // end namespace oofem
 #endif // structuralinterfacematerialstatus_h

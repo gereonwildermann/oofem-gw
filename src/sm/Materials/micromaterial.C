@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -93,14 +93,14 @@ MicroMaterial :: MicroMaterial(int n, Domain *d) : StructuralMaterial(n, d), Unk
 {}
 
 
-void MicroMaterial :: initializeFrom(InputRecord &ir)
+void MicroMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, this->inputFileNameMicro, _IFT_MicroMaterial_fileName);
 
     OOFEM_LOG_INFO( "** Instanciating microproblem with BC from file %s\n", inputFileNameMicro.c_str() );
-    OOFEMTXTDataReader drMicro( inputFileNameMicro.c_str() );
-    this->problemMicro = InstanciateProblem(drMicro, _processor, 0); //0=contextFlag-store/resore
-    drMicro.finish();
+    auto drMicro=DataReader::makeFromFilename(inputFileNameMicro );
+    this->problemMicro = InstanciateProblem(*drMicro, _processor, 0); //0=contextFlag-store/resore
+    drMicro->finish();
     OOFEM_LOG_INFO("Microproblem instanciated\n");
 }
 

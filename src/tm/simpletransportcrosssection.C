@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -44,19 +44,19 @@ SimpleTransportCrossSection :: SimpleTransportCrossSection(int n, Domain *d) : T
 
 
 void
-SimpleTransportCrossSection :: initializeFrom(InputRecord &ir)
+SimpleTransportCrossSection :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     TransportCrossSection :: initializeFrom(ir);
 
     IR_GIVE_FIELD(ir, this->matNumber, _IFT_SimpleTransportCrossSection_material);
     this->propertyDictionary.clear();
-    if ( ir.hasField(_IFT_SimpleTransportCrossSection_thickness) ) {
+    if ( ir->hasField(_IFT_SimpleTransportCrossSection_thickness) ) {
         double thickness;
         IR_GIVE_FIELD(ir, thickness, _IFT_SimpleTransportCrossSection_thickness);
         this->propertyDictionary.add(CS_Thickness, thickness);
     }
     double area = 0.0;
-    if ( ir.hasField(_IFT_SimpleTransportCrossSection_area) ) {
+    if ( ir->hasField(_IFT_SimpleTransportCrossSection_area) ) {
         IR_GIVE_FIELD(ir, area, _IFT_SimpleTransportCrossSection_area);
     }
     propertyDictionary.add(CS_Area, area);

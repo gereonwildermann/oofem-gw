@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -494,7 +494,7 @@ MisesMatGrad :: computeLocalDamageDrivingVariable(double &answer, GaussPoint *gp
 
 
 void
-MisesMatGrad :: initializeFrom(InputRecord &ir)
+MisesMatGrad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MisesMat :: initializeFrom(ir);
 

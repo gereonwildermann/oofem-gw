@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -50,7 +50,7 @@ CompoDamageMat :: CompoDamageMat(int n, Domain *d) : StructuralMaterial(n, d)
 }
 
 
-void CompoDamageMat :: initializeFrom(InputRecord &ir)
+void CompoDamageMat :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Material :: initializeFrom(ir);
 

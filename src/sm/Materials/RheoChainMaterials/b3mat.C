@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,7 +43,7 @@ namespace oofem {
 REGISTER_Material(B3Material);
 
 void
-B3Material :: initializeFrom(InputRecord &ir)
+B3Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MaxwellChainMaterial :: initializeFrom(ir);
 
@@ -338,7 +338,8 @@ B3Material :: computeShrinkageStrainVector(FloatArray &answer, GaussPoint *gp, T
     /* ask for humidity and temperature from external sources, if provided */
     FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
     FieldPtr tf;
-    FloatArray gcoords, et2, ei2, stressVector, fullStressVector;
+    FloatArray et2, ei2, stressVector, fullStressVector;
+    Coordinates gcoords;
 
     if ( ( tf = fm->giveField(FT_Temperature) ) ) {
         // temperature field registered

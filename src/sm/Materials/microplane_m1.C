@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -47,7 +47,7 @@ M1Material :: M1Material(int n, Domain *d) : MicroplaneMaterial(n, d)
 { }
 
 void
-M1Material :: initializeFrom(InputRecord &ir)
+M1Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MicroplaneMaterial :: initializeFrom(ir);
 
@@ -366,7 +366,7 @@ M1Material :: givePlaneStressStiffMtrx(FloatMatrix &answer, MatResponseMode rMod
 
 
 void
-M1Material :: initializeFrom(InputRecord &ir)
+M1Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 

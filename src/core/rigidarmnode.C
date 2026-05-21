@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -55,7 +55,7 @@ RigidArmNode :: RigidArmNode(int n, Domain *aDomain) : Node(n, aDomain)
 
 
 void
-RigidArmNode :: initializeFrom(InputRecord &ir, int priority)
+RigidArmNode :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
 
     Node :: initializeFrom(ir, priority);

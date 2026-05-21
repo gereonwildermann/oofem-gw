@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -138,7 +138,7 @@ LIBeam2d :: computeStressVector(FloatArray &answer, const FloatArray &strain, Ga
 
 
 int
-LIBeam2d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+LIBeam2d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     double ksi, n1, n2;
 
@@ -146,7 +146,7 @@ LIBeam2d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoor
     n1  = ( 1. - ksi ) * 0.5;
     n2  = ( 1. + ksi ) * 0.5;
 
-    answer.resize(3);
+    answer.zero();
     answer.at(1) = n1 * this->giveNode(1)->giveCoordinate(1) + n2 *this->giveNode(2)->giveCoordinate(1);
     if (xy) {
         answer.at(2) = n1 * this->giveNode(1)->giveCoordinate(2) + n2 *this->giveNode(2)->giveCoordinate(2);
@@ -340,7 +340,7 @@ LIBeam2d :: givePitch()
 
 
 void
-LIBeam2d :: initializeFrom(InputRecord &ir, int priority)
+LIBeam2d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralElement :: initializeFrom(ir, priority);
     ParameterManager &ppm = domain->elementPPM;

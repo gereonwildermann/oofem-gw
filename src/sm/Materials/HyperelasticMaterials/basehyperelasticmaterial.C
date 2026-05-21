@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2020   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ BaseHyperElasticMaterial::compute_d2VolumetricEnergy_dF2(const Tensor2_3d &F) co
 
 
 void
-BaseHyperElasticMaterial::initializeFrom(InputRecord &ir)
+BaseHyperElasticMaterial::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // volumetric energy constant, usually bulk modulus
     IR_GIVE_FIELD(ir, K, _IFT_BaseHyperElasticMaterial_k);

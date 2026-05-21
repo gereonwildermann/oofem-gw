@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -304,7 +304,7 @@ TrabBoneGrad3D :: computeCumPlastStrain(GaussPoint *gp, TimeStep *tStep) const
 
 
 void
-TrabBoneGrad3D :: initializeFrom(InputRecord &ir)
+TrabBoneGrad3D :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     TrabBone3D :: initializeFrom(ir);
 

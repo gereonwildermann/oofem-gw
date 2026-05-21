@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ IntMatElastic :: give3dStiffnessMatrix_dTdj(MatResponseMode rMode, GaussPoint *g
 }
 
 void
-IntMatElastic :: initializeFrom(InputRecord &ir)
+IntMatElastic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

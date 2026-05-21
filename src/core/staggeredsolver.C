@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -77,7 +77,7 @@ StaggeredSolver :: StaggeredSolver(Domain *d, EngngModel *m) : NRSolver(d, m)
 
 
 void
-StaggeredSolver :: initializeFrom(InputRecord &ir)
+StaggeredSolver :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     NRSolver ::initializeFrom(ir);
 

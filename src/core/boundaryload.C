@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -91,7 +91,7 @@ BoundaryLoad :: computeValueAt(FloatArray &answer, TimeStep *tStep, const FloatA
 
 
 void
-BoundaryLoad :: initializeFrom(InputRecord &ir)
+BoundaryLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Load :: initializeFrom(ir);
 

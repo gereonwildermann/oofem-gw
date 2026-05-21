@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -455,7 +455,7 @@ Quad1MindlinShell3D::computeStiffnessMatrix(FloatMatrix &answer, MatResponseMode
 
 
 void
-Quad1MindlinShell3D::initializeFrom(InputRecord &ir, int priority)
+Quad1MindlinShell3D::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     StructuralElement::initializeFrom(ir, priority);
@@ -634,7 +634,7 @@ Quad1MindlinShell3D::computeLCS()
     }
 
     for ( int i = 1; i <= 4; i++ ) {
-        this->lnodes [ i - 1 ].beProductOf(this->lcsMatrix, this->giveNode(i)->giveCoordinates() );
+        this->lnodes [ i - 1 ] = this->lcsMatrix * this->giveNode(i)->giveCoordinates();//beProductOf(this->lcsMatrix, this->giveNode(i)->giveCoordinates() );
     }
 }
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -51,7 +51,7 @@ IntMatIsoDamageTable :: IntMatIsoDamageTable(int n, Domain *d) : IntMatIsoDamage
 
 
 void
-IntMatIsoDamageTable :: initializeFrom(InputRecord &ir)
+IntMatIsoDamageTable :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

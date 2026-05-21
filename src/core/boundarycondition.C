@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -77,15 +77,15 @@ double BoundaryCondition :: give(Dof *dof, ValueModeType mode, double time)
 
 
 void
-BoundaryCondition :: initializeFrom(InputRecord &ir)
+BoundaryCondition :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     GeneralBoundaryCondition :: initializeFrom(ir);
 
-    if ( ir.hasField(_IFT_BoundaryCondition_values) ) {
+    if ( ir->hasField(_IFT_BoundaryCondition_values) ) {
         IR_GIVE_FIELD(ir, values, _IFT_BoundaryCondition_values);
     } else {
         double prescribedValue;
-        if ( ir.hasField(_IFT_BoundaryCondition_PrescribedValue) ) {
+        if ( ir->hasField(_IFT_BoundaryCondition_PrescribedValue) ) {
             IR_GIVE_FIELD(ir, prescribedValue, _IFT_BoundaryCondition_PrescribedValue);
         } else {
             IR_GIVE_FIELD(ir, prescribedValue, _IFT_BoundaryCondition_PrescribedValue_d);

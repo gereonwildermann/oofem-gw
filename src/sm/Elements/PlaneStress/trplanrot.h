@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ protected:
     void computeStressVector(FloatArray &answer, const FloatArray &strain, GaussPoint *gp, TimeStep *tStep) override;
 
     double giveArea() override;
-    virtual void giveNodeCoordinates(FloatArray &x, FloatArray &y);
+    virtual void giveNodeCoordinates(Coordinates &x, Coordinates &y);
 
     void computeBodyLoadVectorAt(FloatArray &answer, Load *forLoad, TimeStep *tStep, ValueModeType mode) override;
 
@@ -80,7 +80,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_TrPlaneStrRot_Name; }
     const char *giveClassName() const override { return "TrPlaneStrRot"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     MaterialMode giveMaterialMode() override { return _PlaneStressRot; }
 

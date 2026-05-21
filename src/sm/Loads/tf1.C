@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ TF1 :: computeValueAt(FloatArray &answer, TimeStep *tStep, const FloatArray &coo
 }
 
 void
-TF1 :: initializeFrom(InputRecord &ir)
+TF1 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
 }
 } // end namespace oofem

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -76,7 +76,7 @@ PrescribedGradientBCNeumann :: ~PrescribedGradientBCNeumann()
 }
 
 
-void PrescribedGradientBCNeumann :: initializeFrom(InputRecord &ir)
+void PrescribedGradientBCNeumann :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
     PrescribedGradientHomogenization :: initializeFrom(ir);
@@ -362,7 +362,7 @@ void PrescribedGradientBCNeumann :: integrateTangent(FloatMatrix &oTangent, Elem
         // const auto &xE = * ( e->giveDofManager( edgeNodes.at( edgeNodes.giveSize() ) )->giveCoordinates() );
 
         std :: vector< Line >segments;
-        std :: vector< FloatArray >intersecPoints;
+        std :: vector< Coordinates >intersecPoints;
         xfemElInt->partitionEdgeSegment(iBndIndex, segments, intersecPoints);
         MaterialMode matMode = e->giveMaterialMode();
         ir = std::make_unique<DiscontinuousSegmentIntegrationRule>(1, e, segments);
@@ -375,14 +375,14 @@ void PrescribedGradientBCNeumann :: integrateTangent(FloatMatrix &oTangent, Elem
     oTangent.clear();
 
     for ( auto &gp: *ir ) {
-        const FloatArray &lcoords = gp->giveNaturalCoordinates();
+        const Coordinates &lcoords = gp->giveNaturalCoordinates();
         FEIElementGeometryWrapper cellgeo(e);
 
         // Evaluate the normal;
         double detJ = interp->boundaryEvalNormal(normal, iBndIndex, lcoords, cellgeo);
 
         // Compute global coordinates of Gauss point
-        FloatArray globalCoord;
+        Coordinates globalCoord;
 
         interp->boundaryLocal2Global(globalCoord, iBndIndex, lcoords, cellgeo);
 

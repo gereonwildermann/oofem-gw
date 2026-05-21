@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -51,7 +51,7 @@ Crack :: Crack(int n, XfemManager *xm, Domain *aDomain) : HybridEI(n, xm, aDomai
     };
 }
 
-void Crack :: initializeFrom(InputRecord &ir)
+void Crack :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     EnrichmentItem :: initializeFrom(ir);
 }
@@ -97,7 +97,7 @@ void Crack :: callGnuplotExportModule(GnuplotExportModule &iExpMod, TimeStep *tS
     iExpMod.outputXFEM(* this, tStep);
 }
 
-void Crack :: computeCrackIntersectionPoints(Crack &iCrack, std :: vector< FloatArray > &oIntersectionPoints, std :: vector< double > &oArcPositions)
+void Crack :: computeCrackIntersectionPoints(Crack &iCrack, std :: vector< Coordinates > &oIntersectionPoints, std :: vector< double > &oArcPositions)
 {
     const double tol = 1.0e-12;
 
@@ -124,7 +124,7 @@ void Crack :: computeCrackIntersectionPoints(Crack &iCrack, std :: vector< Float
     }
 }
 
-void Crack :: computeArcPoints(const std :: vector< FloatArray > &iIntersectionPoints, std :: vector< double > &oArcPositions)
+void Crack :: computeArcPoints(const std :: vector< Coordinates > &iIntersectionPoints, std :: vector< double > &oArcPositions)
 {
     const double tol = 1.0e-12;
 

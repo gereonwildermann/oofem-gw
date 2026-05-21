@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -81,7 +81,7 @@ public:
 
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     Interface *giveInterface(InterfaceType it) override;
 
@@ -94,7 +94,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_LIBeam2d_Name; }
     const char *giveClassName() const override { return "LIBeam2d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void initializeFinish() override;
 
     MaterialMode giveMaterialMode() override { return _2dBeam; }

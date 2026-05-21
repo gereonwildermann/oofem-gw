@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -49,7 +49,7 @@ namespace oofem {
 REGISTER_BoundaryCondition(NeumannMomentLoad);
 
 void
-NeumannMomentLoad :: initializeFrom(InputRecord &ir)
+NeumannMomentLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     BoundaryLoad :: initializeFrom(ir);
 
@@ -79,13 +79,13 @@ NeumannMomentLoad :: computeXbar()
 
         auto iRule = i->giveIntegrationRule(3, thisElement->giveGeometryType() );
 
-        FloatArray coord;
+        Coordinates coord;
         for ( auto &gp: *iRule ) {
             FloatArray lcoords = gp->giveNaturalCoordinates();
             double detJ = i->giveTransformationJacobian(lcoords, FEIElementGeometryWrapper(thisElement));
 
             i->local2global(coord, lcoords, FEIElementGeometryWrapper(thisElement));
-            coord.times(gp->giveWeight()*fabs(detJ));
+            coord *=(gp->giveWeight()*fabs(detJ));
 
             V += gp->giveWeight()*fabs(detJ);
 

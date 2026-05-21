@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -57,10 +57,10 @@ RVEStokesFlowMaterialStatus :: RVEStokesFlowMaterialStatus(int n, int rank, Gaus
     TransportMaterialStatus(g), oldTangent(true)
 {
     OOFEM_LOG_INFO( "************************** Instanciating microproblem from file %s\n", inputfile.c_str() );
-    OOFEMTXTDataReader dr( inputfile.c_str() );
+    auto dr=DataReader::makeFromFilename(inputfile);
 
-    auto e = InstanciateProblem(dr, _processor, 0);
-    dr.finish();
+    auto e = InstanciateProblem(*dr, _processor, 0);
+    dr->finish();
  
     if ( dynamic_cast< StokesFlowVelocityHomogenization* >(e.get()) ) {
         this->rve.reset( dynamic_cast< StokesFlowVelocityHomogenization* >(e.release()) );
@@ -128,7 +128,7 @@ RVEStokesFlow :: RVEStokesFlow(int n, Domain *d) : TransportMaterial(n, d)
 { }
 
 
-void RVEStokesFlow :: initializeFrom(InputRecord &ir)
+void RVEStokesFlow :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, this->rveFilename, _IFT_RVEStokesFlow_fileName);
 }
@@ -154,7 +154,7 @@ RVEStokesFlow :: giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateTy
     case IST_Tangent:
     {
         const auto &temp = status->giveTangentMatrix();
-        answer = {temp(0,0), temp(0,1), temp(0,2), temp(1,0), temp(1,1), temp(1,2), temp(2,0), temp(2,1), temp(2,2)};
+        answer = Vec9(temp(0,0), temp(0,1), temp(0,2), temp(1,0), temp(1,1), temp(1,2), temp(2,0), temp(2,1), temp(2,2));
         return 1;
     }
     default:

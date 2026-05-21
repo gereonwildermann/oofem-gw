@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -89,7 +89,7 @@ PrescribedDispSlipBCNeumannRC :: ~PrescribedDispSlipBCNeumannRC()
 }
 
 
-void PrescribedDispSlipBCNeumannRC :: initializeFrom(InputRecord &ir)
+void PrescribedDispSlipBCNeumannRC :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
     PrescribedDispSlipHomogenization :: initializeFrom(ir);
@@ -681,7 +681,7 @@ void PrescribedDispSlipBCNeumannRC :: integrateTangentStress(FloatMatrix &oTange
         double detJ = interp->boundaryEvalNormal(normal, iBndIndex, lcoords, cellgeo);
 
         // Compute global coordinates of Gauss point
-        FloatArray globalCoord;
+        Coordinates globalCoord;
         interp->boundaryLocal2Global(globalCoord, iBndIndex, lcoords, cellgeo);
 
         // Compute local coordinates on the element
@@ -874,7 +874,7 @@ void PrescribedDispSlipBCNeumannRC::integrateTangentRStressConcrete( FloatMatrix
         double detJ = interp->boundaryEvalNormal(normal, iBndIndex, lcoords, cellgeo);
 
         //Compute global coordinates of Gauss point
-        FloatArray globalCoord;
+        Coordinates globalCoord;
         interp->boundaryLocal2Global(globalCoord, iBndIndex, lcoords, cellgeo);
 
         //Compute local coordinates on the element

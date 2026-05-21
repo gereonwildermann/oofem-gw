@@ -9,7 +9,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -279,7 +279,7 @@ KelvinChainMaterial :: CreateStatus(GaussPoint *gp) const
 }
 
 void
-KelvinChainMaterial :: initializeFrom(InputRecord &ir)
+KelvinChainMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RheoChainMaterial :: initializeFrom(ir);
     this->giveDiscreteTimes(); // Makes sure the new discrete times are evaluated.

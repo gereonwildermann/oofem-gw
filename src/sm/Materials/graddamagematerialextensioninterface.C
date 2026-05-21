@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ GradientDamageMaterialExtensionInterface :: giveGradientDamageStiffnessMatrix_dd
   
 
 void
-GradientDamageMaterialExtensionInterface :: initializeFrom(InputRecord &ir)
+GradientDamageMaterialExtensionInterface :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // read the characteristic length
     IR_GIVE_FIELD(ir, internalLength, _IFT_GradientDamageMaterialExtensionInterface_l);

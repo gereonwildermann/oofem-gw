@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ public:
     virtual ~IntElLine2() { }
     FEInterpolation *giveInterpolation() const override;
     int computeNumberOfDofs() override { return 12; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
 
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_IntElLine2_Name; }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -92,7 +92,7 @@ LSpace :: giveInterface(InterfaceType interface)
 
 
 void
-LSpace :: initializeFrom(InputRecord &ir, int priority)
+LSpace :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     Structural3DElement :: initializeFrom(ir, priority);
     ParameterManager &ppm = this->giveDomain()->elementPPM;
@@ -111,7 +111,7 @@ LSpace :: computeBmatrixAt(GaussPoint *gp, FloatMatrix &answer, int li, int ui)
     FloatMatrix dNdx, dNdxShear;
     interp->evaldNdx( dNdx, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(this) );
     if ( this->reducedShearIntegration ) {
-        interp->evaldNdx( dNdxShear, { 0., 0., 0. }, FEIElementGeometryWrapper(this) );
+        interp->evaldNdx( dNdxShear, Vec3( 0., 0., 0. ), FEIElementGeometryWrapper(this) );
     } else {
         dNdxShear =  dNdx;
     }

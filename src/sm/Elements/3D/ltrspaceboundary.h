@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ protected:
     void giveInternalForcesVector(FloatArray &answer, TimeStep *tStep, int useUpdatedGpRecord = 0) override;
     void computeStiffnessMatrix(FloatMatrix &answer, MatResponseMode rMode, TimeStep *tStep) override;
     double computeVolumeAround(GaussPoint *gp) override;
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
     double giveLengthInDir(const FloatArray &normalToCrackPlane) override;
 
@@ -91,7 +91,7 @@ public:
     void recalculateCoordinates(int nodeNumber, FloatArray &coords) override;
 
     // definition & identification
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     const char *giveInputRecordName() const override { return _IFT_LTRSpaceBoundary_Name; }
     const char *giveClassName() const override { return "LTRSpaceBoundary"; }

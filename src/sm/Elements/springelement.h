@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -118,7 +118,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_SpringElement_Name; }
     const char *giveClassName() const override { return "SpringElement"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     Element_Geometry_Type giveGeometryType() const override { return EGT_point; }
 
 protected:

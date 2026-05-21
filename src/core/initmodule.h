@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -74,7 +74,7 @@ public:
     /// Destructor
     virtual ~InitModule();
     /// Initializes receiver according to object description stored in input record.
-    virtual void initializeFrom(InputRecord &ir) = 0;
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir) = 0;
     /// Reads the input. Abstract service.
     virtual void doInit() = 0;
     /// Returns class name of the receiver.

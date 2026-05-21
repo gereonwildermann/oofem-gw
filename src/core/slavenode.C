@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,7 +48,7 @@ REGISTER_DofManager(SlaveNode);
 ParamKey SlaveNode::IPK_SlaveNode_masterDofManagers("masterdofman");
 ParamKey SlaveNode::IPK_SlaveNode_weights("weights");
 
-void SlaveNode :: initializeFrom(InputRecord &ir, int priority)
+void SlaveNode :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm =  this->giveDomain()->dofmanPPM;
 

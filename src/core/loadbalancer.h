@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -78,7 +78,7 @@ public:
     virtual ~LoadBalancerMonitor() { }
 
     /// Initializes receiver according to object description stored in input record.
-    virtual void initializeFrom(InputRecord &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
 
     /**@name Load evaluation and imbalance detection methods*/
     //@{
@@ -157,7 +157,7 @@ public:
 
     //@}
     ///Initializes receiver according to object description stored in input record.
-    virtual void initializeFrom(InputRecord &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
 
     /// Returns reference to its domain.
     Domain *giveDomain() { return domain; }

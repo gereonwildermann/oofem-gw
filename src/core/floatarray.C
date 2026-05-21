@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,14 +71,14 @@ namespace oofem {
         if(n==size()){ _DBG("rwv/AFTER"); return; }
         Index size0=size();
         VectorXd::conservativeResize(n);
-        (*this).tail(size()-size0).array()=0.;
+        if(size0<n) (*this).tail(n-size0).array()=0.;
         _DBG("rwv/AFTER");
     }
     void FloatArray::resize(Index n){
         _DBG("r/BEFORE");
         Index size0=size();
         VectorXd::conservativeResize(n);
-        (*this).tail(size()-size0).array()=0.;
+        if(size0<n) (*this).tail(n-size0).array()=0.;
         _DBG("r/AFTER");
     }
 #else
@@ -104,7 +104,7 @@ namespace oofem {
     {
     #ifndef NDEBUG
         if ( allocChunk < 0 ) {
-            OOFEM_FATAL("allocChunk must be non-negative; %d", allocChunk);
+            OOFEM_FATAL("allocChunk must be non-negative; %ld", allocChunk);
         }
 
     #endif
@@ -190,6 +190,7 @@ void FloatArray :: copySubVector(const FloatArray &src, int si){ this->resizeWit
 void FloatArray :: power(const double exponent){ *this=this->array().pow(exponent).matrix(); }
 void FloatArray :: beColumnOf(const FloatMatrix &mat, int col){ *this=mat.col(col-1); }
 void FloatArray :: beRowOf(const FloatMatrix &mat, Index row){ *this=mat.row(row-1).transpose(); }
+FloatArray &FloatArray :: operator = ( const double & val ){ this->array()=val; return *this; }
 #else
 
 bool FloatArray :: isAllFinite() const
@@ -298,6 +299,9 @@ void FloatArray :: plusProduct(const FloatMatrix &b, const FloatArray &s, double
 #  ifndef NDEBUG
     if ( this->giveSize() != b.giveNumberOfColumns() ) {
         OOFEM_ERROR( "dimension mismatch in a[%d] and b[%d, *]", this->giveSize(), b.giveNumberOfColumns() );
+    }
+    if (b.rows() != s.giveSize()) {
+        OOFEM_ERROR( "dimension mismatch in b[*,%d] and s[%d]", b.giveNumberOfRows(), s.giveSize() );
     }
 #  endif
 
@@ -426,7 +430,7 @@ void FloatArray :: beDifferenceOf(const FloatArray &a, const FloatArray &b, Inde
 {
 #ifndef NDEBUG
     if ( a.size() < n || b.size() < n ) {
-        OOFEM_ERROR("wrong size ", a.giveSize(), b.giveSize());
+        OOFEM_ERROR("wrong size %d vs %d", a.giveSize(), b.giveSize());
     }
 
 #endif
@@ -600,6 +604,11 @@ double FloatArray :: distance_square(const FloatArray &from) const
 // returns distance between receiver and from from
 // computed using generalized pythagorean formulae
 {
+#ifndef NDEBUG
+    if ( this->giveSize() != from.giveSize() ) {
+        OOFEM_ERROR("dimension mismatch in distance_square(x[%d], y[%d])", this->giveSize(), from.giveSize());
+    }
+#endif
     double dist = 0.;
     Index s = min(this->size(), from.size());
     for (Index i = 1; i <= s; ++i ) {
@@ -620,7 +629,7 @@ void FloatArray :: assemble(const FloatArray &fe, const IntArray &loc)
     Index n = fe.size();
 #  ifndef NDEBUG
     if ( n != (Index) loc.size() ) {
-        OOFEM_ERROR("dimensions of 'fe' (%d) and 'loc' (%d) mismatch", fe.giveSize(), loc.giveSize() );
+        OOFEM_ERROR("dimensions of 'fe' (%d) and 'loc' (%d) mismatch", (int)fe.giveSize(), (int)loc.giveSize() );
     }
 
 #  endif
@@ -641,7 +650,7 @@ void FloatArray :: assembleSquared(const FloatArray &fe, const IntArray &loc)
     Index n = fe.size();
 #  ifndef NDEBUG
     if ( n != (Index) loc.size() ) {
-        OOFEM_ERROR("dimensions of 'fe' (%d) and 'loc' (%d) mismatch", fe.giveSize(), loc.giveSize() );
+        OOFEM_ERROR("dimensions of 'fe' (%d) and 'loc' (%d) mismatch", (int)fe.giveSize(), (int)loc.giveSize() );
     }
 
 #  endif
@@ -684,7 +693,6 @@ void FloatArray :: zero()
 {
     std::fill(this->begin(), this->end(), 0.);
 }
-
 
 
 void FloatArray :: beProductOf(const FloatMatrix &aMatrix, const FloatArray &anArray)
@@ -946,6 +954,8 @@ int FloatArray :: givePackSize(DataStream &buff) const
     return buff.givePackSizeOfSizet(1) + buff.givePackSizeOfDouble(this->giveSize());
 }
 
+
+#ifndef _USE_EIGEN
 // IML compat
 
 FloatArray &FloatArray :: operator = ( const double & val )
@@ -999,6 +1009,13 @@ FloatArray &operator -= ( FloatArray & x, const FloatArray & y )
     x.subtract(y);
     return x;
 }
+
+FloatArray &operator /= ( FloatArray & x, const double & a )
+{
+    x.times(1./a);
+    return x;
+}
+#endif
 
 double dot(const FloatArray &x, const FloatArray &y)
 {
@@ -1057,7 +1074,7 @@ void FloatArray :: beVectorForm(const FloatMatrix &aMatrix)
     }
 
 #  endif
-    *this = {
+    *this = Vec9(
         aMatrix.at(1, 1),
         aMatrix.at(2, 2),
         aMatrix.at(3, 3),
@@ -1067,7 +1084,7 @@ void FloatArray :: beVectorForm(const FloatMatrix &aMatrix)
         aMatrix.at(3, 2),
         aMatrix.at(3, 1),
         aMatrix.at(2, 1)
-    };
+    );
 }
 
 void FloatArray :: beSymVectorFormOfStrain(const FloatMatrix &aMatrix)
@@ -1080,14 +1097,14 @@ void FloatArray :: beSymVectorFormOfStrain(const FloatMatrix &aMatrix)
     }
 #  endif
 
-    *this = {
+    *this = Vec6(
         aMatrix.at(1, 1),
         aMatrix.at(2, 2),
         aMatrix.at(3, 3),
         ( aMatrix.at(2, 3) + aMatrix.at(3, 2) ),
         ( aMatrix.at(1, 3) + aMatrix.at(3, 1) ),
         ( aMatrix.at(1, 2) + aMatrix.at(2, 1) )
-    };
+            );
 }
 
 
@@ -1101,14 +1118,14 @@ void FloatArray :: beSymVectorForm(const FloatMatrix &aMatrix)
 
 #  endif
 
-    *this = {
+    *this = Vec6(
         aMatrix.at(1, 1),
         aMatrix.at(2, 2),
         aMatrix.at(3, 3),
         0.5 * ( aMatrix.at(2, 3) + aMatrix.at(3, 2) ),
         0.5 * ( aMatrix.at(1, 3) + aMatrix.at(3, 1) ),
         0.5 * ( aMatrix.at(1, 2) + aMatrix.at(2, 1) )
-    };
+    );
 }
 
 void FloatArray :: changeComponentOrder()

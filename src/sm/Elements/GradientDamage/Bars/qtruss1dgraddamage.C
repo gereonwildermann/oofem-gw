@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -99,7 +99,7 @@ QTruss1dGradDamage :: giveDofManDofIDMask_d(IntArray &answer) const
 
 
 void
-QTruss1dGradDamage :: initializeFrom(InputRecord &ir, int priority)
+QTruss1dGradDamage :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralElement :: initializeFrom(ir, priority);
 }

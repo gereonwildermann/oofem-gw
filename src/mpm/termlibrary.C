@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -153,11 +153,11 @@ void gNTfTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolatio
 
 // BTamN Term (Qp)
 
-BTamNTerm::BTamNTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at) : MPMSymbolicTerm(testField, unknownField, _Unknown), aType(at) {}
+BTamNTerm::BTamNTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at) : GenericCellTerm(testField, unknownField, _Unknown), aType(at) {}
 
 void BTamNTerm::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatMatrix B, mn;
-    FloatArray m({1,1,1,0,0,0}), Np;
+    FloatArray m=Vec6(1,1,1,0,0,0), Np;
     MaterialMode mmode = (mode==0)?gp->giveMaterialMode():mode;
     this->field->interpolation->evalN(Np, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(aType, gp, tstep));
@@ -218,11 +218,11 @@ void BTamNTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolati
 
 // NTamTBTerm Term (Q^T du/dt)
 
-NTamTBTerm::NTamTBTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at, ValueModeType ufieldVM) : MPMSymbolicTerm(testField, unknownField, _Unknown), aType(at), unknownFieldVMT(ufieldVM) {}
+NTamTBTerm::NTamTBTerm (const Variable *testField, const Variable* unknownField, MatResponseMode at, ValueModeType ufieldVM) : GenericCellTerm(testField, unknownField, _Unknown), aType(at), unknownFieldVMT(ufieldVM) {}
 
 void NTamTBTerm::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatMatrix B, mb;
-    FloatArray m({1,1,1,0,0,0}), Np;
+    FloatArray m=Vec6(1,1,1,0,0,0), Np;
     MaterialMode mmode = (mode==0)?gp->giveMaterialMode():mode;
     this->testField->interpolation->evalN(Np, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     m.times(e.giveCrossSection()->giveMaterial(gp)->giveCharacteristicValue(aType, gp, tstep));
@@ -285,7 +285,7 @@ void NTamTBTerm::grad(FloatMatrix& answer, const Variable *v, const FEInterpolat
 
 // NTcN Term (S(dp/dt))
 
-NTcN::NTcN (const Variable *testField, const Variable* unknownField, MatResponseMode ctype, ValueModeType uFieldVMT) : MPMSymbolicTerm(testField, unknownField, _Unknown), ctype(ctype), unknownFieldVMT(uFieldVMT) {}
+NTcN::NTcN (const Variable *testField, const Variable* unknownField, MatResponseMode ctype, ValueModeType uFieldVMT) : GenericCellTerm(testField, unknownField, _Unknown), ctype(ctype), unknownFieldVMT(uFieldVMT) {}
 
 void NTcN::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
     FloatArray Np;

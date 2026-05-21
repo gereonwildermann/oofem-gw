@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -66,7 +66,7 @@ LinkSlip :: LinkSlip(int n, Domain *d) : StructuralInterfaceMaterial(n, d)
 
 
 void
-LinkSlip :: initializeFrom(InputRecord &ir)
+LinkSlip :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);;
     

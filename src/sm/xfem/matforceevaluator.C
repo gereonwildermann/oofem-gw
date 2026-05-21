@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -68,7 +68,8 @@ void MaterialForceEvaluator::computeMaterialForce(FloatArray &oMatForce, Domain 
     localizer->giveAllElementsWithNodesWithinBox(elList, iTipInfo.mGlobalCoord, iRadius);
 
     if ( elList.isEmpty() ) {
-        FloatArray lcoords, closest;
+        FloatArray lcoords;
+        Coordinates closest;
         Element *closestEl = localizer->giveElementClosestToPoint(lcoords, closest, iTipInfo.mGlobalCoord);
 
         if ( closestEl != nullptr ) {
@@ -93,7 +94,7 @@ void MaterialForceEvaluator::computeMaterialForce(FloatArray &oMatForce, Domain 
         for ( int nodeInd : elNodes ) {
             DofManager *dMan = iDomain.giveDofManager(nodeInd);
 
-            weightInNodes[nodeInd] = computeWeightFunctionInPoint( dMan->giveCoordinates(), iTipInfo.mGlobalCoord, iRadius);
+            weightInNodes[nodeInd] = computeWeightFunctionInPoint( Vec3(dMan->giveCoordinate(1), dMan->giveCoordinate(2), dMan->giveCoordinate(3)), iTipInfo.mGlobalCoord, iRadius);
         }
 
     }

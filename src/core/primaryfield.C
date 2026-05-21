@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -426,7 +426,7 @@ PrimaryField :: __evaluateAt(FloatArray &answer, const FloatArray &coords,
 }
 
 int
-PrimaryField :: evaluateAt(FloatArray &answer, const FloatArray &coords,
+PrimaryField :: evaluateAt(FloatArray &answer, const Coordinates &coords,
                            ValueModeType mode, TimeStep *tStep)
 {
     return this->__evaluateAt(answer, coords, mode, tStep, NULL);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -45,6 +45,7 @@
 #include "verbose.h"
 #include "classfactory.h"
 #include "domain.h"
+#include "progressbar.h"
 
 #include <stdlib.h>
 
@@ -77,28 +78,13 @@ StaggeredProblem :: ~StaggeredProblem()
 
 ///////////
 int
-StaggeredProblem :: instanciateYourself(DataReader &dr, InputRecord &ir, const char *dataOutputFileName, const char *desc)
+StaggeredProblem :: instanciateYourself(DataReader &dr, const std::shared_ptr<InputRecord> &ir, const char *dataOutputFileName, const char *desc)
 {
     int result;
     result = EngngModel :: instanciateYourself(dr, ir, dataOutputFileName, desc);
-    ir.finish();
     // instanciate slave problems
     result &= this->instanciateSlaveProblems();
     return result;
-}
-
-int
-StaggeredProblem :: instanciateDefaultMetaStep(InputRecord &ir)
-{
-    if ( timeDefinedByProb ) {
-        /* just set a nonzero number of steps;
-         * needed for instanciateDefaultMetaStep to pass; overall has no effect as time stepping is deteremined by slave
-         */
-        this->numberOfSteps = 1;
-    }
-    EngngModel :: instanciateDefaultMetaStep(ir);
-    //there are no slave problems initiated so far, the overall metaStep will defined in a slave problem instantiation
-    return 1;
 }
 
 int
@@ -108,9 +94,10 @@ StaggeredProblem :: instanciateSlaveProblems()
     //EngngModel *timeDefProb = NULL;
     emodelList.resize( inputStreamNames.size() );
     if ( timeDefinedByProb ) {
-        OOFEMTXTDataReader dr(inputStreamNames [ timeDefinedByProb - 1 ]);
-        std :: unique_ptr< EngngModel >prob( InstanciateProblem(dr, this->pMode, this->contextOutputMode, this) );
+        auto dr=DataReader::makeFromFilename(inputStreamNames [ timeDefinedByProb - 1 ]);
+        std :: unique_ptr< EngngModel >prob( InstanciateProblem(*dr, this->pMode, this->contextOutputMode, this) );
         //timeDefProb = prob.get();
+        dr->finish();
         emodelList [ timeDefinedByProb - 1 ] = std :: move(prob);
     }
 
@@ -119,9 +106,10 @@ StaggeredProblem :: instanciateSlaveProblems()
             continue;
         }
 
-        OOFEMTXTDataReader dr(inputStreamNames [ i - 1 ]);
+        auto dr=DataReader::makeFromFilename(inputStreamNames [ i - 1 ]);
         //the slave problem dictating time needs to have attribute master=NULL, other problems point to the dictating slave
-        std :: unique_ptr< EngngModel >prob( InstanciateProblem(dr, this->pMode, this->contextOutputMode, this) );
+        std :: unique_ptr< EngngModel >prob( InstanciateProblem(*dr, this->pMode, this->contextOutputMode, this) );
+        dr->finish();
         emodelList [ i - 1 ] = std :: move(prob);
     }
 
@@ -130,27 +118,27 @@ StaggeredProblem :: instanciateSlaveProblems()
 
 
 void
-StaggeredProblem :: initializeFrom(InputRecord &ir)
+StaggeredProblem :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, numberOfSteps, _IFT_EngngModel_nsteps);
     if ( numberOfSteps <= 0 ) {
         throw ValueInputException(ir, _IFT_EngngModel_nsteps, "nsteps must be > 0");
     }
-    if ( ir.hasField(_IFT_StaggeredProblem_deltat) ) {
+    if ( ir->hasField(_IFT_StaggeredProblem_deltat) ) {
         EngngModel :: initializeFrom(ir);
         IR_GIVE_FIELD(ir, deltaT, _IFT_StaggeredProblem_deltat);
         dtFunction = 0;
-    } else if ( ir.hasField(_IFT_StaggeredProblem_prescribedtimes) ) {
+    } else if ( ir->hasField(_IFT_StaggeredProblem_prescribedtimes) ) {
         EngngModel :: initializeFrom(ir);
         IR_GIVE_FIELD(ir, discreteTimes, _IFT_StaggeredProblem_prescribedtimes);
         dtFunction = 0;
-    } else if ( ir.hasField(_IFT_StaggeredProblem_dtf) ) {
+    } else if ( ir->hasField(_IFT_StaggeredProblem_dtf) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, dtFunction, _IFT_StaggeredProblem_dtf);
     } else {
         IR_GIVE_FIELD(ir, timeDefinedByProb, _IFT_StaggeredProblem_timeDefinedByProb);
     }
 
-    if ( ir.hasField(_IFT_StaggeredProblem_adaptiveStepLength) ) {
+    if ( ir->hasField(_IFT_StaggeredProblem_adaptiveStepLength) ) {
         adaptiveStepLength = true;
         this->minStepLength = 0.;
         IR_GIVE_OPTIONAL_FIELD(ir, minStepLength, _IFT_StaggeredProblem_minsteplength);
@@ -174,13 +162,13 @@ StaggeredProblem :: initializeFrom(InputRecord &ir)
     //    IR_GIVE_OPTIONAL_FIELD(ir, timeLag, _IFT_StaggeredProblem_timeLag);
 
     inputStreamNames.resize(2);
-    if ( ir.hasField(_IFT_StaggeredProblem_prob3) ){
+    if ( ir->hasField(_IFT_StaggeredProblem_prob3) ){
         inputStreamNames.resize(3);
     }
     
     IR_GIVE_FIELD(ir, inputStreamNames [ 0 ], _IFT_StaggeredProblem_prob1);
     IR_GIVE_FIELD(ir, inputStreamNames [ 1 ], _IFT_StaggeredProblem_prob2);
-    if ( ir.hasField(_IFT_StaggeredProblem_prob3) ){
+    if ( ir->hasField(_IFT_StaggeredProblem_prob3) ){
         IR_GIVE_OPTIONAL_FIELD(ir, inputStreamNames [ 2 ], _IFT_StaggeredProblem_prob3);
     }
     
@@ -198,7 +186,7 @@ StaggeredProblem :: initializeFrom(InputRecord &ir)
         domainList.clear();
     }
 
-    suppressOutput = ir.hasField(_IFT_EngngModel_suppressOutput);
+    suppressOutput = ir->hasField(_IFT_EngngModel_suppressOutput);
 
     if ( suppressOutput ) {
         printf("Suppressing output.\n");
@@ -234,14 +222,14 @@ StaggeredProblem :: updateAttributes(MetaStep *mStep)
     }
 
     if ( !timeDefinedByProb ) {
-        if ( ir.hasField(_IFT_StaggeredProblem_deltat) ) {
+        if ( ir->hasField(_IFT_StaggeredProblem_deltat) ) {
             IR_GIVE_FIELD(ir, deltaT, _IFT_StaggeredProblem_deltat);
             IR_GIVE_OPTIONAL_FIELD(ir, dtFunction, _IFT_StaggeredProblem_dtf);
             IR_GIVE_OPTIONAL_FIELD(ir, stepMultiplier, _IFT_StaggeredProblem_stepmultiplier);
             if ( stepMultiplier < 0 ) {
                 OOFEM_ERROR("stepMultiplier must be > 0")
             }
-        } else if ( ir.hasField(_IFT_StaggeredProblem_prescribedtimes) ) {
+        } else if ( ir->hasField(_IFT_StaggeredProblem_prescribedtimes) ) {
             IR_GIVE_FIELD(ir, discreteTimes, _IFT_StaggeredProblem_prescribedtimes);
         }
     }
@@ -441,6 +429,22 @@ StaggeredProblem :: solveYourself()
         sjstep = sp->giveMetaStep(smstep)->giveStepRelativeNumber( sp->giveCurrentStep()->giveNumber() ) + 1;
     }
 
+    bool showProgress=true;
+    std::string progressMsg = std::string(PRG_VERSION_SHORT) + " | Solution Progress:";
+    if ( this->master || (( this->giveNumberOfSteps() == 1 ) && ( this->giveNumberOfMetaSteps() == 1 )) ) {
+        showProgress=false;
+    }
+    if ( showProgress ) {
+        oofem_ProgressBar.initialize();
+        if ( showProgress ) oofem_ProgressBar.update(0, "OOFEM");
+    }
+
+    // determine the total number of steps accross all meta steps, for progress bar
+    int totalSteps = 0;
+    for ( int imstep = 1; imstep <= sp->giveNumberOfMetaSteps(); imstep++ ) {
+        totalSteps += sp->giveMetaStep(imstep)->giveNumberOfSteps();
+    }
+    int stepCounter = 0; // for progress bar
     for ( int imstep = smstep; imstep <= sp->giveNumberOfMetaSteps(); imstep++ ) { //loop over meta steps
         MetaStep *activeMStep = sp->giveMetaStep(imstep);
         // update state according to new meta step in all slaves
@@ -448,6 +452,7 @@ StaggeredProblem :: solveYourself()
 
         int nTimeSteps = activeMStep->giveNumberOfSteps();
         for ( int jstep = sjstep; jstep <= nTimeSteps; jstep++ ) { //loop over time steps
+            stepCounter++; // for progress bar
             this->timer.startTimer(EngngModelTimer :: EMTT_SolutionStepTimer);
             this->timer.initTimer(EngngModelTimer :: EMTT_NetComputationalStepTimer);
             sp->preInitializeNextStep();
@@ -466,6 +471,9 @@ StaggeredProblem :: solveYourself()
             sp->giveCurrentStep()->solutionTime = _steptime;
             
             this->terminate( sp->giveCurrentStep() );
+
+            // update progress bar
+            if ( showProgress ) oofem_ProgressBar.update( stepCounter / ( double ) totalSteps, progressMsg.c_str() );
 
             OOFEM_LOG_INFO("EngngModel info: user time consumed by solution step %d: %.2fs\n",
                            sp->giveCurrentStep()->giveNumber(), _steptime);

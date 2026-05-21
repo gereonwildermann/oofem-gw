@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -123,7 +123,7 @@ IntElSurfTr1 :: computeAreaAround(IntegrationPoint *ip)
     this->computeCovarBaseVectorsAt(ip, G1, G2);
     double weight  = ip->giveWeight();
     G3.beVectorProductOf(G1, G2);
-    return 0.5 * G3.computeNorm() * weight;
+    return G3.computeNorm() * weight;
 }
 
 void
@@ -166,15 +166,16 @@ IntElSurfTr1 :: computeTransformationMatrixAt(GaussPoint *gp, FloatMatrix &answe
 
 
 int
-IntElSurfTr1 :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+IntElSurfTr1 :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
-    FloatArray N, meanNode;
+    FloatArray N;
+    Coordinates meanNode;
     this->interpolation.evalN( N, lcoords, FEIElementGeometryWrapper(this) );
-    answer.resize(3);
+    //answer.resize(3);
     answer.zero();
     for ( int i = 1; i <= 3; i++ ) {
         meanNode = 0.5 * ( this->giveNode(i)->giveCoordinates() + this->giveNode(i + 3)->giveCoordinates() );
-        answer += N.at(i) * meanNode;
+        answer.add(N.at(i), meanNode);
     }
 
     return 1;
@@ -182,7 +183,7 @@ IntElSurfTr1 :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &l
 
 
 bool
-IntElSurfTr1 :: computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords)
+IntElSurfTr1 :: computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords)
 {
     OOFEM_ERROR("Not implemented");
     //return false;

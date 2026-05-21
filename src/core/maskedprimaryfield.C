@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -36,7 +36,7 @@
 
 namespace oofem {
 int
-MaskedPrimaryField :: evaluateAt(FloatArray &answer, const FloatArray &coords,
+MaskedPrimaryField :: evaluateAt(FloatArray &answer, const Coordinates &coords,
                                  ValueModeType mode, TimeStep *tStep)
 {
     return this->master->__evaluateAt(answer, coords, mode, tStep, & mask);

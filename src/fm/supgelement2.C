@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -58,7 +58,7 @@ SUPGElement2 :: SUPGElement2(int n, Domain *aDomain) :
 
 
 void
-SUPGElement2 :: initializeFrom(InputRecord &ir, int priority)
+SUPGElement2 :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     SUPGElement :: initializeFrom(ir, priority);
 }

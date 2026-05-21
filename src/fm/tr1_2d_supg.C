@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -98,7 +98,7 @@ FEInterpolation *
 TR1_2D_SUPG :: giveInterpolation() const { return & interp; }
 
 void
-TR1_2D_SUPG :: initializeFrom(InputRecord &ir, int priority)
+TR1_2D_SUPG :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     SUPGElement :: initializeFrom(ir, priority);
 

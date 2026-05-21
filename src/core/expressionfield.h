@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ public:
 //     Constructor.
     ExpressionField(void);
    
-    int evaluateAt(FloatArray &answer, const FloatArray &coords,
+    int evaluateAt(FloatArray &answer, const Coordinates &coords,
                            ValueModeType mode, TimeStep *tStep) override;
                            
                            
@@ -81,7 +81,7 @@ public:
     
     const char *giveClassName() const override { return "ExpressionField"; }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 };
 
 } // end namespace oofem

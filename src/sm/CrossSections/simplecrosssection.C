@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -504,26 +504,26 @@ SimpleCrossSection::give2dPlateSubSoilStiffMtrx(MatResponseMode rMode, GaussPoin
 
 
 void
-SimpleCrossSection::initializeFrom(InputRecord &ir)
+SimpleCrossSection::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     CrossSection::initializeFrom(ir);
 
     double value;
 
     double thick = 0.0;
-    if ( ir.hasField(_IFT_SimpleCrossSection_thick) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_thick) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, thick, _IFT_SimpleCrossSection_thick);
         propertyDictionary.add(CS_Thickness, thick);
     }
 
     double width = 0.0;
-    if ( ir.hasField(_IFT_SimpleCrossSection_width) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_width) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, width, _IFT_SimpleCrossSection_width);
         propertyDictionary.add(CS_Width, width);
     }
 
     double area = 0.0;
-    if ( ir.hasField(_IFT_SimpleCrossSection_area) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_area) ) {
         IR_GIVE_FIELD(ir, area, _IFT_SimpleCrossSection_area);
     } else {
         area = thick * width;
@@ -575,7 +575,7 @@ SimpleCrossSection::initializeFrom(InputRecord &ir)
     this->materialNumber = 0;
     IR_GIVE_OPTIONAL_FIELD(ir, this->materialNumber, _IFT_SimpleCrossSection_MaterialNumber);
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_directorx) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_directorx) ) {
         value = 0.0;
         IR_GIVE_FIELD(ir, value, _IFT_SimpleCrossSection_directorx);
         propertyDictionary.add(CS_DirectorVectorX, value);
@@ -891,7 +891,8 @@ SimpleCrossSection::giveTemperatureVector(FloatArray &answer, GaussPoint *gp, Ti
 
     if ( ( tf = fm->giveField(FT_Temperature) ) ) {
         // temperature field registered
-        FloatArray gcoords, et2;
+        Coordinates gcoords;
+        FloatArray et2;
         int err;
         elem->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
         if ( ( err = tf->evaluateAt(et2, gcoords, VM_Total, tStep) ) ) {

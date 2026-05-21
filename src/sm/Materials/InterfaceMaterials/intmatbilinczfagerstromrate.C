@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -98,9 +98,8 @@ IntMatBilinearCZFagerstromRate :: giveFirstPKTraction_3d(const FloatArrayF<3> &d
         Qtrial += dot(Kstiff, dJ);
 
         double Qn = Qtrial.at(3);
-        auto QtrialShear = {Qtrial.at(1), Qtrial.at(2), 0.};
 
-        double Qt = norm(QtrialShear);
+        double Qt = norm(Vec2(Qtrial.at(1), Qtrial.at(2)));
 
         //double S = this->GIc/this->sigf;
         double sigf = this->sigf;
@@ -298,7 +297,7 @@ IntMatBilinearCZFagerstromRate :: giveFirstPKTraction_3d(const FloatArrayF<3> &d
 
 //const double tolerance = 1.0e-12; // small number
 void
-IntMatBilinearCZFagerstromRate :: initializeFrom(InputRecord &ir)
+IntMatBilinearCZFagerstromRate :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, kn0, _IFT_IntMatBilinearCZFagerstrom_kn);
     this->knc = kn0;                        // Defaults to the same stiffness in compression and tension

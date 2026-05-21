@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -144,4 +144,16 @@ void StructuralInterfaceMaterialStatus :: addStateVariables(const MaterialStatus
 {
     OOFEM_ERROR("not implemented");
 }
+
+FloatArray
+StructuralInterfaceMaterialStatus::jumpTractionReduced(const FloatArrayF<3> &vec, GaussPoint *gp) const
+{
+    if (gp->giveMaterialMode() == _1dInterface)
+        return FloatArray::fromIniList({ vec.at(1) });
+    else if (gp->giveMaterialMode() == _2dInterface)
+        return FloatArray::fromIniList({ vec.at(1), vec.at(2) });
+    else
+        return FloatArray::fromIniList({ vec.at(1), vec.at(2), vec.at(3) }); // for 3d, return full vector
+        
+}   
 } // end namespace oofem

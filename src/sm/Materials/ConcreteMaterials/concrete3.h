@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -67,7 +67,7 @@ public:
         delete linearElasticMaterial;
     }
 
-     void initializeFrom(InputRecord &ir) override;
+     void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
      const char *giveClassName() const override { return "Concrete3"; }
      const char *giveInputRecordName() const override { return _IFT_Concrete3_Name; }
 

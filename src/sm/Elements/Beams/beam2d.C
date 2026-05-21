@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -381,7 +381,7 @@ Beam2d :: giveLocalCoordinateSystem(FloatMatrix &answer)
 
 
 void
-Beam2d :: initializeFrom(InputRecord &ir, int priority)
+Beam2d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     // first call parent
     BeamBaseElement :: initializeFrom(ir, priority);
@@ -459,7 +459,8 @@ Beam2d :: computeBoundaryEdgeLoadVector(FloatArray &answer, BoundaryLoad *load, 
     }
 
     double l = this->computeLength();
-    FloatArray coords, t;
+    Coordinates coords;
+    FloatArray t;
     FloatMatrix N, T;
 
     answer.clear();

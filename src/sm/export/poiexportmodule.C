@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ POIExportModule :: ~POIExportModule()
 
 
 void
-POIExportModule :: initializeFrom(InputRecord &ir)
+POIExportModule :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule :: initializeFrom(ir);
 
@@ -248,7 +248,8 @@ void
 POIExportModule :: exportPrimVarAs(UnknownType valID, FILE *stream, TimeStep *tStep)
 {
     Domain *d = emodel->giveDomain(1);
-    FloatArray pv, coords(3), lcoords, closest;
+    FloatArray pv, lcoords;
+    Coordinates coords, closest;
     InternalStateValueType type = ISVT_UNDEFINED;
 
     if ( valID == DisplacementVector ) {

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -109,15 +109,15 @@ NodeErrorCheckingRule :: NodeErrorCheckingRule(const std :: string &line, double
     }
 }
 
-NodeErrorCheckingRule :: NodeErrorCheckingRule(InputRecord& ir, double tol): ErrorCheckingRule(tol){
+NodeErrorCheckingRule :: NodeErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol){
     std::string unknown;
-    ir.giveField(tstep,"tStep");
-    ir.giveOptionalField(tsubstep,"tStepVer");
-    ir.giveField(number,"number");
-    ir.giveField(dofid,"dof");
-    ir.giveField(unknown,"unknown");
-    ir.giveField(value,"value");
-    ir.giveOptionalField(tolerance,"tolerance");
+    ir->giveField(tstep,"tStep");
+    ir->giveOptionalField(tsubstep,"tStepVer");
+    ir->giveField(number,"number");
+    ir->giveField(dofid,"dof");
+    ir->giveField(unknown,"unknown");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
     if ( unknown == "d" ) {
         mode = VM_Total;
     } else if ( unknown == "v" ) {
@@ -209,6 +209,21 @@ InternalElementDofManErrorCheckingRule::InternalElementDofManErrorCheckingRule (
     }
 }
 
+InternalElementDofManErrorCheckingRule::InternalElementDofManErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    std::string unknown;
+    ir->giveField(tstep,"tStep");
+    ir->giveField(number,"number");
+    ir->giveField(idofman,"dofman");
+    ir->giveField(dofid,"dof");
+    ir->giveField(unknown,"unknown");
+    ir->giveField(value,"value");
+    if(unknown=="d") mode=VM_Total;
+    else if(unknown=="v") mode=VM_Velocity;
+    else if(unknown=="a") mode=VM_Acceleration;
+    else OOFEM_ERROR("Can't recognize unknown '%s' (must be one of: d, v, a)",unknown.c_str());
+}
+
+
 bool
 InternalElementDofManErrorCheckingRule :: check(Domain *domain, TimeStep *tStep)
 {
@@ -298,18 +313,18 @@ ElementErrorCheckingRule :: ElementErrorCheckingRule(const std :: string &line, 
     ist = (InternalStateType)istnum;
 }
 
-ElementErrorCheckingRule :: ElementErrorCheckingRule(InputRecord& ir, double tol): ErrorCheckingRule(tol) {
-    ir.giveField(tstep,"tStep");
-    ir.giveOptionalField(tsubstep,"tStepVer");
-    ir.giveField(number,"number");
-    ir.giveOptionalField(irule,"irule");
-    ir.giveField(gpnum,"gp");
+ElementErrorCheckingRule :: ElementErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    ir->giveField(tstep,"tStep");
+    ir->giveOptionalField(tsubstep,"tStepVer");
+    ir->giveField(number,"number");
+    ir->giveOptionalField(irule,"irule");
+    ir->giveField(gpnum,"gp");
     int istnum;
-    ir.giveField(istnum,"keyword");
+    ir->giveField(istnum,"keyword");
     ist = (InternalStateType)istnum;
-    ir.giveField(component,"component");
-    ir.giveField(value,"value");
-    ir.giveOptionalField(tolerance,"tolerance");
+    ir->giveField(component,"component");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
 }
 
 bool
@@ -322,6 +337,7 @@ ElementErrorCheckingRule :: check(Domain *domain, TimeStep *tStep)
 
     FloatArray ipval;
     Element *element = domain->giveGlobalElement(number);
+    // std::cerr<<"Element "<<number<<" @ "<<(void*)element<<std::endl;
     if ( !element ) {
         if ( domain->giveEngngModel()->isParallel() ) {
             return true;
@@ -406,6 +422,18 @@ BeamElementErrorCheckingRule :: BeamElementErrorCheckingRule(const std :: string
         OOFEM_ERROR("Something wrong in the error checking rule: %s\n", line.c_str());
     }
     ist = (BeamElementErrorCheckingRule::BeamElementValueType)istnum;
+}
+
+BeamElementErrorCheckingRule :: BeamElementErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    ir->giveField(tstep,"tStep");
+    ir->giveOptionalField(tsubstep,"tStepVer");
+    ir->giveField(number,"number");
+    int istnum;
+    ir->giveField(istnum,"keyword");
+    ist = (BeamElementErrorCheckingRule::BeamElementValueType)istnum;
+    ir->giveField(component,"component");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
 }
 
 bool
@@ -527,13 +555,13 @@ ReactionErrorCheckingRule :: ReactionErrorCheckingRule(const std :: string &line
     }
 }
 
-ReactionErrorCheckingRule :: ReactionErrorCheckingRule(InputRecord& ir, double tol): ErrorCheckingRule(tol) {
-    ir.giveField(tstep,"tStep");
-    ir.giveOptionalField(tsubstep,"tStepVer");
-    ir.giveField(number,"number");
-    ir.giveField(dofid,"dof");
-    ir.giveField(value,"value");
-    ir.giveOptionalField(tolerance,"tolerance");
+ReactionErrorCheckingRule :: ReactionErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    ir->giveField(tstep,"tStep");
+    ir->giveOptionalField(tsubstep,"tStepVer");
+    ir->giveField(number,"number");
+    ir->giveField(dofid,"dof");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
 }
 
 bool
@@ -639,6 +667,12 @@ LoadLevelErrorCheckingRule :: LoadLevelErrorCheckingRule(const std :: string &li
     }
 }
 
+LoadLevelErrorCheckingRule :: LoadLevelErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    ir->giveField(tstep,"tStep");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
+}
+
 
 bool
 LoadLevelErrorCheckingRule :: check(Domain *domain, TimeStep *tStep)
@@ -677,6 +711,13 @@ EigenValueErrorCheckingRule :: EigenValueErrorCheckingRule(const std :: string &
     }
 }
 
+EigenValueErrorCheckingRule :: EigenValueErrorCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol) {
+    ir->giveField(tstep,"tStep");
+    ir->giveField(number,"EigNum");
+    ir->giveField(value,"value");
+    ir->giveOptionalField(tolerance,"tolerance");
+}
+
 bool
 EigenValueErrorCheckingRule :: check(Domain *domain, TimeStep *tStep)
 {
@@ -707,6 +748,8 @@ TimeCheckingRule :: TimeCheckingRule(const std :: string &line, double tol) :
 {
 }
 
+TimeCheckingRule::TimeCheckingRule(const std::shared_ptr<InputRecord>& ir, double tol): ErrorCheckingRule(tol){ }
+
 bool
 TimeCheckingRule :: check(Domain *domain, TimeStep *tStep)
 {
@@ -729,7 +772,7 @@ ErrorCheckingExportModule :: ErrorCheckingExportModule(int n, EngngModel *e) : E
 }
 
 void
-ErrorCheckingExportModule :: initializeFrom(InputRecord &ir)
+ErrorCheckingExportModule :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule :: initializeFrom(ir);
 
@@ -738,7 +781,7 @@ ErrorCheckingExportModule :: initializeFrom(InputRecord &ir)
 
     filename = std::string("");
 
-    if ( ir.hasField(_IFT_ErrorCheckingExportModule_filename) ) {
+    if ( ir->hasField(_IFT_ErrorCheckingExportModule_filename) ) {
         IR_GIVE_FIELD(ir, this->filename, _IFT_ErrorCheckingExportModule_filename);
     }
     else {
@@ -746,14 +789,14 @@ ErrorCheckingExportModule :: initializeFrom(InputRecord &ir)
     }
     #ifdef _USE_XML
         /* we need to cast to XMLInputRecord just to get the reader object */
-        XMLInputRecord* xmlrec=dynamic_cast<XMLInputRecord*>(&ir);
+        std::shared_ptr<XMLInputRecord> xmlrec=std::dynamic_pointer_cast<XMLInputRecord>(ir);
         if(xmlrec) this->readRulesFromRecords(*(xmlrec->giveReader()),ir);
         else
     #endif
     this->readRulesFromTextFile(ir);
 
     this->writeIST.clear();
-    writeChecks = ir.hasField(_IFT_ErrorCheckingExportModule_writeIST);
+    writeChecks = ir->hasField(_IFT_ErrorCheckingExportModule_writeIST);
     if ( writeChecks ) {
         IR_GIVE_FIELD(ir, this->writeIST, _IFT_ErrorCheckingExportModule_writeIST);
     }
@@ -765,7 +808,7 @@ ErrorCheckingExportModule :: initializeFrom(InputRecord &ir)
     IR_GIVE_OPTIONAL_FIELD(ir, this->extractorMode, _IFT_ErrorCheckingExportModule_extractormode);
 }
 
-void ErrorCheckingExportModule::readRulesFromTextFile(InputRecord& ir){
+void ErrorCheckingExportModule::readRulesFromTextFile(const std::shared_ptr<InputRecord>& ir){
     // Reads all the rules;
     std :: ifstream inputStream(this->filename);
     if ( !inputStream ) {
@@ -783,37 +826,25 @@ void ErrorCheckingExportModule::readRulesFromTextFile(InputRecord& ir){
     }
 }
 
-void ErrorCheckingExportModule::readRulesFromRecords(DataReader& dr, InputRecord& ir){
+void ErrorCheckingExportModule::readRulesFromRecords(DataReader& dr, const std::shared_ptr<InputRecord>& ir){
     double tol=1e-6;
-    ir.giveOptionalField(tol,"tolerance");
-    DataReader::GroupRecords ruleRecs=dr.giveGroupRecords("",/*whatever*/DataReader::IR_elemRec,-1);
-    for(auto& rir: ruleRecs){
+    ir->giveOptionalField(tol,"tolerance");
+    DataReader::GroupRecords ruleRecs=dr.giveGroupRecords(DataReader::IR_errorcheckRec,-1);
+    for(auto rir: ruleRecs){
         std::string n;
-        rir.giveRecordKeywordField(n);
+        rir->giveRecordKeywordField(n);
         // std::cerr<<"Check rule of type "<<n<<std::endl;
         std::unique_ptr<ErrorCheckingRule> rule;
         if (n=="NODE") { rule=std::make_unique<NodeErrorCheckingRule>(rir,tol); }
         if (n=="ELEMENT") { rule=std::make_unique<ElementErrorCheckingRule>(rir,tol); }
         if (n=="REACTION") { rule=std::make_unique<ReactionErrorCheckingRule>(rir,tol); }
-        // else { std::cerr<<"not yet implemented."<<std::endl; }
-        #if 0
-        } else if ( line.compare(0, 12, "#ELEMENTNODE") == 0 ) {
-            return std::make_unique<InternalElementDofManErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 8, "#ELEMENT") == 0 ) {
-            return std::make_unique<ElementErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 13, "#BEAM_ELEMENT") == 0 ) {
-            return std::make_unique<BeamElementErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 9, "#REACTION") == 0 ) {
-            return std::make_unique<ReactionErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 10, "#LOADLEVEL") == 0 ) {
-            return std::make_unique<LoadLevelErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 7, "#EIGVAL") == 0 ) {
-            return std::make_unique<EigenValueErrorCheckingRule>(line, errorTolerance);
-        } else if ( line.compare(0, 5, "#TIME") == 0 ) {
-            return std::make_unique<TimeCheckingRule>(line, errorTolerance);
-        #endif
+        if (n=="BEAM_ELEMENT") { rule=std::make_unique<BeamElementErrorCheckingRule>(rir,tol); }
+        if (n=="EIGVAL") { rule=std::make_unique<EigenValueErrorCheckingRule>(rir,tol); }
+        if (n=="LOADLEVEL") { rule=std::make_unique<LoadLevelErrorCheckingRule>(rir,tol); }
+        if (n=="TIME") { rule=std::make_unique<TimeCheckingRule>(rir,tol); }
+        if (n=="ELEMENTNODE") { rule=std::make_unique<InternalElementDofManErrorCheckingRule>(rir,tol); }
         if(rule) errorCheckingRules.push_back(std::move(rule));
-        else { std::cerr<<"No rule for "<<n<<" created."<<std::endl; }
+        else { OOFEM_ERROR("%s: unknown error checking rule '%s'",rir->giveLocation().c_str(),n.c_str()); }
     }
 }
 

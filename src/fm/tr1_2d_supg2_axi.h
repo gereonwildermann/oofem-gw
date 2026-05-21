@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -58,7 +58,7 @@ protected:
      * myPoly[1] Occupied by second fluid (air).
      */
     Polygon myPoly [ 2 ];
-    std::vector< FloatArray > vcoords [ 2 ];
+    std::vector< Coordinates > vcoords [ 2 ];
 
     integrationDomain id [ 2 ];
     /**
@@ -95,7 +95,7 @@ public:
     const char *giveClassName() const override { return "TR1_2D_SUPG2_AXI"; }
     const char *giveInputRecordName() const override { return _IFT_TR1_2D_SUPG2_AXI_Name; }
     MaterialMode giveMaterialMode() override { return _2dAxiFlow; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void giveInputRecord(DynamicInputRecord &input) override;
 
     void printOutputAt(FILE *file, TimeStep *tStep) override;
@@ -115,7 +115,7 @@ protected:
     void computeTangent(FloatMatrix &answer, MatResponseMode mode, GaussPoint *gp, TimeStep *tStep) override;
     void updateVolumePolygons(Polygon &referenceFluidPoly, Polygon &secondFluidPoly, int &rfPoints, int &sfPoints,
                               const FloatArray &normal, const double p, bool updFlag);
-    double computeVolumeAroundID(GaussPoint *gp, integrationDomain id, const std::vector< FloatArray > &idpoly);
+    double computeVolumeAroundID(GaussPoint *gp, integrationDomain id, const std::vector< Coordinates > &idpoly);
     double computeRadiusAt(GaussPoint *gp);
     void computeBMtrx(FloatMatrix &answer, GaussPoint *gp);
     void computeNVector(FloatArray &answer, GaussPoint *gp);

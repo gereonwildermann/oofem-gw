@@ -11,7 +11,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ qcNode :: qcNode(int n, Domain *aDomain) : Node(n, aDomain)
 #endif
 }
 
-void qcNode :: initializeFrom(InputRecord &ir, int priority)
+void qcNode :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     Node :: initializeFrom(ir, priority);
 
@@ -153,7 +153,7 @@ void qcNode :: postInitializeAsHangingNode()
 
     // First check element and interpolation
     if ( masterElement == -1 ) { // Then we find it by taking the closest (probably containing element)
-        FloatArray closest;
+        Coordinates closest;
         SpatialLocalizer *sp = this->domain->giveSpatialLocalizer();
         sp->init();
         // Closest point or containing point? It should be contained, but with numerical errors it might be slightly outside

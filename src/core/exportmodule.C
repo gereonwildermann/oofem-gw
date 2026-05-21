@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -56,9 +56,9 @@ ExportModule :: ~ExportModule()
 
 
 void
-ExportModule :: initializeFrom(InputRecord &ir)
+ExportModule :: initializeFrom(const std::shared_ptr<InputRecord>& ir)
 {
-    tstep_all_out_flag = ir.hasField(_IFT_ExportModule_tstepall);
+    tstep_all_out_flag = ir->hasField(_IFT_ExportModule_tstepall);
 
     tstep_step_out = 0;
     IR_GIVE_OPTIONAL_FIELD(ir, tstep_step_out, _IFT_ExportModule_tstepstep);
@@ -70,7 +70,7 @@ ExportModule :: initializeFrom(InputRecord &ir)
 
     IR_GIVE_OPTIONAL_FIELD(ir, pythonExport, _IFT_ExportModule_pythonexport);
     
-    domain_all_flag = ir.hasField(_IFT_ExportModule_domainall);
+    domain_all_flag = ir->hasField(_IFT_ExportModule_domainall);
 
     if ( !domain_all_flag ) {
         domainMask.clear();

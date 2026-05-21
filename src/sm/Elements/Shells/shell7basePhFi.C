@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ Shell7BasePhFi :: Shell7BasePhFi(int n, Domain *aDomain) : Shell7Base(n, aDomain
 	this->numberOfLayers = nLayers;
 }
 
-void Shell7BasePhFi :: initializeFrom(InputRecord &ir, int priority)
+void Shell7BasePhFi :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     Shell7Base :: initializeFrom(ir, priority);
 }
@@ -1282,7 +1282,7 @@ Shell7BasePhFi :: computeBmatrixForStressRecAt(FloatArray &lcoords, FloatMatrix 
 }
 
 
-std::vector<FloatArray>
+std::vector<Coordinates>
 Shell7BasePhFi :: giveFictiousNodeCoordsForExport(int layer)
 {
     // compute fictious node coords

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -52,7 +52,7 @@ FluidMaterialEvaluator :: FluidMaterialEvaluator(int i, EngngModel *_master) : E
 }
 
 
-void FluidMaterialEvaluator :: initializeFrom(InputRecord &ir)
+void FluidMaterialEvaluator :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     this->deltaT = 1.0;
     IR_GIVE_OPTIONAL_FIELD(ir, this->deltaT, _IFT_FluidMaterialEvaluator_deltat);

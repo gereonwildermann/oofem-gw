@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -65,7 +65,7 @@ CrossSection :: setupIntegrationPoints(IntegrationRule &irule, int npointsXY, in
 }
 
 void
-CrossSection :: initializeFrom(InputRecord &ir)
+CrossSection :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // Read set number the cross section is applied to
     this->setNumber = 0;

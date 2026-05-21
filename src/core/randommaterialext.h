@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -111,7 +111,7 @@ public:
      * The density of material is read into property dictionary (keyword 'd')
      * Intended to be called from material initializeFrom service.
      */
-    void initializeFrom(InputRecord &ir);
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir);
     void giveInputRecord(DynamicInputRecord &ir);
     /**
      * Returns the property in associated status of given integration point if defined.

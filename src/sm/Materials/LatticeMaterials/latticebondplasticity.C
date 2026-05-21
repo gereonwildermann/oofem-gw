@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -74,7 +74,7 @@ LatticeBondPlasticity::computeDHardeningDKappa(double kappa) const
 
 
 void
-LatticeBondPlasticity::initializeFrom(InputRecord &ir)
+LatticeBondPlasticity::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LatticeLinearElastic::initializeFrom(ir);
 

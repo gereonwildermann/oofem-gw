@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -1196,7 +1196,7 @@ LayeredCrossSection::imposeStrainConstrainsOnGradient(GaussPoint *gp, FloatArray
 
 
 void
-LayeredCrossSection::initializeFrom(InputRecord &ir)
+LayeredCrossSection::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     CrossSection::initializeFrom(ir);
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -40,7 +40,7 @@ namespace oofem {
 REGISTER_BoundaryCondition(Reinforcement);
 
 void
-Reinforcement :: initializeFrom(InputRecord &ir)
+Reinforcement :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
 #  ifdef VERBOSE
     // VERBOSE_PRINT1 ("Instanciating load ",number)

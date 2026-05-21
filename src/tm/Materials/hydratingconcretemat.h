@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,7 +43,6 @@
 #define _IFT_HydratingConcreteMat_Name "hydratingconcretemat"
 #define _IFT_HydratingConcreteMat_referenceTemperature "referencetemperature"
 #define _IFT_HydratingConcreteMat_relMatAge "relmatage"
-#define _IFT_HydratingConcreteMat_castAt "castat"
 #define _IFT_HydratingConcreteMat_hydrationModelType "hydrationmodeltype"
 #define _IFT_HydratingConcreteMat_maxModelIntegrationTime "maxmodelintegrationtime"
 #define _IFT_HydratingConcreteMat_minModelTimeStepIntegrations "minmodeltimestepintegrations"
@@ -97,7 +96,7 @@ public:
 
     const char *giveClassName() const override { return "HydratingConcreteMat"; }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     // post-processing
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;

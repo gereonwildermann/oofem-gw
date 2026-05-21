@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -38,6 +38,7 @@
 #include <cstdio>
 #include <map>
 
+#include "oofemcfg.h"
 #include "femcmpnn.h"
 #include "intarray.h"
 #include "floatarray.h"
@@ -100,7 +101,7 @@ class OOFEM_EXPORT DofManager : public FEMComponent
 {
 protected:
     /// Array storing nodal coordinates.
-    FloatArray coordinates;
+    Coordinates coordinates;
 
     /// Array of DOFs.
     std::vector< Dof * > dofArray;
@@ -387,11 +388,11 @@ public:
         return this->coordinates.at(i);
     }
     /// @return Pointer to node coordinate array.
-    const FloatArray &giveCoordinates() const { return this->coordinates; }
+    const Coordinates &giveCoordinates() const { return this->coordinates; }
     //@}
 
     /// Set coordinates
-    void setCoordinates(const FloatArray &coords) {
+    void setCoordinates(const Coordinates &coords) {
         this->coordinates = coords;
     }
     
@@ -453,8 +454,8 @@ public:
      */
     virtual bool giveMasterDofMans(IntArray &masters);
 
-    void initializeFrom(InputRecord &ir) override { initializeFrom(ir, 1); };
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override { initializeFrom(ir, 1); };
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void initializeFinish() override;
     void postInitialize() override;
 

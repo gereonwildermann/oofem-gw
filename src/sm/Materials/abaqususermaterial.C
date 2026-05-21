@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,7 +71,7 @@ AbaqusUserMaterial::~AbaqusUserMaterial()
 #endif
 }
 
-void AbaqusUserMaterial::initializeFrom(InputRecord &ir)
+void AbaqusUserMaterial::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     std::string umatname;
 
@@ -119,11 +119,11 @@ void AbaqusUserMaterial::initializeFrom(InputRecord &ir)
 
 #endif
 
-    if ( ir.hasField(_IFT_AbaqusUserMaterial_numericalTangent) ) {
+    if ( ir->hasField(_IFT_AbaqusUserMaterial_numericalTangent) ) {
         mUseNumericalTangent = true;
     }
 
-    if ( ir.hasField(_IFT_AbaqusUserMaterial_numericalTangentPerturbation) ) {
+    if ( ir->hasField(_IFT_AbaqusUserMaterial_numericalTangentPerturbation) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, mPerturbation, _IFT_AbaqusUserMaterial_numericalTangentPerturbation);
         printf("mPerturbation: %e\n", mPerturbation);
     }
@@ -292,7 +292,7 @@ AbaqusUserMaterial::giveRealStressVector_3d(const FloatArrayF< 6 > &strain, Gaus
     /* An array containing the coordinates of this point. These are the current coordinates if geometric
      * nonlinearity is accounted for during the step (see “Procedures: overview,” Section 6.1.1); otherwise,
      * the array contains the original coordinates of the point */
-    FloatArray coords;
+    Coordinates coords;
     gp->giveElement()->computeGlobalCoordinates(coords, gp->giveNaturalCoordinates() );
 
     /* Rotation increment matrix. This matrix represents the increment of rigid body rotation of the basis
@@ -444,7 +444,7 @@ AbaqusUserMaterial::giveFirstPKStressVector_3d(const FloatArrayF< 9 > &vF, Gauss
     /* An array containing the coordinates of this point. These are the current coordinates if geometric
      * nonlinearity is accounted for during the step (see “Procedures: overview,” Section 6.1.1); otherwise,
      * the array contains the original coordinates of the point */
-    FloatArray coords;
+    Coordinates coords;
     gp->giveElement()->computeGlobalCoordinates(coords, gp->giveNaturalCoordinates() );  ///@todo Large deformations?
 
     /* Rotation increment matrix. This matrix represents the increment of rigid body rotation of the basis

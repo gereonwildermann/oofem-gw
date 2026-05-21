@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -127,7 +127,7 @@ protected:
 public:
     StructuralFE2Material(int n, Domain * d);
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     const char *giveInputRecordName() const override { return _IFT_StructuralFE2Material_Name; }
     const char *giveClassName() const override { return "StructuralFE2Material"; }

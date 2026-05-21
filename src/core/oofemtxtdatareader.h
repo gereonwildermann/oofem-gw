@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,18 +53,18 @@ class OOFEM_EXPORT OOFEMTXTDataReader : public DataReader
 {
 protected:
     std :: string dataSourceName;
-    std :: list< OOFEMTXTInputRecord > recordList;
+    std :: list< std::shared_ptr<OOFEMTXTInputRecord> > recordList;
 
     /// Keeps track of the current position in the list
-    std :: list< OOFEMTXTInputRecord > :: iterator it;
+    std :: list< std::shared_ptr<OOFEMTXTInputRecord> > :: iterator it;
 
 public:
     /// Constructor.
-    OOFEMTXTDataReader(std :: string inputfilename);
+    OOFEMTXTDataReader(std :: string inputfilename, bool skipHeader=false);
     OOFEMTXTDataReader(const OOFEMTXTDataReader & x);
     virtual ~OOFEMTXTDataReader();
 
-    InputRecord &giveInputRecord(InputRecordType, int recordId) override;
+    std::shared_ptr<InputRecord> giveNextInputRecord(InputRecordType) override;
     bool peekNext(const std :: string &keyword) override;
     void finish() override;
     std :: string giveReferenceName() const override { return dataSourceName; }

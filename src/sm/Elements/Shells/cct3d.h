@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -83,7 +83,7 @@ public:
     virtual ~CCTPlate3d() {}
 
 protected:
-    void giveLocalCoordinates(FloatArray &answer, const FloatArray &global);
+    void giveLocalCoordinates(Coordinates &answer, const Coordinates &global);
     void giveNodeCoordinates(double &x1, double &x2, double &x3,
                              double &y1, double &y2, double &y3,
                              double &z1, double &z2, double &z3) override;
@@ -116,8 +116,8 @@ public:
     virtual const FloatMatrix *computeGtoLRotationMatrix();
     bool computeGtoLRotationMatrix(FloatMatrix &answer) override;
 
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     int giveLocalCoordinateSystem(FloatMatrix &answer) override
     {

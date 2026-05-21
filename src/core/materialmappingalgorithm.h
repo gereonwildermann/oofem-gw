@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -108,7 +108,7 @@ public:
      * @param region If > 0 region id of receiver point, if < 0 ignore regions.
      * @param tStep Time step.
      */
-    virtual void __init(Domain *dold, IntArray &varTypes, const FloatArray &coords, Set &sourceElemSet, TimeStep *tStep, bool iCohesiveZoneGP = false) = 0;
+    virtual void __init(Domain *dold, IntArray &varTypes, const Coordinates &coords, Set &sourceElemSet, TimeStep *tStep, bool iCohesiveZoneGP = false) = 0;
     /**
      * Finishes the mapping for given time step. Used to perform cleanup.
      * Typically some mappers require to compute some global mesh data related to
@@ -136,7 +136,7 @@ public:
      * @param tStep Time step.
      * @return Nonzero if o.k.
      */
-    virtual int __mapVariable(FloatArray &answer, const FloatArray &coords, InternalStateType type, TimeStep *tStep) = 0;
+    virtual int __mapVariable(FloatArray &answer, const Coordinates &coords, InternalStateType type, TimeStep *tStep) = 0;
     /**
      * Initializes receiver according to object description stored in input record.
      * InitString can be imagined as data record in component database
@@ -149,7 +149,7 @@ public:
      */
     virtual int mapStatus(MaterialStatus &oStatus) const = 0;
 
-    virtual void initializeFrom(InputRecord &ir) { }
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir) { }
     /**
      * Setups the input record of receiver.
      * @param input Input record to be filled.

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -51,7 +51,7 @@ Concrete2 :: Concrete2(int n, Domain *d) : DeformationTheoryMaterial(n, d),
 
 
 void
-Concrete2 :: initializeFrom(InputRecord &ir)
+Concrete2 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Material :: initializeFrom(ir);
 

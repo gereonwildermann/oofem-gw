@@ -10,27 +10,25 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
+# Import shared settings
+from global_conf import *
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'OOFEM Input Manual'
-copyright = '2021, Bořek Patzák'
-author = 'Bořek Patzák'
-
-# The full version, including alpha/beta/rc tags
-release = '1.0'
-
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [ 'sphinx.ext.imgconverter']
+extensions = [ 'sphinx.ext.imgconverter', 'myst_parser']
+myst_enable_extensions = ['colon_fence' ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

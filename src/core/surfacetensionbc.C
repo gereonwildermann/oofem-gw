@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -60,13 +60,13 @@
 namespace oofem {
 REGISTER_BoundaryCondition(SurfaceTensionBoundaryCondition);
 
-void SurfaceTensionBoundaryCondition :: initializeFrom(InputRecord &ir)
+void SurfaceTensionBoundaryCondition :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ActiveBoundaryCondition :: initializeFrom(ir);
 
     IR_GIVE_FIELD(ir, this->gamma, _IFT_SurfaceTensionBoundaryCondition_gamma);
 
-    this->useTangent = ir.hasField(_IFT_SurfaceTensionBoundaryCondition_useTangent);
+    this->useTangent = ir->hasField(_IFT_SurfaceTensionBoundaryCondition_useTangent);
 }
 
 void SurfaceTensionBoundaryCondition :: giveLocationArrays(std :: vector< IntArray > &rows, std :: vector< IntArray > &cols, CharType type,
@@ -204,14 +204,14 @@ void SurfaceTensionBoundaryCondition :: computeTangentFromElement(FloatMatrix &a
 
         if ( e->giveDomain()->isAxisymmetric() ) {
             FloatArray N;
-            FloatArray gcoords;
+            Coordinates gcoords;
             FloatArray tmpB(2 *nodes);
             for ( GaussPoint *gp: *iRule ) {
                 fei2d->edgeEvaldNds( dNds, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 fei->boundaryEvalN( N, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 double J = fei->boundaryGiveTransformationJacobian( side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 fei->boundaryLocal2Global( gcoords, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
-                double r = gcoords(0); // First coordinate is the radial coord.
+                double r = gcoords[0]; // First coordinate is the radial coord.
 
                 es.beProductOf(xy, dNds);
 
@@ -317,13 +317,13 @@ void SurfaceTensionBoundaryCondition :: computeLoadVectorFromElement(FloatArray 
 
         if ( e->giveDomain()->isAxisymmetric() ) {
             FloatArray N;
-            FloatArray gcoords;
+            Coordinates gcoords;
             for ( GaussPoint *gp: *iRule ) {
                 fei2d->edgeEvaldNds( dNds, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 fei->boundaryEvalN( N, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 double J = fei->boundaryGiveTransformationJacobian( side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
                 fei->boundaryLocal2Global( gcoords, side, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(e) );
-                double r = gcoords(0); // First coordinate is the radial coord.
+                double r = gcoords[0]; // First coordinate is the radial coord.
 
                 es.beProductOf(xy, dNds);
 

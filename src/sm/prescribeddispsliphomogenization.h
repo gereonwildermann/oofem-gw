@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -82,7 +82,7 @@ public:
     PrescribedDispSlipHomogenization() { }
     virtual ~PrescribedDispSlipHomogenization() { }
 
-    virtual void initializeFrom(InputRecord &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
     virtual void giveInputRecord(DynamicInputRecord &input);
 
     // Methods for field homogenization implemented by respective BCs

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -625,7 +625,7 @@ PerfectlyPlasticMaterial :: GiveStressCorrectionBackToYieldSurface(GaussPoint *g
 
 
 void
-PerfectlyPlasticMaterial :: initializeFrom(InputRecord &ir)
+PerfectlyPlasticMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Material :: initializeFrom(ir);
     this->giveLinearElasticMaterial()->initializeFrom(ir);

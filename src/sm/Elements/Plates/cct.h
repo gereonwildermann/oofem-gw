@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -106,7 +106,7 @@ public:
     // definition & identification
     const char *giveClassName() const override { return "CCTPlate"; }
     const char *giveInputRecordName() const override { return _IFT_CCTPlate_Name; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
 
     int computeNumberOfDofs() override { return 9; }
     void giveDofManDofIDMask(int inode, IntArray &) const override;
@@ -122,7 +122,7 @@ public:
 
     Interface *giveInterface(InterfaceType it) override;
 
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
 
     void NodalAveragingRecoveryMI_computeNodalValue(FloatArray &answer, int node,

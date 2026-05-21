@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -55,7 +55,7 @@ GPExportModule :: ~GPExportModule()
 
 
 void
-GPExportModule :: initializeFrom(InputRecord &ir)
+GPExportModule :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, vartypes, _IFT_GPExportModule_vartypes);
@@ -71,7 +71,8 @@ GPExportModule :: doOutput(TimeStep *tStep, bool forcedOutput)
     }
 
     double weight;
-    FloatArray gcoords, intvar;
+    Coordinates gcoords;
+    FloatArray intvar;
 
     Domain *d = emodel->giveDomain(1);
     FILE *stream = this->giveOutputStream(tStep);

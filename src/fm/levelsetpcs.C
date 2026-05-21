@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ LevelSetPCS :: initialize()
 
 
 void
-LevelSetPCS :: initializeFrom(InputRecord &ir)
+LevelSetPCS :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_OPTIONAL_FIELD(ir, previousLevelSetValues, _IFT_LevelSetPCS_levelSetValues);
     if ( !previousLevelSetValues.giveSize() ) {

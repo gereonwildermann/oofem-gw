@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -141,13 +141,14 @@ void LSPrimaryVariableMapper :: mapPrimaryVariables(FloatArray &oU, Domain &iOld
                     //////////////
                     // Global coordinates of GP
                     const FloatArray &localCoord = gp->giveNaturalCoordinates();
-                    FloatArray globalCoord;
+                    Coordinates globalCoord;
                     elNew->computeGlobalCoordinates(globalCoord, localCoord);
                     //////////////
 
 
                     // Localize element and point in the old domain
-                    FloatArray localCoordOld(dim), pointCoordOld(dim);
+                    FloatArray localCoordOld(dim);
+                    Coordinates pointCoordOld(dim);
                     StructuralElement *elOld = dynamic_cast< StructuralElement * >( iOldDom.giveSpatialLocalizer()->giveElementClosestToPoint(localCoordOld, pointCoordOld, globalCoord, 0) );
                     if ( elOld == NULL ) {
                         OOFEM_ERROR("Failed to cast Element old to StructuralElement.");

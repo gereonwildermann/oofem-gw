@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -78,7 +78,7 @@ namespace oofem {
     public:
         StationaryMPMSProblem(int i, EngngModel * _master) : EngngModel(i, _master), nMethod(nullptr) { ndomains = 1;}
 
-        void initializeFrom(InputRecord &ir) override {
+        void initializeFrom(const std::shared_ptr<InputRecord> &ir) override {
             EngngModel::initializeFrom(ir);
             IR_GIVE_FIELD(ir, lhsIntegrals, "lhsterms");
             IR_GIVE_FIELD(ir, rhsIntegrals, "rhsterms");
@@ -183,6 +183,9 @@ namespace oofem {
                 OOFEM_ERROR("Unknown component");
             }
         }
+
+        void updateSolution(FloatArray &solutionVector, TimeStep *tStep, Domain *d) override
+        {}
 
 
         TimeStep* giveNextStep() override

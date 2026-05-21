@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -89,7 +89,7 @@ LinQuad3DPlaneStress::giveCellGeometryWrapper()
 
 
 void
-LinQuad3DPlaneStress :: computeLocalNodalCoordinates(std::vector< FloatArray > &lxy)
+LinQuad3DPlaneStress :: computeLocalNodalCoordinates(std::vector< Coordinates > &lxy)
 // Returns global coordinates given in global vector
 // transformed into local coordinate system of the
 // receiver
@@ -103,7 +103,7 @@ LinQuad3DPlaneStress :: computeLocalNodalCoordinates(std::vector< FloatArray > &
     lxy.resize(4);
     for ( int i = 0; i < 4; i++ ) {
         const auto &nc = this->giveNode(i + 1)->giveCoordinates();
-        lxy[i].beProductOf(* GtoLRotationMatrix, nc);
+        lxy[i] = (* GtoLRotationMatrix) * nc;//.beProductOf(* GtoLRotationMatrix, nc);
     }
 }
 

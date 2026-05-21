@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -135,7 +135,7 @@ TrabBoneNLEmbed :: giveInterface(InterfaceType type)
 }
 
 void
-TrabBoneNLEmbed :: initializeFrom(InputRecord &ir)
+TrabBoneNLEmbed :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     TrabBoneEmbed :: initializeFrom(ir);
     StructuralNonlocalMaterialExtensionInterface :: initializeFrom(ir);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -163,7 +163,7 @@ public:
 #endif
     void _resize_internal(Index newsize);
     /// Initializer list constructor.
-    FloatArray(std :: initializer_list< double >list) { (*this)=fromIniList(list); }
+    // FloatArray(std :: initializer_list< double >list) { (*this)=fromIniList(list); }
     static FloatArray fromVector(const std::vector<double>& v);
     static FloatArray fromList(const std::list<double>& l);
     static FloatArray fromConcatenated(std::initializer_list<FloatArray> ini);
@@ -182,7 +182,7 @@ public:
 
 
     /// Assignment operator.
-    inline FloatArray &operator = (std :: initializer_list< double >list) { (*this)=fromIniList(list); return *this; }
+    // inline FloatArray &operator = (std :: initializer_list< double >list) { (*this)=fromIniList(list); return *this; }
     /// Assign from fixed size array
     template< std::size_t N >
     inline FloatArray &operator = (const FloatArrayF<N> &src){
@@ -228,9 +228,9 @@ public:
     void checkBounds(Index i) const
     {
         if ( i <= 0 ) {
-            OOFEM_ERROR("array error on index : %d <= 0", i);
+            OOFEM_ERROR("array error on index : %d <= 0", (int)i);
         } else if ( i > size()) {
-            OOFEM_ERROR("array error on index : %d > %d", i, this->size());
+            OOFEM_ERROR("array error on index : %d > %d", (int)i, (int)this->size());
         }
     }
     /**
@@ -570,9 +570,25 @@ public:
     //@}
 #endif
 
-
 ///@name IML compatibility: functions
 //@{
+#ifndef _USE_EIGEN
+    /// Vector multiplication by scalar
+    OOFEM_EXPORT FloatArray &operator *= ( FloatArray & x, const double & a );
+    OOFEM_EXPORT FloatArray operator *( const double & a, const FloatArray & x );
+    OOFEM_EXPORT FloatArray operator *( const FloatArray & x, const double & a );
+    //
+    OOFEM_EXPORT FloatArray operator / ( const FloatArray & x, const double & a );
+    OOFEM_EXPORT FloatArray operator / ( const double & a, const FloatArray & x );
+    //
+    OOFEM_EXPORT FloatArray operator + ( const FloatArray & x, const FloatArray & y );
+    OOFEM_EXPORT FloatArray operator - ( const FloatArray & x, const FloatArray & y );
+    OOFEM_EXPORT FloatArray &operator += ( FloatArray & x, const FloatArray & y );
+    OOFEM_EXPORT FloatArray &operator -= ( FloatArray & x, const FloatArray & y );
+    OOFEM_EXPORT FloatArray &operator /= ( FloatArray & x, const double & a );
+#endif
+
+  
 OOFEM_EXPORT double norm(const FloatArray &x);
 OOFEM_EXPORT double norm_square(const FloatArray &x);
 OOFEM_EXPORT double dot(const FloatArray &x, const FloatArray &y);

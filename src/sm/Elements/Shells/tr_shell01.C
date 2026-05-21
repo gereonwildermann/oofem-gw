@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ TR_SHELL01 :: TR_SHELL01(int n, Domain *aDomain) : StructuralElement(n, aDomain)
 
 
 void
-TR_SHELL01 :: initializeFrom(InputRecord &ir, int priority)
+TR_SHELL01 :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     // proc tady neni return = this...   ??? termitovo
     StructuralElement :: initializeFrom(ir, priority);
@@ -403,13 +403,13 @@ TR_SHELL01 :: ZZErrorEstimatorI_computeLocalStress(FloatArray &answer, FloatArra
 
 
 void
-TR_SHELL01 :: SpatialLocalizerI_giveBBox(FloatArray &bb0, FloatArray &bb1)
+TR_SHELL01 :: SpatialLocalizerI_giveBBox(Coordinates &bb0, Coordinates &bb1)
 {
     FloatArray lt3, gt3; // global vector in the element thickness direction of lenght thickeness/2
     const FloatMatrix *GtoLRotationMatrix = plate->computeGtoLRotationMatrix();
 
     // setup vector in the element local cs. perpendicular to element plane of thickness/2 length
-    lt3 = {0., 0., 1.}; //this->giveCrossSection()->give(CS_Thickness)/2.0; // HUHU
+    lt3 = Vec3(0., 0., 1.); //this->giveCrossSection()->give(CS_Thickness)/2.0; // HUHU
     // transform it to globa cs
     gt3.beTProductOf(* GtoLRotationMatrix, lt3);
 
@@ -423,16 +423,25 @@ TR_SHELL01 :: SpatialLocalizerI_giveBBox(FloatArray &bb0, FloatArray &bb1)
         _c = coordinates;
         _c.add(gt3);
         if ( i == 1 ) {
-            bb0 = bb1 = _c;
+            bb0 = _c;
+            bb1 = _c;
         } else {
-            bb0.beMinOf(bb0, _c);
-            bb1.beMaxOf(bb1, _c);
+            //bb0.beMinOf(bb0, _c);
+            //bb1.beMaxOf(bb1, _c);
+            for (int j = 0; j < 3; ++j) {
+                if (bb0[j] > _c[j]) bb0[j] = _c[j];
+                if (bb1[j] < _c[j]) bb1[j] = _c[j];
+            }
         }
 
         _c = coordinates;
         _c.subtract(gt3);
-        bb0.beMinOf(bb0, _c);
-        bb1.beMaxOf(bb1, _c);
+        //bb0.beMinOf(bb0, _c);
+        //bb1.beMaxOf(bb1, _c);
+        for (int j = 0; j < 3; ++j) {
+            if (bb0[j] > _c[j]) bb0[j] = _c[j];
+            if (bb1[j] < _c[j]) bb1[j] = _c[j];
+        }
     }
 }
 

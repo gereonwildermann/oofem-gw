@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -188,7 +188,7 @@ M4Material :: giveRealMicroplaneStressVector(GaussPoint *gp, int mnumber,
 
 
 void
-M4Material :: initializeFrom(InputRecord &ir)
+M4Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MicroplaneMaterial_Bazant :: initializeFrom(ir);
 

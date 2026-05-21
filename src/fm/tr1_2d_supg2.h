@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -70,7 +70,7 @@ protected:
      * myPoly[1] occupied by second fluid (air).
      */
     Polygon myPoly [ 2 ];
-    std::vector< FloatArray > vcoords [ 2 ];
+    std::vector< Coordinates > vcoords [ 2 ];
 
     integrationDomain id [ 2 ];
     /**
@@ -120,7 +120,7 @@ public:
 
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
     int computeNumberOfDofs() override;
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     void updateYourself(TimeStep *tStep) override;
 
@@ -177,7 +177,7 @@ protected:
     void computeNVector(FloatArray &answer, GaussPoint *gp);
     void updateVolumePolygons(Polygon &referenceFluidPoly, Polygon &secondFluidPoly, int &rfPoints, int &sfPoints,
                               const FloatArray &normal, const double p, bool updFlag);
-    double computeVolumeAroundID(GaussPoint *gp, integrationDomain id, const std::vector< FloatArray > &idpoly);
+    double computeVolumeAroundID(GaussPoint *gp, integrationDomain id, const std::vector< Coordinates > &idpoly);
     void updateIntegrationRules();
     Material *_giveMaterial(int indx) { return domain->giveMaterial(mat [ indx ]); }
 };

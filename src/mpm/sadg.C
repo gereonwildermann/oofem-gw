@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2024   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -207,7 +207,7 @@ class SADGBoundaryElement : public SADGElement {
             IntegrationRule* ir = this->giveDefaultIntegrationRulePtr();
             for (int j=0;j<ir->giveNumberOfIntegrationPoints();j++) {
                 FloatArray lc = ir->getIntegrationPoint(j)->giveNaturalCoordinates();
-                FloatArray gc;
+                Coordinates gc;
                 this->giveInterpolation()->local2global(gc, lc, FEIElementGeometryWrapper(this));
                 FloatArray normal, v, N;
                 this->giveInterpolation()->boundaryEvalNormal(normal, 1, lc, FEIElementGeometryWrapper(this));
@@ -299,7 +299,7 @@ class SADGBLine1 : public SADGBoundaryElement {
             this->numberOfGaussPoints = 2;
     }
     
-    void initializeFrom(InputRecord &ir, int priority) override {
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override {
         SADGBoundaryElement::initializeFrom(ir, priority);
         this->numberOfDofMans = this->dofManArray.giveSize();
         if (!((numberOfDofMans == 2) || (numberOfDofMans == 4))) {
@@ -519,7 +519,7 @@ class SADGBQuad1 : public SADGBoundaryElement {
             this->numberOfGaussPoints = 8;
         }
     
-    void initializeFrom(InputRecord &ir, int priority) override {
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override {
         SADGBoundaryElement::initializeFrom(ir, priority);
         this->numberOfDofMans = this->dofManArray.giveSize();
         if (!((numberOfDofMans == 4) || (numberOfDofMans == 8))) {

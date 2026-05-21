@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -97,6 +97,11 @@ public:
     int read(double *data, std::size_t count) override { return this->recv_buff->read(data, count); }
     int read(char *data, std::size_t count) override { return this->recv_buff->read(data, count); }
     int read(bool &data) override { return recv_buff->read(data); }
+
+#ifdef _WIN32
+    int write( const size_t *data, std::size_t count ) override { return send_buff->write( data, count ); }
+    int read( size_t *data, std::size_t count ) override { return this->recv_buff->read( data, count ); }
+#endif
 
     /// Initializes send buffer to empty state. All packed data are lost.
     void initSendBuff() { send_buff->init(); }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ LIBeam3dBoundary :: LIBeam3dBoundary(int n, Domain *aDomain) : LIBeam3d(n, aDoma
 
 
 void
-LIBeam3dBoundary :: initializeFrom(InputRecord &ir, int priority)
+LIBeam3dBoundary :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     LIBeam3d :: initializeFrom(ir, priority);
     ParameterManager &ppm = giveDomain()->elementPPM;
@@ -158,7 +158,7 @@ LIBeam3dBoundary :: computeLength()
 
 
 int
-LIBeam3dBoundary :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+LIBeam3dBoundary :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     double ksi, n1, n2;
     FloatArray coordsNodeA, coordsNodeB;
@@ -169,7 +169,7 @@ LIBeam3dBoundary :: computeGlobalCoordinates(FloatArray &answer, const FloatArra
     recalculateCoordinates(1, coordsNodeA);
     recalculateCoordinates(2, coordsNodeB);
 
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = n1 * coordsNodeA.at(1) + n2 * coordsNodeB.at(1);
     answer.at(2) = n1 * coordsNodeA.at(2) + n2 * coordsNodeB.at(2);
     answer.at(3) = n1 * coordsNodeA.at(3) + n2 * coordsNodeB.at(3);

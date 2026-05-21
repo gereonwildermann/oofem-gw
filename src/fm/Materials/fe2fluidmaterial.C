@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -244,7 +244,7 @@ FE2FluidMaterial :: computeTangents3D(MatResponseMode mode, GaussPoint *gp, Time
     };
 }
 
-void FE2FluidMaterial :: initializeFrom(InputRecord &ir)
+void FE2FluidMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     FluidDynamicMaterial :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, this->inputfile, _IFT_FE2FluidMaterial_fileName);
@@ -261,10 +261,10 @@ int FE2FluidMaterial :: giveIPValue(FloatArray &answer, GaussPoint *gp, Internal
 {
     FE2FluidMaterialStatus *status = static_cast< FE2FluidMaterialStatus * >( this->giveStatus(gp) );
     if ( type == IST_VOFFraction ) {
-        answer = FloatArray{status->giveVOFFraction()};
+        answer = Vec1(status->giveVOFFraction());
         return true;
     } else if ( type == IST_Pressure ) {
-        answer = FloatArray{status->givePressure()};
+        answer = Vec1(status->givePressure());
         return true;
     } else if ( type == IST_Undefined ) { ///@todo What should one call this value? Relation between pressure and volumetric strain-rate.
 #if 0
@@ -289,7 +289,7 @@ int FE2FluidMaterial :: giveIPValue(FloatArray &answer, GaussPoint *gp, Internal
             OOFEM_ERROR("Error in volumetric pressure tangent");
         }
 #endif
-        answer = FloatArray{status->giveVolumetricPressureTangent()};
+        answer = Vec1(status->giveVolumetricPressureTangent());
         return true;
     } else {
         return FluidDynamicMaterial :: giveIPValue(answer, gp, type, tStep);
@@ -324,9 +324,9 @@ FE2FluidMaterialStatus :: FE2FluidMaterialStatus(int n, int rank, GaussPoint *gp
 // Uses an input file for now, should eventually create the RVE itself.
 bool FE2FluidMaterialStatus :: createRVE(int n, int rank, GaussPoint *gp, const std :: string &inputfile)
 {
-    OOFEMTXTDataReader dr( inputfile.c_str() );
-    this->rve = InstanciateProblem(dr, _processor, 0); // Everything but nrsolver is updated.
-    dr.finish();
+    auto dr=DataReader::makeFromFilename(inputfile);
+    this->rve = InstanciateProblem(*dr, _processor, 0); // Everything but nrsolver is updated.
+    dr->finish();
     this->rve->setProblemScale(microScale);
     this->rve->checkProblemConsistency();
     this->rve->initMetaStepAttributes( this->rve->giveMetaStep(1) );

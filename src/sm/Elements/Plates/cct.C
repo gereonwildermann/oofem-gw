@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -308,7 +308,7 @@ CCTPlate::computeArea()
 }
 
 void
-CCTPlate::initializeFrom(InputRecord &ir, int priority)
+CCTPlate::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralElement::initializeFrom(ir, priority);
 }
@@ -349,7 +349,7 @@ CCTPlate::computeVolumeAround(GaussPoint *gp)
 {
     double detJ, weight;
 
-    std::vector< FloatArray >lc = { FloatArray(3), FloatArray(3), FloatArray(3) };
+    std::vector< Coordinates >lc(3); 
     this->giveNodeCoordinates( lc [ 0 ].at(1), lc [ 1 ].at(1), lc [ 2 ].at(1),
                                lc [ 0 ].at(2), lc [ 1 ].at(2), lc [ 2 ].at(2),
                                lc [ 0 ].at(3), lc [ 1 ].at(3), lc [ 2 ].at(3) );
@@ -405,7 +405,7 @@ CCTPlate::giveInterface(InterfaceType interface)
 #define POINT_TOL 1.e-3
 
 bool
-CCTPlate::computeLocalCoordinates(FloatArray &answer, const FloatArray &coords)
+CCTPlate::computeLocalCoordinates(FloatArray &answer, const Coordinates &coords)
 //converts global coordinates to local planar area coordinates,
 //does not return a coordinate in the thickness direction, but
 //does check that the point is in the element thickness

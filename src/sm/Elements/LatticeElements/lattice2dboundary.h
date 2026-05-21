@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -84,7 +84,7 @@ public:
     //
     const char *giveInputRecordName() const override { return _IFT_Lattice2dBoundary_Name; }
     const char *giveClassName() const override { return "Lattice2dBoundary"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
 
     void saveContext(DataStream &stream, ContextMode mode) override;

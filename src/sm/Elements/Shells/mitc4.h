@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -101,7 +101,7 @@ public:
     const char *giveInputRecordName() const override { return _IFT_MITC4Shell_Name; }
     integrationDomain giveIntegrationDomain() const override { return _3dDegShell; }
     MaterialMode giveMaterialMode() override { return _3dDegeneratedShell; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     int computeNumberOfDofs() override { return 24; }
     int computeNumberOfGlobalDofs() override { return 24; }
@@ -145,8 +145,8 @@ private:
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
     FloatMatrix giveCharacteristicTensor(CharTensor type, GaussPoint *gp, TimeStep *tStep);
     void printOutputAt(FILE *file, TimeStep *tStep) override;
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &coords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &coords) override;
     double computeVolumeAround(GaussPoint *gp) override;
     std::array< FloatArrayF< 3 >, 3 >computeLocalBaseVectors();
     std::array< FloatArrayF< 4 >, 2 >givedNdx(const FloatArrayF< 3 > &coords);

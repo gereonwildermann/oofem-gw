@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ class Quad1MindlinShell3D : public StructuralElement,
 {
 protected:
     /// Cached nodal coordinates in local c.s.,
-    std::vector< FloatArray >lnodes;
+    std::vector< Coordinates >lnodes;
     /// Cached coordinates in local c.s.,
     FloatMatrix lcsMatrix;
     /// Flag controlling reduced (one - point) integration for shear
@@ -102,7 +102,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_Quad1MindlinShell3D_Name; }
     const char *giveClassName() const override { return "Quad1MindlinShell3D"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
 
     int computeNumberOfDofs() override { return 24; }
     int computeNumberOfGlobalDofs() override { return 24; }

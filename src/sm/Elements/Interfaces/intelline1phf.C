@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -136,7 +136,7 @@ IntElLine1PhF :: computeAreaAround(IntegrationPoint *ip)
 
 
 void
-IntElLine1PhF :: initializeFrom(InputRecord &ir, int priority)
+IntElLine1PhF :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralInterfaceElement :: initializeFrom(ir, priority);
     ParameterManager *ppm = this->giveDomain()->elementPPM;

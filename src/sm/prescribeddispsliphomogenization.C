@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -42,7 +42,7 @@
 
 namespace oofem {
 
-void PrescribedDispSlipHomogenization::initializeFrom(InputRecord &ir)
+void PrescribedDispSlipHomogenization::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     mCenterCoord.resize( dispGradient.giveNumberOfColumns() );
     mCenterCoord.zero();

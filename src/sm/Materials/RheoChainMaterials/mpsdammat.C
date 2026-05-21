@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -202,12 +202,12 @@ MPSDamMaterial :: hasMaterialModeCapability(MaterialMode mode) const
 
 
 void
-MPSDamMaterial :: initializeFrom(InputRecord &ir)
+MPSDamMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MPSMaterial :: initializeFrom(ir);
 
     this->isotropic = false;
-    if ( ir.hasField(_IFT_MPSDamMaterial_isotropic) ) {
+    if ( ir->hasField(_IFT_MPSDamMaterial_isotropic) ) {
         this->isotropic = true;
     }
 
@@ -216,7 +216,7 @@ MPSDamMaterial :: initializeFrom(InputRecord &ir)
 
     this->timeDepFracturing = false;
 
-    if ( ir.hasField(_IFT_MPSDamMaterial_timedepfracturing) ) {
+    if ( ir->hasField(_IFT_MPSDamMaterial_timedepfracturing) ) {
         this->timeDepFracturing = true;
         //
         IR_GIVE_FIELD(ir, fib_s, _IFT_MPSDamMaterial_fib_s);
@@ -225,7 +225,7 @@ MPSDamMaterial :: initializeFrom(InputRecord &ir)
         this->gf28 = 0.;
         this->ft28 = 0.;
         
-        if (  ( ir.hasField(_IFT_MPSDamMaterial_ft28) ) && ( ir.hasField(_IFT_MPSDamMaterial_gf28) ) )  {
+        if (  ( ir->hasField(_IFT_MPSDamMaterial_ft28) ) && ( ir->hasField(_IFT_MPSDamMaterial_gf28) ) )  {
             
             IR_GIVE_FIELD(ir, gf28, _IFT_MPSDamMaterial_gf28);
             if (gf28 < 0.) {
@@ -627,7 +627,7 @@ MPSDamMaterial :: computeDamageForCohesiveCrack(double kappa, GaussPoint *gp) co
 
             OOFEM_WARNING("Material number %d, decrease e0, or increase Gf from %f to Gf=%f", this->giveNumber(), gf, minGf);
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         }
 
@@ -667,7 +667,7 @@ MPSDamMaterial :: computeDamageForCohesiveCrack(double kappa, GaussPoint *gp) co
             OOFEM_WARNING("damage parameter is %f, which is smaller than 0, snap-back problems", omega);
             omega = 1.;
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
 
         }
@@ -726,7 +726,7 @@ MPSDamMaterial :: initDamaged(double kappa, FloatArray &principalDirection, Gaus
         if ( gf != 0. && e0 >= ( wf / le ) ) { // case for a given fracture energy
             OOFEM_WARNING("Fracturing strain %e is lower than the elastic strain e0=%e, possible snap-back. Element number %d, wf %e, le %e. Increase fracturing strain or decrease element size by at least %f", wf / le, e0, gp->giveElement()->giveLabel(), wf, le, e0/(wf/le) );
             if ( checkSnapBack ) {
-                OOFEM_ERROR("");
+                OOFEM_ERROR("x");
             }
         }
     }

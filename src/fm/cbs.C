@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -132,7 +132,7 @@ NumericalMethod *CBS :: giveNumericalMethod(MetaStep *mStep)
 }
 
 void
-CBS :: initializeFrom(InputRecord &ir)
+CBS :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     EngngModel :: initializeFrom(ir);
     int val = 0;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -244,7 +244,7 @@ LineSearchNM :: search(int istep, FloatArray &prod, FloatArray &eta, double amp,
 }
 
 void
-LineSearchNM :: initializeFrom(InputRecord &ir)
+LineSearchNM :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     /* default values set in constructor
      * ls_tolerance = 0.80;

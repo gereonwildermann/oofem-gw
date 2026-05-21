@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ void ProblemSequence :: solveYourself()
 }
 
 
-int ProblemSequence :: instanciateYourself(DataReader &dr, InputRecord &ir, const char *outFileName, const char *desc)
+int ProblemSequence :: instanciateYourself(DataReader &dr, const std::shared_ptr<InputRecord> &ir, const char *outFileName, const char *desc)
 {
     int result = EngngModel :: instanciateYourself(dr, ir, dataOutputFileName.c_str(), desc);
     ir.finish();
@@ -82,7 +82,7 @@ int ProblemSequence :: instanciateYourself(DataReader &dr, InputRecord &ir, cons
 }
 
 
-void ProblemSequence :: initializeFrom(InputRecord &ir)
+void ProblemSequence :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     EngngModel :: initializeFrom(ir);
 

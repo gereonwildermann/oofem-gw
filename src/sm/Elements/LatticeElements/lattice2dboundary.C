@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -437,7 +437,7 @@ double Lattice2dBoundary :: givePitch()
 
 
 void
-Lattice2dBoundary :: initializeFrom(InputRecord &ir, int priority)
+Lattice2dBoundary :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     // first call parent

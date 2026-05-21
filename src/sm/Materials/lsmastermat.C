@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -55,7 +55,7 @@ LargeStrainMasterMaterial :: LargeStrainMasterMaterial(int n, Domain *d) : Struc
 }
 
 void
-LargeStrainMasterMaterial :: initializeFrom(InputRecord &ir)
+LargeStrainMasterMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_OPTIONAL_FIELD(ir, slaveMat, _IFT_LargeStrainMasterMaterial_slaveMat); // number of slave material
     IR_GIVE_OPTIONAL_FIELD(ir, m, _IFT_LargeStrainMasterMaterial_m); // type of Set-Hill strain tensor

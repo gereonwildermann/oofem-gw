@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ public:
 
     int computeNumberOfDofs() override { return 18; }
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     double computeVolumeAround(GaussPoint *) override;
 
@@ -74,7 +74,7 @@ public:
 
     virtual const char *giveInputRecordName() const override { return _IFT_LatticeBeam3dBoundary_Name; }
     virtual const char *giveClassName() const override { return "LatticeBeam3dBoundary"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     
     virtual Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }

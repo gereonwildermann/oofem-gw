@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -75,7 +75,7 @@ Node :: Node(int n, Domain *aDomain) :
 { }
 
 
-void Node :: initializeFrom(InputRecord &ir, int priority)
+void Node :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 // Gets from the source line from the data file all the data of the receiver.
 {
     int size;
@@ -94,7 +94,7 @@ void Node :: initializeFrom(InputRecord &ir, int priority)
     //
     if ( flag && domain->giveEngngModel()->giveEquationScalingFlag() ) {
         double lscale = domain->giveEngngModel()->giveVariableScale(VST_Length);
-        this->coordinates.times(1. / lscale);
+        this->coordinates *= (1. / lscale);
     }
     // Read if available local coordinate system in this node
     FloatArray triplets;
@@ -357,10 +357,10 @@ Node :: checkConsistency()
                 // compare coordinate systems
                 masterNode = dynamic_cast< Node * >( domain->giveDofManager(master) );
                 if ( !masterNode ) {
-                    OOFEM_WARNING("master dofManager is not compatible", 1);
+                    OOFEM_WARNING("master dofManager is not compatible");
                     result = 0;
                 } else if ( !this->hasSameLCS(masterNode) ) {
-                    OOFEM_WARNING("different lcs for master/slave nodes", 1);
+                    OOFEM_WARNING("different lcs for master/slave nodes");
                     result = 0;
                 }
             }

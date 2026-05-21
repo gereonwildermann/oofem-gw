@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -39,6 +39,7 @@
 #include "dictionary.h"
 #include "range.h"
 #include "scalarfunction.h"
+#include "datareader.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -47,12 +48,14 @@
 #include <ostream>
 #include <sstream>
 
+
 namespace oofem {
+
 OOFEMTXTInputRecord :: OOFEMTXTInputRecord() : tokenizer(), record()
 { }
 
 OOFEMTXTInputRecord :: OOFEMTXTInputRecord(const OOFEMTXTInputRecord &src) : tokenizer(),
-    record(src.record), lineNumber(src.lineNumber)
+    record(src.record), lineNumber(src.lineNumber), inputRecordType(src.inputRecordType)
 {
     tokenizer.tokenizeLine( this->record );
     int ntok = tokenizer.giveNumberOfTokens();
@@ -77,6 +80,7 @@ OOFEMTXTInputRecord &
 OOFEMTXTInputRecord :: operator = ( const OOFEMTXTInputRecord & src )
 {
     this->record = src.record;
+    this->inputRecordType = src.inputRecordType;
     tokenizer.tokenizeLine( this->record );
     int ntok = tokenizer.giveNumberOfTokens();
     readFlag.resize(ntok);
@@ -88,6 +92,11 @@ OOFEMTXTInputRecord :: operator = ( const OOFEMTXTInputRecord & src )
 }
 
 
+std :: string
+OOFEMTXTInputRecord::giveLocation() const {
+    return std::string(giveReader()?giveReader()->giveReferenceName():"<?reader_NULL?>")+":"+std::to_string(giveLineNumber());
+}
+
 int
 OOFEMTXTInputRecord :: giveGroupCount(InputFieldType id, const std::string& name, bool optional){
     int size=0;
@@ -98,8 +107,9 @@ OOFEMTXTInputRecord :: giveGroupCount(InputFieldType id, const std::string& name
 
 bool
 OOFEMTXTInputRecord :: hasChild(InputFieldType id, const std::string& name, bool optional){
+    if(id[0]=='\0') return true;
     int count=this->giveGroupCount(id,name,optional);
-    if(count>1) OOFEM_ERROR("Number of '%s' children (%d) must be 0 or 1 (not %d)",name.c_str(),id,count);
+    if(count>1) OOFEM_ERROR("Number of '%s' children (%s) must be 0 or 1 (not %d)",name.c_str(),id,count);
     return count>0;
 }
 
@@ -123,11 +133,11 @@ OOFEMTXTInputRecord :: giveRecordKeywordField(std :: string &answer, int &value)
         setReadFlag(1);
         auto ptr = scanInteger(tokenizer.giveToken(2), value);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, "RecordID", lineNumber);
+            throw BadFormatInputException(shared_from_this(), "RecordID", lineNumber);
         }
         setReadFlag(2);
     } else {
-        throw BadFormatInputException(*this, "RecordID", lineNumber);
+        throw BadFormatInputException(shared_from_this(), "RecordID", lineNumber);
     }
 }
 
@@ -138,70 +148,74 @@ OOFEMTXTInputRecord :: giveRecordKeywordField(std :: string &answer)
         answer = std :: string( tokenizer.giveToken(1) );
         setReadFlag(1);
     } else {
-        throw BadFormatInputException(*this, "RecordID", lineNumber);
+        throw BadFormatInputException(shared_from_this(), "RecordID", lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(int &answer, InputFieldType id)
 {
+    traceField(id,"int");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         auto ptr = scanInteger(tokenizer.giveToken(indx + 1), answer);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
         setReadFlag(indx + 1);
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(double &answer, InputFieldType id)
 {
+    traceField(id,"double");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         auto ptr = scanDouble(tokenizer.giveToken(indx + 1), answer);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
         setReadFlag(indx + 1);
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(bool &answer, InputFieldType id)
 {
+    traceField(id,"bool");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int val;
         auto ptr = scanInteger(tokenizer.giveToken(indx + 1), val);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
         setReadFlag(indx + 1);
         answer = val != 0;
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(std :: string &answer, InputFieldType id)
 {
+    traceField(id,"std::string");
     int indx = 0;
     if ( id ) {
         if ( ( indx = this->giveKeywordIndx(id) ) == 0 ) {
-            throw MissingKeywordInputException(*this, id, lineNumber);
+            throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
@@ -216,20 +230,21 @@ OOFEMTXTInputRecord :: giveField(std :: string &answer, InputFieldType id)
         setReadFlag(indx);
     } else {
         answer = "";
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(IntArray &answer, InputFieldType id)
 {
+    traceField(id,"IntArray");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int size;
         setReadFlag(indx);
         auto ptr = scanInteger(tokenizer.giveToken(++indx), size);
         if ( ptr == nullptr || *ptr != 0) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         answer.resize(size);
@@ -239,7 +254,7 @@ OOFEMTXTInputRecord :: giveField(IntArray &answer, InputFieldType id)
             int value;
             ptr = scanInteger(tokenizer.giveToken(indx + i), value);
             if ( ptr == nullptr || *ptr != 0 ) {
-                throw BadFormatInputException(*this, id, lineNumber);
+                throw BadFormatInputException(shared_from_this(), id, lineNumber);
             }
 
             answer.at(i) = value;
@@ -247,20 +262,21 @@ OOFEMTXTInputRecord :: giveField(IntArray &answer, InputFieldType id)
         }
 
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(FloatArray &answer, InputFieldType id)
 {
+    traceField(id,"FloatArray");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int size;
         setReadFlag(indx);
         auto ptr = scanInteger(tokenizer.giveToken(++indx), size);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         answer.resize(size);
@@ -270,7 +286,7 @@ OOFEMTXTInputRecord :: giveField(FloatArray &answer, InputFieldType id)
             double value;
             auto ptr = scanDouble(tokenizer.giveToken(indx + i), value);
             if ( ptr == nullptr || *ptr != 0 ) {
-                throw BadFormatInputException(*this, id, lineNumber);
+                throw BadFormatInputException(shared_from_this(), id, lineNumber);
             }
 
             answer.at(i) = value;
@@ -278,13 +294,31 @@ OOFEMTXTInputRecord :: giveField(FloatArray &answer, InputFieldType id)
         }
 
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
+OOFEMTXTInputRecord :: giveField(Coordinates &answer, InputFieldType id)
+{
+    FloatArray arr(3);
+    this->giveField(arr, id);
+    int size = arr.size();
+    if (size > 3) {
+        throw BadFormatInputException(shared_from_this(), id, lineNumber);
+    } else {
+        answer[0] = size>0? arr[0] : 0.0;
+        answer[1] = size>1? arr[1] : 0.0;
+        answer[2] = size>2? arr[2] : 0.0;
+    }
+
+}
+
+
+void
 OOFEMTXTInputRecord :: giveField(FloatMatrix &answer, InputFieldType id)
 {
+    traceField(id,"FloatMatrix");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int nrows, ncols;
@@ -292,37 +326,38 @@ OOFEMTXTInputRecord :: giveField(FloatMatrix &answer, InputFieldType id)
 
         auto ptr = scanInteger(tokenizer.giveToken(++indx), nrows);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
         ptr = scanInteger(tokenizer.giveToken(++indx), ncols);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
 
         if ( readMatrix(tokenizer.giveToken(++indx), nrows, ncols, answer) == 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(std :: vector< std :: string > &answer, InputFieldType id)
 {
+    traceField(id,"std::vector<std::string>");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int size;
         setReadFlag(indx);
         auto ptr = scanInteger(tokenizer.giveToken(++indx), size);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
         answer.reserve(size);
         setReadFlag(indx);
@@ -332,20 +367,21 @@ OOFEMTXTInputRecord :: giveField(std :: vector< std :: string > &answer, InputFi
         }
 
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(Dictionary &answer, InputFieldType id)
 {
+    traceField(id,"Dictionary");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         setReadFlag(indx);
         int size;
         auto ptr = scanInteger(tokenizer.giveToken(++indx), size);
         if ( ptr == nullptr || *ptr != 0 ) {
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
@@ -363,20 +399,21 @@ OOFEMTXTInputRecord :: giveField(Dictionary &answer, InputFieldType id)
             setReadFlag(indx);
             auto ptr = scanDouble(tokenizer.giveToken(++indx), value);
             if ( ptr == nullptr || *ptr != 0 ) {
-                throw BadFormatInputException(*this, id, lineNumber);
+                throw BadFormatInputException(shared_from_this(), id, lineNumber);
             }
 
             setReadFlag(indx);
             answer.add(key, value);
         }
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(std :: list< Range > &list, InputFieldType id)
 {
+    traceField(id,"std::list<Range>");
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
         int li, hi;
@@ -385,7 +422,7 @@ OOFEMTXTInputRecord :: giveField(std :: list< Range > &list, InputFieldType id)
         if ( * rec != '{' ) {
             OOFEM_WARNING("missing left '{'");
             list.clear();
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
 
         setReadFlag(indx);
@@ -405,16 +442,17 @@ OOFEMTXTInputRecord :: giveField(std :: list< Range > &list, InputFieldType id)
         if ( * rec != '}' ) {
             OOFEM_WARNING("missing end '}'");
             list.clear();
-            throw BadFormatInputException(*this, id, lineNumber);
+            throw BadFormatInputException(shared_from_this(), id, lineNumber);
         }
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 void
 OOFEMTXTInputRecord :: giveField(ScalarFunction &answer, InputFieldType id)
 {
+    traceField(id,"ScalarFunction");
     const char *rec;
     int indx = this->giveKeywordIndx(id);
 
@@ -426,7 +464,7 @@ OOFEMTXTInputRecord :: giveField(ScalarFunction &answer, InputFieldType id)
             int refVal;
             auto ptr = scanInteger(rec + 1, refVal);
             if ( ptr == nullptr || *ptr != 0 ) {
-                throw BadFormatInputException(*this, id, lineNumber);
+                throw BadFormatInputException(shared_from_this(), id, lineNumber);
             }
             setReadFlag(indx);
             answer.setReference(refVal);
@@ -443,20 +481,21 @@ OOFEMTXTInputRecord :: giveField(ScalarFunction &answer, InputFieldType id)
             double val;
             auto ptr = scanDouble(tokenizer.giveToken(indx), val);
             if ( ptr == nullptr || *ptr != 0 ) {
-                throw BadFormatInputException(*this, id, lineNumber);
+                throw BadFormatInputException(shared_from_this(), id, lineNumber);
             }
 
             setReadFlag(indx);
             answer.setValue(val);
         }
     } else {
-        throw MissingKeywordInputException(*this, id, lineNumber);
+        throw MissingKeywordInputException(shared_from_this(), id, lineNumber);
     }
 }
 
 bool
 OOFEMTXTInputRecord :: hasField(InputFieldType id)
 {
+    traceField(id,"flag");
     //returns nonzero if id is present in source
     int indx = this->giveKeywordIndx(id);
     if ( indx ) {
@@ -555,7 +594,7 @@ OOFEMTXTInputRecord :: finish(bool wrn)
     }
 
     if ( wf ) {
-        OOFEM_WARNING( buff.str().c_str() );
+        OOFEM_WARNING("%s", buff.str().c_str() );
     }
 }
 
@@ -663,7 +702,20 @@ OOFEMTXTInputRecord :: readMatrix(const char *helpSource, int r, int c, FloatMat
     } else {
         return 0;
     }
-
 }
+
+#ifdef _USE_TRACE_FIELDS
+    void OOFEMTXTInputRecord::traceField(InputFieldType id, const char* type) {
+        if(!InputRecord::TraceFields::active) return;
+        std::string tag;
+        /* synthetic tags for records which have no leading tag (only data) */
+        if(inputRecordType==DataReader::IR_outManRec) tag="~OutputManager~";
+        else if(inputRecordType==DataReader::IR_domainCompRec) tag="~DomainCompRec~";
+        else if(inputRecordType==DataReader::IR_mstepRec) tag="~MetaStep~";
+        else if(inputRecordType==DataReader::IR_unspecified) tag="?UNSPECIFIED?";
+        else this->giveRecordKeywordField(tag);
+        InputRecord::TraceFields::write(tag+";"+id+";"+type);
+    }
+#endif
 
 } // end namespace oofem

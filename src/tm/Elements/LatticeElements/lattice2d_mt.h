@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -97,9 +97,9 @@ public:
     void giveCrackWidths(FloatArray &widths) override { widths = crackWidths; }
 
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
 
     void computeConductivityMatrix(FloatMatrix &answer, MatResponseMode rMode, TimeStep *tStep) override;
 
@@ -113,7 +113,7 @@ public:
     double giveWidth() { return width; }
     int computeNumberOfDofs() override { return 2; }
     void giveDofManDofIDMask(int inode, IntArray &) const override;
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
 
     void updateInternalState(TimeStep *tStep) override;

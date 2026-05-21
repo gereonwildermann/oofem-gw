@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -117,7 +117,7 @@ CohesiveInterfaceMaterial :: give3dStiffnessMatrix_Eng(MatResponseMode rMode, Ga
 
 
 void
-CohesiveInterfaceMaterial :: initializeFrom(InputRecord &ir)
+CohesiveInterfaceMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

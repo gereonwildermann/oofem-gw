@@ -1,6 +1,11 @@
 
-Input Manual
+OOFEM Input Manual
 ==================
+
+Authors: |author|
+
+Version: |version|, Date: |today|
+
 .. toctree::
     :caption: Content
     :maxdepth: 2
@@ -9,5 +14,6 @@ Input Manual
     analysisrecords
     domainrecords
     apendices
+    xml
     examples
     about

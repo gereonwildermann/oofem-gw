@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -284,7 +284,7 @@ LargeStrainMasterMaterialGrad :: giveFirstPKStressVectorGrad(FloatArray &answer1
 
 
 void
-LargeStrainMasterMaterialGrad :: initializeFrom(InputRecord &ir)
+LargeStrainMasterMaterialGrad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LargeStrainMasterMaterial :: initializeFrom(ir);
 }

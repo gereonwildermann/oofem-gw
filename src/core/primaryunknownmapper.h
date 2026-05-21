@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -36,6 +36,7 @@
 #define primaryunknownmapper_h
 
 #include "oofemenv.h"
+#include "oofemcfg.h"
 #include "interface.h"
 #include "valuemodetype.h"
 #include "floatarray.h"
@@ -91,7 +92,7 @@ public:
      * @return Nonzero if o.k.
      */
     virtual int evaluateAt(FloatArray &answer, IntArray &dofMask, ValueModeType mode,
-                           Domain *oldd, const FloatArray &coords, IntArray &regList, TimeStep *tStep) = 0;
+                           Domain *oldd, const Coordinates &coords, IntArray &regList, TimeStep *tStep) = 0;
 protected:
     /// Returns string for prepending output (used by error reporting macros).
     std :: string errorInfo(const char *func) const;

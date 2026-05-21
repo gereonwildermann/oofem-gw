@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -59,13 +59,13 @@ protected:
 public:
     NURBSInterpolation(int nsd) : BSplineInterpolation(nsd) { }
 
-    void initializeFrom(InputRecord &ir, ParameterManager&pm, int elnum, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, ParameterManager&pm, int elnum, int priority) override;
     void postInitialize(ParameterManager&pm, int elnum) override;
 
     void evalN(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double evaldNdx(FloatMatrix &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    int global2local(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override {
+    void local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    int global2local(FloatArray &answer, const Coordinates &lcoords, const FEICellGeometry &cellgeo) const override {
         OOFEM_ERROR("Not yet implemented.");
     }
     void giveJacobianMatrixAt(FloatMatrix &jacobianMatrix, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,8 +69,8 @@ public:
     void computeLumpedMassMatrix(FloatMatrix &answer, TimeStep *tStep) override;
     void computeMassMatrix(FloatMatrix &answer, TimeStep *tStep) override  { computeLumpedMassMatrix(answer, tStep); }
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
 
     int computeNumberOfDofs() override;
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
@@ -88,7 +88,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_InterfaceElem1d_Name; }
     const char *giveClassName() const override { return "InterfaceElem1d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void initializeFinish() override;
     
     Element_Geometry_Type giveGeometryType() const override { return EGT_point; }

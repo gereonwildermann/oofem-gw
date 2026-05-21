@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -50,66 +50,66 @@ REGISTER_CrossSection(VariableCrossSection);
 
 
 void
-VariableCrossSection :: initializeFrom(InputRecord &ir)
+VariableCrossSection :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
-    if ( ir.hasField(_IFT_SimpleCrossSection_thick) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_thick) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, thicknessExpr, _IFT_SimpleCrossSection_thick);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_width) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_width) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, widthExpr, _IFT_SimpleCrossSection_width);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_area) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_area) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, areaExpr, _IFT_SimpleCrossSection_area);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_iy) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_iy) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, iyExpr, _IFT_SimpleCrossSection_iy);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_iy) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_iy) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, izExpr, _IFT_SimpleCrossSection_iz);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_ik) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_ik) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, ixExpr, _IFT_SimpleCrossSection_ik);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_shearareay) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_shearareay) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, shearAreayExpr, _IFT_SimpleCrossSection_shearareay);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_shearareaz) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_shearareaz) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, shearAreazExpr, _IFT_SimpleCrossSection_shearareaz);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_drillStiffness) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_drillStiffness) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, drillingStiffnessExpr, _IFT_SimpleCrossSection_drillStiffness);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_relDrillStiffness) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_relDrillStiffness) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, relDrillingStiffnessExpr, _IFT_SimpleCrossSection_relDrillStiffness);
     }
 
-    if ( ir.hasField(_IFT_SimpleCrossSection_drillType) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_drillType) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, drillingTypeExpr, _IFT_SimpleCrossSection_drillType);
     }
 
     IR_GIVE_OPTIONAL_FIELD(ir, this->materialNumber, _IFT_SimpleCrossSection_MaterialNumber);
 
     directorxExpr.setValue(0.0);
-    if ( ir.hasField(_IFT_SimpleCrossSection_directorx) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_directorx) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, directorxExpr, _IFT_SimpleCrossSection_directorx);
     }
 
     directoryExpr.setValue(0.0);
-    if ( ir.hasField(_IFT_SimpleCrossSection_directory) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_directory) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, directoryExpr, _IFT_SimpleCrossSection_directory);
     }
 
     directorzExpr.setValue(1.0);
-    if ( ir.hasField(_IFT_SimpleCrossSection_directorz) ) {
+    if ( ir->hasField(_IFT_SimpleCrossSection_directorz) ) {
         IR_GIVE_OPTIONAL_FIELD(ir, directorzExpr, _IFT_SimpleCrossSection_directorz);
     }
 
@@ -173,7 +173,7 @@ VariableCrossSection :: giveExpression(const ScalarFunction **expr, CrossSection
     } else if ( aProperty == CS_DirectorVectorZ ) {
         * expr = & directorzExpr;
     } else {
-        OOFEM_ERROR("called with unknown ID %d", this->giveNumber(), aProperty);
+        OOFEM_ERROR("%d: called with unknown ID %d", this->giveNumber(), aProperty);
     }
 }
 
@@ -210,9 +210,11 @@ VariableCrossSection :: give(CrossSectionProperty aProperty, const FloatArray &c
         } else { // global coordinates needed
             if ( local ) {
                 // convert given coords into global cs
-                if ( !elem->computeGlobalCoordinates(c, coords) ) {
+                Coordinates cg;
+                if ( !elem->computeGlobalCoordinates(cg, coords) ) {
                     OOFEM_ERROR( "computeGlobalCoordinates failed (element %d)", elem->giveNumber() );
                 }
+                c = cg;
             } else {
                 c = coords;
             }

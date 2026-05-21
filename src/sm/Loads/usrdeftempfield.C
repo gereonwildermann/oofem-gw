@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -78,7 +78,7 @@ UserDefinedTemperatureField :: computeValueAt(FloatArray &answer, TimeStep *tSte
 }
 
 void
-UserDefinedTemperatureField :: initializeFrom(InputRecord &ir)
+UserDefinedTemperatureField :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, size, _IFT_UserDefinedTemperatureField_size);
     if ( size > 3 ) {

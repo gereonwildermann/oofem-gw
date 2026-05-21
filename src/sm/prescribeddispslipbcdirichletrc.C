@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -434,7 +434,7 @@ void PrescribedDispSlipBCDirichletRC :: computeTangent(FloatMatrix &tangent, Tim
     }
 }
 
-void PrescribedDispSlipBCDirichletRC :: initializeFrom(InputRecord &ir)
+void PrescribedDispSlipBCDirichletRC :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     GeneralBoundaryCondition :: initializeFrom(ir);
     PrescribedDispSlipHomogenization::initializeFrom(ir);

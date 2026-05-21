@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -832,7 +832,7 @@ TrabBone3D :: constructFabricTransformationMatrix() const
 }
 
 void
-TrabBone3D :: initializeFrom(InputRecord &ir)
+TrabBone3D :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 

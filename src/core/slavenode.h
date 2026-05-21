@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -75,7 +75,7 @@ public:
     /// Destructor.
     virtual ~SlaveNode(void) { }
 
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     bool isDofTypeCompatible(dofType type) const override { return ( type == DT_master || type == DT_slave ); }
     void updateLocalNumbering(EntityRenumberingFunctor &f) override;

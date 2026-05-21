@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -46,7 +46,7 @@ namespace oofem {
 REGISTER_Material(B3SolidMaterial);
 
 void
-B3SolidMaterial :: initializeFrom(InputRecord &ir)
+B3SolidMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // ph!!!
     //KelvinChainMaterial :: initializeFrom(ir);
@@ -704,7 +704,8 @@ B3SolidMaterial :: giveHumidity(GaussPoint *gp, TimeStep *tStep) const //compute
 
     if ( ( tf = fm->giveField(FT_HumidityConcentration) ) ) {
         // humidity field registered
-        FloatArray gcoords, et2;
+        Coordinates gcoords;
+        FloatArray et2;
         int err;
         gp->giveElement()->computeGlobalCoordinates( gcoords, gp->giveNaturalCoordinates() );
         if ( ( err = tf->evaluateAt(et2, gcoords, VM_Total, tStep) ) ) {
@@ -730,7 +731,8 @@ B3SolidMaterial :: giveHumidityIncrement(GaussPoint *gp, TimeStep *tStep) const 
 
     if ( ( tf = fm->giveField(FT_HumidityConcentration) ) ) {
         // humidity field registered
-        FloatArray gcoords, et2, ei2;
+        Coordinates gcoords;
+        FloatArray et2, ei2;
         int err;
         gp->giveElement()->computeGlobalCoordinates( gcoords, gp->giveNaturalCoordinates() );
         if ( ( err = tf->evaluateAt(et2, gcoords, VM_Total, tStep) ) ) {

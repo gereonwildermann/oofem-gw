@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2022   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -82,7 +82,7 @@ public:
     /// Destructor.
     virtual ~GeneralSlaveNode(void) {}
 
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void initializeFinish() override;
     void postInitialize() override;
     virtual bool isDofTypeCompatible(dofType type) const override {

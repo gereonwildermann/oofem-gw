@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -50,15 +50,15 @@ DynamicDataReader :: ~DynamicDataReader()
 }
 
 void
-DynamicDataReader :: insertInputRecord(InputRecordType type, std::unique_ptr<InputRecord> record)
+DynamicDataReader :: insertInputRecord(InputRecordType type, std::shared_ptr<InputRecord> record)
 {
     // Should care about the record type, but its a hassle.
-    this->recordList.push_back(std::move(record));
+    this->recordList.push_back(record);
     this->it = recordList.end();
 }
 
-InputRecord &
-DynamicDataReader :: giveInputRecord(InputRecordType typeId, int recordId)
+std::shared_ptr<InputRecord>
+DynamicDataReader :: giveNextInputRecord(InputRecordType typeId)
 {
     // Ignores recordId in favor of having a dynamic list (just incremental access). typeId could be supported, but its a hassle.
     // The txt data reader makes the same assumptions.
@@ -67,7 +67,7 @@ DynamicDataReader :: giveInputRecord(InputRecordType typeId, int recordId)
     } else {
         ++this->it;
     }
-    return **(this->it);
+    return *(this->it);
 }
 
 bool
@@ -94,7 +94,7 @@ DynamicDataReader :: writeToFile(const char *fileName)
     fout << this->outputFileName << '\n';
     fout << this->description << '\n';
     for ( auto &rec: this->recordList ) {
-        fout << rec->giveRecordAsString() << "\n";
+        fout << rec->giveRecordInTXTFormat() << "\n";
     }
     fout.close();
 }

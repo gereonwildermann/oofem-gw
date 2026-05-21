@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -54,8 +54,8 @@ protected:
 public:
     IntElSurfTr1(int n, Domain *d);
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
     virtual void computeCovarBaseVectorsAt(IntegrationPoint *ip, FloatArray &G1, FloatArray &G2);
     //bool computeGtoLRotationMatrix(FloatMatrix &answer) override;
     void computeTransformationMatrixAt(GaussPoint *gp, FloatMatrix &answer) override;

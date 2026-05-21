@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -146,7 +146,7 @@ MisesMatNl :: modifyNonlocalWeightFunctionAround(GaussPoint *gp) const
     }
 
     Element *elem = gp->giveElement();
-    FloatArray coords;
+    Coordinates coords;
     elem->computeGlobalCoordinates( coords, gp->giveNaturalCoordinates() );
     double xtarget = coords.at(1);
 
@@ -279,7 +279,7 @@ MisesMatNl :: giveInterface(InterfaceType type)
 
 
 void
-MisesMatNl :: initializeFrom(InputRecord &ir)
+MisesMatNl :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MisesMat :: initializeFrom(ir);
     StructuralNonlocalMaterialExtensionInterface :: initializeFrom(ir);

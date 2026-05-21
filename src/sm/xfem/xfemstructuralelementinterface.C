@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -110,7 +110,7 @@ bool XfemStructuralElementInterface :: XfemElementInterface_updateIntegrationRul
 
         bool firstIntersection = true;
 
-        std :: vector< std :: vector< FloatArray > >pointPartitions;
+        std :: vector< std :: vector< Coordinates > >pointPartitions;
         mSubTri.clear();
 
         std :: vector< int >enrichingEIs;
@@ -150,7 +150,7 @@ bool XfemStructuralElementInterface :: XfemElementInterface_updateIntegrationRul
                         }
 
                         // We have xi_s and xi_e. Fetch sub polygon.
-                        std :: vector< FloatArray >crackPolygon;
+                        std :: vector< Coordinates >crackPolygon;
                         crack->giveSubPolygon(crackPolygon, startXi, endXi);
 
                         ///////////////////////////////////
@@ -289,7 +289,7 @@ bool XfemStructuralElementInterface :: XfemElementInterface_updateIntegrationRul
                 std :: vector< Triangle >allTriCopy;
                 for ( size_t triIndex = 0; triIndex < mSubTri.size(); triIndex++ ) {
                     // Call alternative version of XfemElementInterface_prepareNodesForDelaunay
-                    std :: vector< std :: vector< FloatArray > >pointPartitionsTri;
+                    std :: vector< std :: vector< Coordinates > >pointPartitionsTri;
                     double startXi, endXi;
                     bool intersection = false;
                     XfemElementInterface_prepareNodesForDelaunay(pointPartitionsTri, startXi, endXi, mSubTri [ triIndex ], eiIndex, intersection);
@@ -310,7 +310,7 @@ bool XfemStructuralElementInterface :: XfemElementInterface_updateIntegrationRul
                             }
 
                             // We have xi_s and xi_e. Fetch sub polygon.
-                            std :: vector< FloatArray >crackPolygon;
+                            std :: vector< Coordinates >crackPolygon;
                             crack->giveSubPolygon(crackPolygon, startXi, endXi);
 
                             int numSeg = crackPolygon.size() - 1;
@@ -1457,7 +1457,7 @@ void XfemStructuralElementInterface :: XfemElementInterface_computeConsistentMas
 }
 
 void
-XfemStructuralElementInterface :: initializeCZFrom(InputRecord &ir, int priority)
+XfemStructuralElementInterface :: initializeCZFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &pm = this->element->giveDomain()->elementPPM;
     PM_UPDATE_PARAMETER(mCZMaterialNum, pm, ir, element->giveNumber(), IPK_XfemElementInterface_CohesiveZoneMaterial, priority);

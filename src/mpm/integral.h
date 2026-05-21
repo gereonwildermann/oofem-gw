@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -61,7 +61,7 @@ namespace oofem {
         Integral (Domain* d, Set* set, const Term* t ) : set(set), term(t), factor(1.0) {
             this->domain = d;
         }   
-        void initializeFrom (InputRecord &ir, EngngModel *emodel);
+        void initializeFrom (const std::shared_ptr<InputRecord> &ir, EngngModel *emodel);
         /// @brief Initialize the integral domain 
         void initialize() {
             if (this->set == nullptr) {

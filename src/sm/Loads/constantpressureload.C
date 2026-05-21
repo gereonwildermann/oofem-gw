@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,13 +48,13 @@ ConstantPressureLoad :: ConstantPressureLoad(int i, Domain *d) : SurfaceLoad(i, 
 }
 
 void
-ConstantPressureLoad :: initializeFrom(InputRecord &ir)
+ConstantPressureLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     BoundaryLoad :: initializeFrom(ir);
 
     IR_GIVE_OPTIONAL_FIELD(ir, this->loadOffset, _IFT_ConstantPressureLoad_LoadOffset);
 #if 1
-    if ( ir.hasField(_IFT_GeneralBoundaryCondition_dofs) ) {
+    if ( ir->hasField(_IFT_GeneralBoundaryCondition_dofs) ) {
         throw ValueInputException(ir, _IFT_GeneralBoundaryCondition_dofs, "Constant pressure load should not specify DOFs");
     }
 #endif

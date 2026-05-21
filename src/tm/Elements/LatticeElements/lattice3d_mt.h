@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ protected:
     int numberOfPolygonVertices;
     FloatMatrix localCoordinateSystem;
     double eccS = 0., eccT = 0., area = 0.;
-    FloatArray midPoint, centroid, globalCentroid;
+    Coordinates midPoint, centroid, globalCentroid;
     int geometryFlag = 0;
     FloatArray normal;
 
@@ -95,9 +95,9 @@ public:
     void computeInternalSourceRhsVectorAt(FloatArray &answer, TimeStep *, ValueModeType mode) override;
     double computeVolumeAround(GaussPoint *) override;
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override;
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override;
 
     void computeConductivityMatrix(FloatMatrix &answer, MatResponseMode rmode, TimeStep *tStep) override;
 
@@ -116,7 +116,7 @@ public:
 
     int computeNumberOfDofs() override { return 2; }
     void giveDofManDofIDMask(int inode, IntArray &) const override;
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     void updateInternalState(TimeStep *tStep) override;
 

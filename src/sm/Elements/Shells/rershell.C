@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -272,7 +272,7 @@ RerShell :: giveArea()
 
 
 void
-RerShell :: initializeFrom(InputRecord &ir, int priority)
+RerShell :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralElement :: initializeFrom(ir, priority);
     numberOfGaussPoints = 1;
@@ -382,7 +382,7 @@ RerShell :: giveLocalCoordinateSystem(FloatMatrix &answer)
 //does check that the point is in the element thickness
 #define POINT_TOL 1.e-3
 bool
-RerShell :: computeLocalCoordinates(FloatArray &answer, const FloatArray &coords)
+RerShell :: computeLocalCoordinates(FloatArray &answer, const Coordinates &coords)
 {
     //set size of return value to 3 area coordinates
     answer.resize(3);

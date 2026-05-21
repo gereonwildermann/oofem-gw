@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,11 +43,9 @@
 #include <string>
 #include <cstring>
 
-#include <tinyxml2.h>
+#include "xmlutil.h"
 
-using namespace tinyxml2;
-
-#define TINYXML //read CEMHYD3D input file through tinyXML library
+#define PUGIXML //read CEMHYD3D input file through pugiXML library
 
 #ifdef __TM_MODULE //OOFEM transport module
  #include "domain.h"
@@ -125,7 +123,7 @@ public:
     /// Perform averaging on a master CemhydMatStatus.
     virtual void averageTemperature();
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     /// Use different methods to evaluate material parameters
     int conductivityType, capacityType, densityType;
     /// Array containing warnings supression for density, conductivity, capacity, high temperature.
@@ -138,7 +136,7 @@ public:
     int eachGP;
     /// XML input file name for CEMHYD3D.
     std :: string XMLfileName;
-    MaterialStatus *CreateStatus(GaussPoint *gp) const override;
+    std::unique_ptr<MaterialStatus> CreateStatus(GaussPoint *gp) const override;
     /**
      * Pointer to master CemhydMatStatus, which is shared among related integration points (on element, for example).
      * When Cemhyd3D runs seperately in each GP, MasterCemhydMatStatus belongs to the first instance, from which the microstructure is copied to the rest of integration points.
@@ -459,14 +457,14 @@ private:
     //+distrib3d
     char ***mic; //char mic [SYSIZE] [SYSIZE] [SYSIZE];
 
-#ifdef TINYXML
-    XMLDocument *xmlFile;
-    void QueryNumAttributeExt(XMLDocument *xmlFile, const char *elementName, int position, int &val);
-    void QueryNumAttributeExt(XMLDocument *xmlFile, const char *elementName, int position, long int &val);
-    void QueryNumAttributeExt(XMLDocument *xmlFile, const char *elementName, const char *key, int &val);
-    void QueryNumAttributeExt(XMLDocument *xmlFile, const char *elementName, int position, double &val);
-    void QueryNumAttributeExt(XMLDocument *xmlFile, const char *elementName, const char *key, double &val);
-    void QueryStringAttributeExt(XMLDocument *xmlFile, const char *elementName, int position, char *chars);
+#ifdef PUGIXML
+    xmlutil::XmlDoc xmlFile;
+    void QueryNumAttributeExt(const char *elementName, int position, int &val);
+    void QueryNumAttributeExt(const char *elementName, int position, long int &val);
+    void QueryNumAttributeExt(const char *elementName, const char *key, int &val);
+    void QueryNumAttributeExt(const char *elementName, int position, double &val);
+    void QueryNumAttributeExt(const char *elementName, const char *key, double &val);
+    void QueryStringAttributeExt(const char *elementName, int position, char *chars);
     int countKey; //counter for many keys in the XML element
 #elif CMLFILE
     cmlfile *F;

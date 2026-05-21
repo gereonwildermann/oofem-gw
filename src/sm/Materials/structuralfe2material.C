@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -67,12 +67,12 @@ StructuralFE2Material :: StructuralFE2Material(int n, Domain *d) : StructuralMat
 
 
 void
-StructuralFE2Material :: initializeFrom(InputRecord &ir)
+StructuralFE2Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
     IR_GIVE_FIELD(ir, this->inputfile, _IFT_StructuralFE2Material_fileName);
 
-    useNumTangent = ir.hasField(_IFT_StructuralFE2Material_useNumericalTangent);
+    useNumTangent = ir->hasField(_IFT_StructuralFE2Material_useNumericalTangent);
 }
 
 
@@ -361,9 +361,9 @@ PrescribedGradientHomogenization* StructuralFE2MaterialStatus::giveBC()
 bool
 StructuralFE2MaterialStatus :: createRVE(int n, const std :: string &inputfile, int rank)
 {
-    OOFEMTXTDataReader dr( inputfile.c_str() );
-    this->rve = InstanciateProblem(dr, _processor, 0); // Everything but nrsolver is updated.
-    dr.finish();
+    auto dr=DataReader::makeFromFilename(inputfile.c_str());
+    this->rve = InstanciateProblem(*dr, _processor, 0); // Everything but nrsolver is updated.
+    dr->finish();
     this->rve->setProblemScale(microScale);
     this->rve->checkProblemConsistency();
     this->rve->initMetaStepAttributes( this->rve->giveMetaStep(1) );
@@ -501,9 +501,9 @@ void StructuralFE2MaterialStatus :: copyStateVariables(const MaterialStatus &iSt
                 ext_ei->appendInputRecords(dataReader);
 
 
-                auto &mir = dataReader.giveInputRecord(DataReader :: IR_enrichItemRec, i);
+                auto mir = dataReader.giveNextInputRecord(DataReader :: IR_enrichItemRec);
                 std :: string name;
-                mir.giveRecordKeywordField(name);
+                mir->giveRecordKeywordField(name);
 
                 std :: unique_ptr< EnrichmentItem >ei( classFactory.createEnrichmentItem( name.c_str(), i, this_xMan, rve_domain ) );
                 if ( ei.get() == NULL ) {

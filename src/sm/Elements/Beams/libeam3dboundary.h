@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -66,12 +66,12 @@ public:
     LIBeam3dBoundary(int n, Domain *d);
     virtual ~LIBeam3dBoundary() { }
 
-    void initializeFrom(InputRecord &ir, int prio) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int prio) override;
     void postInitialize() override;
 
     int computeNumberOfDofs() override { return 21; }
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
     int giveLocalCoordinateSystem(FloatMatrix &answer) override;
     bool computeGtoLRotationMatrix(FloatMatrix &answer) override;
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;

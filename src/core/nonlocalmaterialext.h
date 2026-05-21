@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -401,7 +401,7 @@ public:
     /// Returns reference to domain.
     Domain *giveDomain() { return this->domain; }
 
-    void initializeFrom(InputRecord &ir);
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir);
     /**
      * Stores receiver in an input record
      * @param input Input record to be filled in.

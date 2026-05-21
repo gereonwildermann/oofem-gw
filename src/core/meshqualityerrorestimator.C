@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -115,7 +115,7 @@ int MeshQualityErrorEstimator :: estimateError(EE_ErrorMode mode, TimeStep *tSte
     return true;
 }
 
-void MeshQualityErrorEstimator :: initializeFrom(InputRecord &ir)
+void MeshQualityErrorEstimator :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ErrorEstimator :: initializeFrom(ir);
 }

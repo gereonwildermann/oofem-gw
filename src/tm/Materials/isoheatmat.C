@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -46,7 +46,7 @@ IsotropicHeatTransferMaterial :: IsotropicHeatTransferMaterial(int n, Domain *d)
 
 
 void
-IsotropicHeatTransferMaterial :: initializeFrom(InputRecord &ir)
+IsotropicHeatTransferMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Material :: initializeFrom(ir);
 
@@ -127,19 +127,19 @@ IsotropicHeatTransferMaterial :: giveIPValue(FloatArray &answer, GaussPoint *gp,
     }
 
     if ( type == IST_Temperature ) {
-        answer = FloatArray{ this->giveTemperature(gp) };
+        answer = Vec1( this->giveTemperature(gp) );
         return 1;
     } else if ( type == IST_Density ) {
-        answer = FloatArray{ this->giveProperty('d', gp, tStep) };
+        answer = Vec1( this->giveProperty('d', gp, tStep) );
         return 1;
     } else if ( type == IST_HeatCapacity ) {
-        answer = FloatArray{ this->giveProperty('c', gp, tStep) };
+        answer = Vec1( this->giveProperty('c', gp, tStep) );
         return 1;
     } else if ( type == IST_ThermalConductivityIsotropic ) {
-        answer = FloatArray{ this->giveProperty('k', gp, tStep) };
+        answer = Vec1( this->giveProperty('k', gp, tStep) );
         return 1;
     } else if ( type == IST_EnergyMassCapacity ) {
-        answer = FloatArray{ this->giveProperty('c', gp, tStep) * this->giveProperty('d', gp, tStep) * this->giveTemperature(gp) };
+        answer = Vec1( this->giveProperty('c', gp, tStep) * this->giveProperty('d', gp, tStep) * this->giveTemperature(gp) );
         return 1;
     }
 

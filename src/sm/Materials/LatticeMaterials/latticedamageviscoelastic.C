@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -50,7 +50,7 @@ LatticeDamageViscoelastic :: LatticeDamageViscoelastic(int n, Domain *d) : Latti
 {}
 
 void
-LatticeDamageViscoelastic :: initializeFrom(InputRecord &ir)
+LatticeDamageViscoelastic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LatticeDamage :: initializeFrom(ir);
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,7 +43,7 @@ namespace oofem {
 #define OPTIMIZED_VERSION_A4dot4
 
 
-void TSplineInterpolation :: initializeFrom(InputRecord &ir, ParameterManager&pm, int elnum, int priority)
+void TSplineInterpolation :: initializeFrom(const std::shared_ptr<InputRecord> &ir, ParameterManager&pm, int elnum, int priority)
 {
     BSplineInterpolation :: initializeFrom(ir, pm, elnum, priority);
 
@@ -286,7 +286,7 @@ double TSplineInterpolation :: evaldNdx(FloatMatrix &answer, const FloatArray &l
 }
 
 
-void TSplineInterpolation :: local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+void TSplineInterpolation :: local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     /* Based on SurfacePoint A4.3 implementation*/
     const FEIIGAElementGeometryWrapper &gw = static_cast< const FEIIGAElementGeometryWrapper& >(cellgeo);
@@ -312,7 +312,7 @@ void TSplineInterpolation :: local2global(FloatArray &answer, const FloatArray &
     giveKnotSpanBasisFuncMask(span, mask);
     count = mask.giveSize();
 
-    answer.resize(nsd);
+    //answer.resize(3);
     answer.zero();
 
     if ( nsd == 2 ) {
@@ -333,7 +333,7 @@ void TSplineInterpolation :: local2global(FloatArray &answer, const FloatArray &
         }
     }
 
-    answer.times(1.0 / weight);
+    answer*=(1.0 / weight);
 }
 
 

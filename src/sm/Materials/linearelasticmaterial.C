@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -42,7 +42,7 @@
 
 namespace oofem {
 void
-LinearElasticMaterial :: initializeFrom(InputRecord &ir)
+LinearElasticMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
 
@@ -228,7 +228,7 @@ LinearElasticMaterial :: giveRealStressVector_Warping(const FloatArrayF<2> &redu
     
     auto status = static_cast< StructuralMaterialStatus * >( this->giveStatus(gp) );
     double G = this->giveShearModulus();
-    FloatArray gcoords;
+    Coordinates gcoords;
     Element *elem = gp->giveElement();
     elem->computeGlobalCoordinates( gcoords, gp->giveNaturalCoordinates() );
     FloatArrayF<2> answer;

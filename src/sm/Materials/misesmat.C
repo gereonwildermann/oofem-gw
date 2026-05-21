@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -57,7 +57,7 @@ MisesMat::MisesMat(int n, Domain *d) : StructuralMaterial(n, d),
 
 
 void
-MisesMat::initializeFrom(InputRecord &ir)
+MisesMat::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial::initializeFrom(ir);
     linearElasticMaterial.initializeFrom(ir); // takes care of elastic constants
@@ -743,7 +743,8 @@ double MisesMat::giveTemperature(GaussPoint *gp, TimeStep *tStep) const
     int err;
     if ( ( tf = fm->giveField(FT_Temperature) ) ) {
         // temperature field registered
-        FloatArray gcoords, answer;
+        FloatArray answer;
+        Coordinates gcoords;
         static_cast< StructuralElement * >( gp->giveElement() )->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
         if ( ( err = tf->evaluateAt(answer, gcoords, VM_Total, tStep) ) ) {
             OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", gp->giveElement()->giveNumber(), err);

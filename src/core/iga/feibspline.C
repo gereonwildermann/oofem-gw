@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,7 +53,7 @@ ParamKey BSplineInterpolation::IPK_BSplineInterpolation_knotMultiplicityW("knotm
 
 
 void
-BSplineInterpolation :: initializeFrom(InputRecord &ir, ParameterManager&pm, int elnum, int priority)
+BSplineInterpolation :: initializeFrom(const std::shared_ptr<InputRecord> &ir, ParameterManager&pm, int elnum, int priority)
 {
     bool flag;
     IntArray degree_tmp;
@@ -397,7 +397,7 @@ double BSplineInterpolation :: evaldNdx(FloatMatrix &answer, const FloatArray &l
 }
 
 
-void BSplineInterpolation :: local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+void BSplineInterpolation :: local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     /* Based on SurfacePoint A3.5 implementation*/
     const FEIIGAElementGeometryWrapper &gw = static_cast< const FEIIGAElementGeometryWrapper& >(cellgeo);
@@ -417,7 +417,7 @@ void BSplineInterpolation :: local2global(FloatArray &answer, const FloatArray &
         this->basisFuns(N [ i ], span[i], lcoords[i], degree [ i ], knotVector [ i ]);
     }
 
-    answer.resize(nsd);
+    //answer.resize(3);
     answer.zero();
 
     if ( nsd == 1 ) {

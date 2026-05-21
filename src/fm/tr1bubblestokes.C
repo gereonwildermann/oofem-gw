@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -280,7 +280,7 @@ void Tr1BubbleStokes :: computeLoadVector(FloatArray &answer, BodyLoad *load, Ch
             if ( load->giveFormulationType() == Load :: FT_Entity ) { // Edge load in xi-eta system
                 load->computeValueAt(t, tStep, lcoords, VM_Total);
             } else { // Edge load in x-y system
-                FloatArray gcoords;
+                Coordinates gcoords;
                 this->interp.boundaryLocal2Global( gcoords, iEdge, lcoords, FEIElementGeometryWrapper(this) );
                 load->computeValueAt(t, tStep, gcoords, VM_Total);
             }

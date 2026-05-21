@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ public:
         mask(std::move(dofIdMask))
     { }
 
-    int evaluateAt(FloatArray &answer, const FloatArray &coords, ValueModeType mode, TimeStep *tStep) override;
+    int evaluateAt(FloatArray &answer, const Coordinates &coords, ValueModeType mode, TimeStep *tStep) override;
     int evaluateAt(FloatArray &answer, DofManager *dman, ValueModeType mode, TimeStep *tStep) override;
 
     void restoreContext(DataStream &stream) override { }

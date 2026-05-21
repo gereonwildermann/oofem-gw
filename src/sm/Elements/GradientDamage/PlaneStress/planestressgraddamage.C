@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -91,7 +91,7 @@ PlaneStressGradDamage :: giveDofManDofIDMask_d(IntArray &answer) const
 
 
 void
-PlaneStressGradDamage :: initializeFrom(InputRecord &ir, int priority)
+PlaneStressGradDamage :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     PlaneStress2d :: initializeFrom(ir, priority);
 }

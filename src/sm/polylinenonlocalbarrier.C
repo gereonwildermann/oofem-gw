@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -181,7 +181,7 @@ PolylineNonlocalBarrier :: giveDistancePointLine(const FloatArray &coordsA, cons
 
 
 void
-PolylineNonlocalBarrier :: initializeFrom(InputRecord &ir)
+PolylineNonlocalBarrier :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, vertexNodes, _IFT_PolylineNonlocalBarrier_vertexnodes);
 

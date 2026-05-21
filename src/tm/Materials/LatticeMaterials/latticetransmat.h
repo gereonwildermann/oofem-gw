@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -146,7 +146,7 @@ protected:
 public:
     LatticeTransportMaterial(int n, Domain *d) : TransportMaterial(n, d) { }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     FloatArrayF< 3 >computeFlux3D(const FloatArrayF< 3 > &grad, double field, GaussPoint *gp, TimeStep *tStep) const override;
 

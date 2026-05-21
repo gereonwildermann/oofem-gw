@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,7 +53,7 @@ RankineMatGrad :: RankineMatGrad(int n, Domain *d) : RankineMat(n, d), GradientD
 
 /////////////////////////////////////////////////////////////////////////////
 void
-RankineMatGrad :: initializeFrom(InputRecord &ir)
+RankineMatGrad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RankineMat :: initializeFrom(ir);
 

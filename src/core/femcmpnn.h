@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,13 +48,14 @@
 #include "contextioresulttype.h"
 #include "contextmode.h"
 #include "floatarray.h"
+#include "inputrecord.h"
 
 namespace oofem {
 class DataStream;
 class Domain;
 class Interface;
 class TimeStep;
-class InputRecord;
+// class InputRecord;
 class DynamicInputRecord;
 class oofegGraphicContext;
 class EntityRenumberingFunctor;
@@ -127,8 +128,8 @@ public:
      * @param ir Input record to initialize from.
      * @param priority Priority of the input record. This is used to determine the order of initialization
      */
-    virtual void initializeFrom(InputRecord &ir);
-    virtual void initializeFrom(InputRecord &ir, int priority) { initializeFrom(ir); }
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) { initializeFrom(ir); }
     /** Finishes the initialization. Note that initializeFrom may be called multiple times. 
      * The initializeFinish typycally performs the input parameter checking (if compulsory parameters set, etc.)
      * After initializeFinish, DOFs and other components may be created.

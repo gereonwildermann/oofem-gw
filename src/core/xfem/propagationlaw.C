@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ void PLDoNothing :: giveInputRecord(DynamicInputRecord &input)
     input.setRecordKeywordField(this->giveInputRecordName(), number);
 }
 
-void PLCrackPrescribedDir :: initializeFrom(InputRecord &ir)
+void PLCrackPrescribedDir :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, mAngle, _IFT_PLCrackPrescribedDir_Dir);
     IR_GIVE_FIELD(ir, mIncrementLength, _IFT_PLCrackPrescribedDir_IncLength);
@@ -101,8 +101,8 @@ bool PLCrackPrescribedDir :: propagateInterface(Domain &iDomain, EnrichmentFront
 
 
     double angleRad = mAngle * M_PI / 180.0;
-    FloatArray dir = Vec2(
-        cos(angleRad), sin(angleRad)
+    FloatArray dir = Vec3(
+        cos(angleRad), sin(angleRad), 0.0
     );
 
     oTipProp.mTipIndex = tipInfo.mTipIndex;
@@ -112,7 +112,7 @@ bool PLCrackPrescribedDir :: propagateInterface(Domain &iDomain, EnrichmentFront
     return true;
 }
 
-void PLnodeRadius :: initializeFrom(InputRecord &ir)
+void PLnodeRadius :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, mRadius, _IFT_PLnodeRadius_Radius);
 

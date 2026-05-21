@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -58,7 +58,7 @@ QSpace :: QSpace(int n, Domain *aDomain) : Structural3DElement(n, aDomain), ZZNo
 
 
 void
-QSpace :: initializeFrom(InputRecord &ir, int priority)
+QSpace :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     Structural3DElement :: initializeFrom(ir, priority);
 }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,7 +53,7 @@ PeakFunction :: evaluateAtTime(double time)
 }
 
 void
-PeakFunction :: initializeFrom(InputRecord &ir)
+PeakFunction :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Function :: initializeFrom(ir);
 

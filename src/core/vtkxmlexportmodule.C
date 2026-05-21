@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -85,7 +85,7 @@ VTKXMLExportModule::~VTKXMLExportModule() {}
 
 
 void
-VTKXMLExportModule::initializeFrom(InputRecord &ir)
+VTKXMLExportModule::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule::initializeFrom(ir);
 
@@ -96,7 +96,7 @@ VTKXMLExportModule::initializeFrom(InputRecord &ir)
     IR_GIVE_OPTIONAL_FIELD(ir, primaryVarsToExport, _IFT_VTKXMLExportModule_primvars); // Macro - see unknowntype.h
     IR_GIVE_OPTIONAL_FIELD(ir, externalForcesToExport, _IFT_VTKXMLExportModule_externalForces); // Macro - see unknowntype.h
     IR_GIVE_OPTIONAL_FIELD(ir, ipInternalVarsToExport, _IFT_VTKXMLExportModule_ipvars); // Macro - see internalstatetype.h
-    if ( ir.hasField(_IFT_VTKXMLExportModule_exportSetMembershipFlag) ) {
+    if ( ir->hasField(_IFT_VTKXMLExportModule_exportSetMembershipFlag) ) {
         exportSetMembershipFlag = true;
     }
 
@@ -996,7 +996,8 @@ VTKXMLExportModule::exportIntVarsInGpAs(IntArray valIDs, TimeStep *tStep)
     Domain *d = emodel->giveDomain(1);
     int nc = 0;
     ( void ) nc; //silence the warning
-    FloatArray gc, value;
+    Coordinates gc;
+    FloatArray value;
     std::ofstream stream;
     InternalStateType isttype;
     InternalStateValueType vtype;

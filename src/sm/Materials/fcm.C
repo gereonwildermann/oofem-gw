@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -102,7 +102,6 @@ FCMMaterial :: giveRealStressVector(FloatArray &answer, GaussPoint *gp,
     double d_tau_old = 0.;
     bool illinoisFlag = false;
 
-    int iterLimitGlobal = 20;
     int iterLimitGradient = 20;
     int iterLimitNormal = 100;
     int iterLimitShear = 100;
@@ -1972,22 +1971,24 @@ FCMMaterial :: computeNumerD2Modulus(GaussPoint *gp, TimeStep *tStep, int shearD
   
 
 void
-FCMMaterial :: initializeFrom(InputRecord &ir)
+FCMMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial :: initializeFrom(ir);
     linearElasticMaterial.initializeFrom(ir);
+
+    IR_GIVE_OPTIONAL_FIELD(ir,iterLimitGlobal,"iterlimitglobal");
 
     this->nAllowedCracks = 3;
     IR_GIVE_OPTIONAL_FIELD(ir, nAllowedCracks, _IFT_FCM_nAllowedCracks);
 
 
     this->crackSpacing = -1.;
-    if ( ir.hasField(_IFT_FCM_crackSpacing) ) {
+    if ( ir->hasField(_IFT_FCM_crackSpacing) ) {
         IR_GIVE_FIELD(ir, crackSpacing, _IFT_FCM_crackSpacing);
     }
 
     this->multipleCrackShear = false;
-    if ( ir.hasField(_IFT_FCM_multipleCrackShear) ) {
+    if ( ir->hasField(_IFT_FCM_multipleCrackShear) ) {
         this->multipleCrackShear = true;
     }
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -51,6 +51,8 @@
 #include "boundarycondition.h"
 #include "activebc.h"
 #include "outputmanager.h"
+//
+#include "Contact/ContactElements//thermalcontactelement.h"
 
 namespace oofem {
 REGISTER_EngngModel(TransientTransportProblem);
@@ -71,7 +73,7 @@ NumericalMethod *TransientTransportProblem :: giveNumericalMethod(MetaStep *mSte
 
 
 void
-TransientTransportProblem :: initializeFrom(InputRecord &ir)
+TransientTransportProblem :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     EngngModel :: initializeFrom(ir);
 
@@ -81,23 +83,23 @@ TransientTransportProblem :: initializeFrom(InputRecord &ir)
 
     IR_GIVE_FIELD(ir, this->alpha, _IFT_TransientTransportProblem_alpha);
 
-    if ( ir.hasField(_IFT_TransientTransportProblem_initt) ) {
+    if ( ir->hasField(_IFT_TransientTransportProblem_initt) ) {
         IR_GIVE_FIELD(ir, initT, _IFT_TransientTransportProblem_initt);
     }
     
     prescribedTimes.clear();
     dtFunction = 0;
-    if ( ir.hasField(_IFT_TransientTransportProblem_dtFunction) ) {
+    if ( ir->hasField(_IFT_TransientTransportProblem_dtFunction) ) {
         IR_GIVE_FIELD(ir, this->dtFunction, _IFT_TransientTransportProblem_dtFunction);
-    } else if ( ir.hasField(_IFT_TransientTransportProblem_prescribedTimes) ) {
+    } else if ( ir->hasField(_IFT_TransientTransportProblem_prescribedTimes) ) {
         IR_GIVE_FIELD(ir, this->prescribedTimes, _IFT_TransientTransportProblem_prescribedTimes);
     } else {
         IR_GIVE_FIELD(ir, this->deltaT, _IFT_TransientTransportProblem_deltaT);
     }
 
-    this->keepTangent = ir.hasField(_IFT_TransientTransportProblem_keepTangent);
+    this->keepTangent = ir->hasField(_IFT_TransientTransportProblem_keepTangent);
 
-    this->lumped = ir.hasField(_IFT_TransientTransportProblem_lumped);
+    this->lumped = ir->hasField(_IFT_TransientTransportProblem_lumped);
 
     field = std::make_unique<DofDistributedPrimaryField>(this, 1, FT_TransportProblemUnknowns, 2, this->alpha);
 
@@ -193,6 +195,7 @@ void TransientTransportProblem :: solveYourselfAt(TimeStep *tStep)
 
     if ( tStep->isTheFirstStep() ) {
         this->applyIC();
+	this->initForNewIteration(this->giveDomain(1),tStep,0, {});
     }
 
     field->advanceSolution(tStep);
@@ -510,7 +513,7 @@ TransientTransportProblem :: checkConsistency()
 {
     // check for proper element type
     for ( auto &elem : this->giveDomain(1)->giveElements() ) {
-        if ( !dynamic_cast< TransportElement * >( elem.get() ) ) {
+      if ( ( !dynamic_cast< TransportElement * >( elem.get() ) ) && !dynamic_cast<ThermalContactElement *> (elem.get()) ) {
             OOFEM_WARNING("Element %d has no TransportElement base", elem->giveLabel());
             return 0;
         }

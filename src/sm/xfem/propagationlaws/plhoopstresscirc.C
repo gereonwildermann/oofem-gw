@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,7 +53,7 @@ namespace oofem {
 REGISTER_PropagationLaw(PLHoopStressCirc)
 
 /////////////////////////////////////////////
-void PLHoopStressCirc :: initializeFrom(InputRecord &ir)
+void PLHoopStressCirc :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, mRadius,                          _IFT_PLHoopStressCirc_Radius);
     IR_GIVE_FIELD(ir, mAngleInc,                        _IFT_PLHoopStressCirc_AngleInc);

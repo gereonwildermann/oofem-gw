@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -52,7 +52,7 @@ J2MPlasticMaterial :: J2MPlasticMaterial(int n, Domain *d) : MPlasticMaterial(n,
 
 
 void
-J2MPlasticMaterial :: initializeFrom(InputRecord &ir)
+J2MPlasticMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     double value;
 

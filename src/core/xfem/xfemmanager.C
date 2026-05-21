@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -151,11 +151,12 @@ IntArray XfemManager :: giveEnrichedDofIDs(const DofManager &iDMan) const
     return dofIdArray;
 }
 
-void XfemManager :: initializeFrom(InputRecord &ir)
+void XfemManager :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
-    IR_GIVE_FIELD(ir, numberOfEnrichmentItems, _IFT_XfemManager_numberOfEnrichmentItems);
-
-    IR_GIVE_OPTIONAL_FIELD(ir, numberOfNucleationCriteria, _IFT_XfemManager_numberOfNucleationCriteria);
+    thisIr=ir;
+    // read later in instanciateYourself
+    // IR_GIVE_FIELD(ir, numberOfEnrichmentItems, _IFT_XfemManager_numberOfEnrichmentItems);
+    // IR_GIVE_OPTIONAL_FIELD(ir, numberOfNucleationCriteria, _IFT_XfemManager_numberOfNucleationCriteria);
 //    printf("numberOfNucleationCriteria: %d\n", numberOfNucleationCriteria);
 
     IR_GIVE_OPTIONAL_FIELD(ir, mNumGpPerTri, _IFT_XfemManager_numberOfGpPerTri);
@@ -206,35 +207,42 @@ void XfemManager :: giveInputRecord(DynamicInputRecord &input)
 int XfemManager :: instanciateYourself(DataReader &dr)
 {
     std :: string name;
-
+    DataReader::GroupRecords enrichRecs=dr.giveGroupRecords(thisIr,_IFT_XfemManager_numberOfEnrichmentItems,DataReader::IR_enrichItemRec,/*optional*/false);
+    numberOfEnrichmentItems=enrichRecs.size();
     enrichmentItemList.resize(numberOfEnrichmentItems);
-    for ( int i = 1; i <= numberOfEnrichmentItems; i++ ) {
-        auto &mir = dr.giveInputRecord(DataReader :: IR_enrichItemRec, i);
-        mir.giveRecordKeywordField(name);
+    int i=1;
+    for(const std::shared_ptr<InputRecord>& mir: enrichRecs){
+        mir->giveRecordKeywordField(name);
 
         std :: unique_ptr< EnrichmentItem >ei( classFactory.createEnrichmentItem( name.c_str(), i, this, this->giveDomain() ) );
         if ( ei.get() == NULL ) {
             OOFEM_ERROR( "unknown enrichment item (%s)", name.c_str() );
         }
-
+        DataReader::RecordGuard scope(dr,mir);
         ei->initializeFrom(mir);
         ei->instanciateYourself(dr);
         this->enrichmentItemList [ i - 1 ] = std :: move(ei);
+        i++;
     }
 
+    DataReader::GroupRecords nuclRecs=dr.giveGroupRecords(thisIr,_IFT_XfemManager_numberOfNucleationCriteria,DataReader::IR_crackNucleationRec,/*optional*/true);
+    numberOfNucleationCriteria=nuclRecs.size();
     mNucleationCriteria.resize(numberOfNucleationCriteria);
-    for ( int i = 1; i <= numberOfNucleationCriteria; i++ ) {
-        auto &mir = dr.giveInputRecord(DataReader :: IR_crackNucleationRec, i);
-        mir.giveRecordKeywordField(name);
+
+    i=1;
+    for(auto& mir: nuclRecs){
+        mir->giveRecordKeywordField(name);
 
         std :: unique_ptr< NucleationCriterion >nc( classFactory.createNucleationCriterion( name.c_str(), this->giveDomain() ) );
         if ( nc.get() == NULL ) {
             OOFEM_ERROR( "Unknown nucleation criterion: (%s)", name.c_str() );
         }
 
+        DataReader::RecordGuard scope(dr,mir);
         nc->initializeFrom(mir);
         nc->instanciateYourself(dr);
         this->mNucleationCriteria [ i - 1 ] = std :: move(nc);
+        i++;
     }
 
 

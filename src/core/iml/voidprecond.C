@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -37,7 +37,7 @@
 #include "voidprecond.h"
 
 namespace oofem {
-VoidPreconditioner :: VoidPreconditioner(const SparseMtrx &a, InputRecord &attributes) : Preconditioner(a, attributes)
+VoidPreconditioner :: VoidPreconditioner(const SparseMtrx &a, const std::shared_ptr<InputRecord> &attributes) : Preconditioner(a, attributes)
 { }
 
 VoidPreconditioner :: VoidPreconditioner() : Preconditioner()

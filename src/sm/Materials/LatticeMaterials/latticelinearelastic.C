@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -69,7 +69,7 @@ LatticeLinearElastic :: hasMaterialModeCapability(MaterialMode mode) const
 
 
 void
-LatticeLinearElastic :: initializeFrom(InputRecord &ir)
+LatticeLinearElastic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LatticeStructuralMaterial :: initializeFrom(ir);
     RandomMaterialExtensionInterface :: initializeFrom(ir);

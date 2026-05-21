@@ -9,7 +9,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -231,7 +231,7 @@ KelvinChainSolidMaterial :: CreateStatus(GaussPoint *gp) const
 }
 
 void
-KelvinChainSolidMaterial :: initializeFrom(InputRecord &ir)
+KelvinChainSolidMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RheoChainMaterial :: initializeFrom(ir);
 }

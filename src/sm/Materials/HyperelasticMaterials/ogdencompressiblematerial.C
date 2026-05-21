@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2014   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -159,7 +159,7 @@ OgdenCompressibleMaterial::CreateStatus(GaussPoint *gp) const
 
 
 void
-OgdenCompressibleMaterial::initializeFrom(InputRecord &ir)
+OgdenCompressibleMaterial::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial::initializeFrom(ir);
     BaseHyperElasticMaterial::initializeFrom(ir);

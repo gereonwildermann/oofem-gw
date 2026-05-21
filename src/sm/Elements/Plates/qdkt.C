@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -341,7 +341,7 @@ QDKTPlate::giveNodeCoordinates(double &x1, double &x2, double &x3, double &x4,
 
 
 void
-QDKTPlate::initializeFrom(InputRecord &ir, int priority)
+QDKTPlate::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     StructuralElement::initializeFrom(ir, priority);
 }
@@ -450,7 +450,7 @@ QDKTPlate::computeBodyLoadVectorAt(FloatArray &answer, Load *forLoad, TimeStep *
 #define POINT_TOL 1.e-3
 
 bool
-QDKTPlate::computeLocalCoordinates(FloatArray &answer, const FloatArray &coords)
+QDKTPlate::computeLocalCoordinates(FloatArray &answer, const Coordinates &coords)
 //converts global coordinates to local planar area coordinates,
 //does not return a coordinate in the thickness direction, but
 //does check that the point is in the element thickness

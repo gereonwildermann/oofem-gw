@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,7 +48,7 @@
 namespace oofem {
 REGISTER_DofManager(InteractionPFEMParticle);
 
-ParamKey InteractionPFEMParticle::IPK_InteractionPFEMParticle_coupledNode("couplednode");
+ParamKey InteractionPFEMParticle::IPK_InteractionPFEMParticle_CoupledNode("couplednode");
 /**
  * Constructor. Creates a particle with number n, belonging to aDomain.
  */
@@ -60,7 +60,7 @@ InteractionPFEMParticle :: InteractionPFEMParticle(int n, Domain *aDomain) : PFE
  * Gets from the source line from the data file all the data of the receiver.
  */
 void
-InteractionPFEMParticle :: initializeFrom(InputRecord &ir, int priority)
+InteractionPFEMParticle :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     PFEMParticle :: initializeFrom(ir, priority);
     ParameterManager &ppm =  this->giveDomain()->dofmanPPM;

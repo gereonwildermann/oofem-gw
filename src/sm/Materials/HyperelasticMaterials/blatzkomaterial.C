@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2020   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -41,7 +41,7 @@ REGISTER_Material(BlatzKoMaterial);
 
 
 void
-BlatzKoMaterial::initializeFrom(InputRecord &ir)
+BlatzKoMaterial::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial::initializeFrom(ir);
     IR_GIVE_FIELD(ir, mu, _IFT_BlatzKoMaterial_mu);

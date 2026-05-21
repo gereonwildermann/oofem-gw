@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -192,7 +192,59 @@ Lattice2d :: computeStiffnessMatrix(FloatMatrix &answer, MatResponseMode rMode,
     answer.plusProductUnsym(bj, dbj, dV);
 }
 
+void
+Lattice2d :: giveInternalForcesVector(FloatArray &answer,
+				      TimeStep *tStep, int useUpdatedGpRecord)
+{
+    FloatMatrix b;
+    FloatArray u, stress(3), strain;
 
+    this->computeVectorOf(VM_Total, tStep, u);
+    // subtract initial displacements, if defined
+    if ( initialDisplacements ) {
+        u.subtract(* initialDisplacements);
+    }
+
+    answer.clear();
+
+    for ( GaussPoint *gp : * this->giveDefaultIntegrationRulePtr() ) {
+        this->computeBmatrixAt(gp, b);
+
+        if ( useUpdatedGpRecord == 1 ) {
+            auto status = gp->giveMaterialStatus();            
+	    LatticeMaterialStatus *lmatStat = dynamic_cast< LatticeMaterialStatus * >( status );
+	    FloatArray stressTemp;
+	    if ( lmatStat ) {
+	      stressTemp = lmatStat->giveLatticeStress();
+	    }
+	    stress.at(1) = stressTemp.at(1);
+            stress.at(2) = stressTemp.at(2);
+            stress.at(3) = stressTemp.at(6);
+        } else {
+            if ( !this->isActivated(tStep) ) {
+	      strain.zero();
+            }
+            strain.beProductOf(b, u);
+            this->computeStressVector(stress, strain, gp, tStep);
+        }
+
+        if ( stress.giveSize() == 0 ) {
+            break;
+        }
+
+        // compute nodal representation of internal forces using f = B^T*Sigma dV
+        double dV = this->computeVolumeAround(gp);
+        answer.plusProduct(b, stress, dV);
+
+    }
+
+    // if inactive update state, but no contribution to global system
+    if ( !this->isActivated(tStep) ) {
+        answer.zero();
+        return;
+    }
+}
+ 
 void Lattice2d :: computeGaussPoints()
 // Sets up the array of Gauss Points of the receiver.
 {
@@ -337,7 +389,7 @@ Lattice2d :: giveLocalCoordinateSystem(FloatMatrix &answer)
 }
 
 void
-Lattice2d :: initializeFrom(InputRecord &ir, int priority)
+Lattice2d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     LatticeStructuralElement :: initializeFrom(ir, priority);
@@ -351,12 +403,13 @@ Lattice2d :: initializeFrom(InputRecord &ir, int priority)
 
 
 int
-Lattice2d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+Lattice2d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = this->gpCoords.at(1);
     answer.at(2) = this->gpCoords.at(2);
-
+    answer.at(3) = 0.;
+    
     return 1;
 }
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -260,7 +260,7 @@ LatticeBeam3dBoundary ::   giveDofManDofIDMask(int inode, IntArray &answer) cons
 }
 
 void
-LatticeBeam3dBoundary :: initializeFrom(InputRecord &ir, int priority)
+LatticeBeam3dBoundary :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm =  this->giveDomain()->elementPPM;
     LatticeBeam3d :: initializeFrom(ir, priority);
@@ -454,13 +454,13 @@ LatticeBeam3dBoundary :: restoreContext(DataStream &stream, ContextMode mode)
 
 
 int
-LatticeBeam3dBoundary :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+LatticeBeam3dBoundary :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     if ( geometryFlag == 0 ) {
         computeGeometryProperties();
     }
 
-    answer.resize(3);
+    //answer.resize(3);
     answer = this->globalCentroid;
 
     return 1;

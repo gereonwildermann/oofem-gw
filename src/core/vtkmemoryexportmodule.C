@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -48,7 +48,7 @@ VTKMemoryExportModule::VTKMemoryExportModule(int n, EngngModel *e) : VTKBaseExpo
 VTKMemoryExportModule::~VTKMemoryExportModule() {}
 
 void
-VTKMemoryExportModule::initializeFrom(InputRecord &ir)
+VTKMemoryExportModule::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
   VTKBaseExportModule::initializeFrom(ir);
   

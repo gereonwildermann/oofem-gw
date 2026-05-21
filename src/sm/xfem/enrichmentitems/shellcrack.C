@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -46,7 +46,7 @@ ShellCrack :: ShellCrack(int n, XfemManager *xm, Domain *aDomain) : Crack(n, xm,
 }
 
 
-void ShellCrack :: initializeFrom(InputRecord &ir)
+void ShellCrack :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Crack :: initializeFrom(ir);
 

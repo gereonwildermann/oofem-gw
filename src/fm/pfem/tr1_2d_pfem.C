@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -117,7 +117,7 @@ TR1_2D_PFEM ::   giveElementDofIDMask(IntArray &answer) const
 
 
 void
-TR1_2D_PFEM :: initializeFrom(InputRecord &ir, int priority)
+TR1_2D_PFEM :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     PFEMElement :: initializeFrom(ir, priority);
 
@@ -243,7 +243,7 @@ TR1_2D_PFEM :: computeDeviatoricStress(FloatArray &answer, GaussPoint *gp, TimeS
 {
     /* one should call material driver instead */
     FloatArray u(6);
-    FloatArrayF<3> eps(3);
+    FloatArrayF<3> eps;
     answer.resize(3);
 
 

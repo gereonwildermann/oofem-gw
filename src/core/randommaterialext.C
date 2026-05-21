@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -60,7 +60,7 @@ RandomMaterialStatusExtensionInterface :: _setProperty(int key, double value)
 
 
 void
-RandomMaterialExtensionInterface :: initializeFrom(InputRecord &ir)
+RandomMaterialExtensionInterface :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     randVariables.clear();
     randomVariableGenerators.clear();
@@ -108,10 +108,10 @@ RandomMaterialExtensionInterface :: _generateStatusVariables(GaussPoint *gp) con
                                                      ( matStat->giveInterface(RandomMaterialStatusExtensionInterfaceType) );
 
     for ( int i = 1; i <= size; i++ ) {
-        FloatArray globalCoordinates;
+        Coordinates globalCoordinates;
         if ( gp->giveElement()->computeGlobalCoordinates(globalCoordinates, gp->giveSubPatchCoordinates() ) ) {
             Function *f = gp->giveElement()->giveDomain()->giveFunction(randomVariableGenerators.at(i) );
-            value = f->evaluate({{ "x", globalCoordinates } });
+            value = f->evaluate({{ "x", FloatArray(globalCoordinates) } });
             status->_setProperty(randVariables.at(i), value);
         } else {
             OOFEM_ERROR("computeGlobalCoordinates failed");

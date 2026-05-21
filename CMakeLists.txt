@@ -36,7 +36,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0074 NEW)
 
 project (oofem CXX C)
 set (OOFEM_HOMEPAGE "http://www.oofem.org")
-set (bp_HOMEPAGE "http://ksm.fsv.cvut.cz/%7Ebp/bp.html")
+set (bp_HOMEPAGE "http://ksm.fsv.cvut.cz/~bp/bp.html")
 string(TIMESTAMP YEAR "%Y")
 set (OOFEM_COPYRIGHT "Copyright (C) 1994-${YEAR} Borek Patzak")
 set (OOFEM_EMAIL "oofem@fsv.cvut.cz")
@@ -103,7 +103,6 @@ set (CMAKE_CXX_FLAGS_PROFILING "${CMAKE_CXX_FLAGS_PROFILING} -O2 -pg")
 #######################################################################
 set (SLEPC_DIR CACHE PATH "Manual SLEPc directory")
 set (X11_DIR CACHE PATH "Manual X11 directory (OOFEG)")
-set (TINYXML2_DIR CACHE PATH "Manual TinyXML-2 directory (CEMHYD only)")
 #set (PETSC_DIR CACHE PATH "Manual PETSc directory")
 set (PETSC_ARCH CACHE STRING "Manual PETSc arch name (e.g. linux-gnu-cxx-opt)")
 set (MPI_DIR CACHE PATH "Manual MPI directory")
@@ -147,7 +146,7 @@ option (USE_PARMETIS "Enable Parmetis support" OFF)
 option (USE_OPENMP_PARALLEL "Enable OpenMP, shared memory parallelism" OFF)
 # Solvers and such
 option (USE_DSS "Enable DSS module" OFF) # No reason to use this
-option (USE_IML "Enable iml++ solvers" OFF) # or this
+option (USE_IML "Enable iml++ solvers" ON) # or this
 option (USE_SPOOLES "Enable SPOOLES-solver" OFF) # or this
 option (USE_INTEL_MKL_PARDISO "Enable MKLPARDISO solver support" OFF)
 option (USE_ONEAPI "Enable OneMKL solver support via OneAPI" OFF)
@@ -172,10 +171,11 @@ option (USE_PYBIND_BINDINGS "Enable Python Pybind11 bindings (OOFEM callable fro
 option (USE_NANOBIND "Use nanobind instead of pybind; requires USE_PYBIND_BINDINGS" OFF)
 option (USE_PYTHON_EXTENSION "Enable Python extension for exposing C++ code to python. Uses Python.h library." OFF)
 option (USE_HDF5 "HDF5 support" OFF)
-option (USE_MPM "Enable experimental multiphysics module" OFF)
+option (USE_MPM "Enable experimental multiphysics module" ON)
 option (USE_OOFEM_EXE "Build oofem executable" ON)
 OPTION (USE_EIGEN "Use Eigen instead of home-made array classes (experimental)" OFF)
-OPTION (USE_XML "Reader for XML input format (requires pugixml)" OFF)
+OPTION (USE_XML "Reader for XML input format (requires pugixml)" ON)
+OPTION (USE_TRACE_FIELDS "Allow tracing field access by setting OOFEM_TRACE_FIELDS_CSV env var" OFF)
 
 if (USE_MPI_PARALLEL)
     add_definitions (-D__MPI_PARALLEL_MODE)
@@ -232,7 +232,7 @@ if (USE_TM)
     list (APPEND MODULE_LIST "tm")
     if (USE_CEMHYD)
         add_definitions (-D__CEMHYD_MODULE)
-        set (USE_TINYXML ON)
+        set (USE_XML ON)
     endif ()
 endif ()
 
@@ -337,8 +337,12 @@ endif ()
 
 if (USE_XML)
     add_definitions(-D_USE_XML)
-    find_package(pugixml REQUIRED)
-    link_libraries(pugixml::pugixml)
+    add_git_submodule(extern/pugixml)
+    link_libraries(pugixml::static)
+endif()
+
+if (USE_TRACE_FIELDS)
+    add_definitions(-D_USE_TRACE_FIELDS)
 endif()
 
 
@@ -471,59 +475,10 @@ if (USE_ONEAPI)
     endif()
 
     message(STATUS "Seeking OneAPI libraries...")
-    if (WIN32)
-        # Windows machine must use Intel OpenMP (libiomp5) for OneAPI
-        list(APPEND MKL_LIBS "mkl_core" "mkl_intel_lp64" "mkl_intel_thread" "libiomp5md")
-    else()
-        list(APPEND MKL_LIBS "mkl_core" "mkl_intel_lp64" "mkl_intel_thread" "pthread")
+    find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+    list (APPEND MODULE_LIST "oneMKL_PARDISO")
+    set (MKL_INTERFACE_FULL "intel_lp64")
     endif ()
-    foreach (f ${MKL_LIBS})
-        # OneAPI installation directory
-        if (INTEL_ONEAPI_DIR)
-            # user provided OneAPI directory
-            message(STATUS "User has provided OneAPI installation directory...")
-            set(oneapiDir ${INTEL_ONEAPI_DIR})
-        elseif (WIN32)
-            # Windows
-            set(oneapiDir "C:/Program Files (x86)/Intel/oneAPI")
-        else()
-            # MacOS or Linux
-            set(oneapiDir "/opt/intel/oneapi")
-        endif()
-
-        # library directory
-        # an alternative could be obtaining from OneAPI's Environment variables
-        if (WIN32)
-            # Windows
-            set(oneapiMklDir "${oneapiDir}/mkl/latest")
-            set(oneapiMklLibDir "${oneapiMklDir}/lib/intel64")
-            set(oneapiLibDir
-                    "${oneapiDir}/compiler/latest/windows/compiler/lib/intel64")
-        elseif(APPLE)
-            # MacOS
-            set(oneapiMklDir "${oneapiDir}/mkl/latest")
-            set(oneapiMklLibDir "${oneapiMklDir}/lib")
-            set(oneapiLibDir "")
-        elseif(UNIX)
-            # Linux (not tested)
-            set(oneapiMklDir "${oneapiDir}/mkl/latest")
-            set(oneapiMklLibDir "${oneapiMklDir}/lib/intel64_lin")
-            set(oneapiLibDir "")
-        endif()
-
-        message(STATUS "    Seeking for ${f} in: ${oneapiMklLibDir};${oneapiLibDir}...")
-        find_library (${f}_LIB ${f} HINTS "${oneapiMklLibDir}" "${oneapiLibDir}" DOC "MKLPARDISO (library)")
-        include_directories ("${oneapiMklDir}/include")
-
-        if (${${f}_LIB} STREQUAL "${f}_LIB-NOTFOUND")
-            message (FATAL_ERROR "OneAPI ${f} library not found")
-        else()
-            message (STATUS "    OK: ${f} library successfully found at ${${f}_LIB}")
-        endif ()
-        list (APPEND EXT_LIBS ${${f}_LIB})
-    endforeach ()
-    list (APPEND MODULE_LIST "MKLPARDISO")
-endif ()
 
 
 if (USE_SLEPC)
@@ -611,20 +566,6 @@ if (USE_HDF5)
     list (APPEND EXT_LIBS ${ZLIB_LIBRARIES})
 endif ()
 
-if (USE_TINYXML)
-    if (TINYXML2_DIR)
-        include_directories (${TINYXML2_DIR})
-        find_library (TINYXML2_LIB NAMES tinyxml2 HINTS ${TINYXML2_DIR} NO_DEFAULT_PATH)
-    else ()
-        find_library (TINYXML2_LIB NAMES tinyxml2 )
-    endif ()
-    if (${TINYXML2_LIB} STREQUAL "TINYXML2_LIB-NOTFOUND")
-        message (FATAL_ERROR "TinyXML2 library not found")
-    endif ()
-    list (APPEND EXT_LIBS ${TINYXML2_LIB})
-    list (APPEND MODULE_LIST "TinyXML-2")
-endif ()
-
 if (USE_IML)
     include_directories ("${oofem_SOURCE_DIR}")
     set (CMAKE_REQUIRED_INCLUDES "${oofem_SOURCE_DIR}")
@@ -658,22 +599,36 @@ else()
 endif()
 
 
-if(USE_PYTHON_EXTENSION)
-    add_definitions(-D_PYTHON_EXTENSION)
-    find_package(Python COMPONENTS Interpreter Development)
-    link_libraries(Python::Python)
-endif ()
-
 if(USE_NANOBIND AND NOT USE_PYBIND_BINDINGS)
     MESSAGE(FATAL_ERROR "USE_NANOBIND requires simultaneous USE_PYBIND_BINDINGS")
 endif()
 
 if (USE_PYBIND_BINDINGS)
     add_definitions(-D_PYBIND_BINDINGS)
+    #find_package(Python COMPONENTS Interpreter Development)
+    #message (STATUS "Python libs: ${Python_LIBRARIES}, lib dirs: ${Python_LIBRARY_DIRS}")
+    #link_libraries(${Python_LIBRARIES})
     # workaround for emscripten: https://github.com/pyodide/pyodide/issues/5054
-    set(PYBIND11_FINDPYTHON ON)
-    find_package(Python COMPONENTS Interpreter Development)
-    link_libraries(Python::Python)
+    set(Python3_USE_STATIC_LIBS OFF)
+    #add_compile_definitions(Py_GIL_DISABLED=0)
+    find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+    # --- Workaround for CMake 4.x + Python 3.12 on Windows ---
+    if (WIN32 AND Python3_FOUND)
+        # Python3_LIBRARIES looks like:
+        #   optimized;<release_lib>;debug;<debug_lib>
+        list(GET Python3_LIBRARIES 1 Python3_LIBRARY_RELEASE)
+        list(GET Python3_LIBRARIES 3 Python3_LIBRARY_DEBUG)
+
+        # Patch the existing imported target instead of creating a new one
+        #set_target_properties(Python3::Python PROPERTIES
+        #    IMPORTED_IMPLIB "${Python3_LIBRARY_RELEASE}"
+        #    IMPORTED_LOCATION "${Python3_LIBRARY_RELEASE}"
+        #    IMPORTED_IMPLIB_DEBUG "${Python3_LIBRARY_DEBUG}"
+        #    IMPORTED_LOCATION_DEBUG "${Python3_LIBRARY_DEBUG}"
+        #    INTERFACE_INCLUDE_DIRECTORIES "${Python3_INCLUDE_DIRS}"
+        #)
+    endif()
+    #set(PYBIND11_FINDPYTHON ON)  # Explicitly choose NEW mode        
     if(USE_NANOBIND)
         if(0)
             add_subdirectory(extern/nanobind)
@@ -698,10 +653,20 @@ if (USE_PYBIND_BINDINGS)
         else()
             add_git_submodule(extern/pybind11)
         endif ()
+        
         # use python include paths and libs for all future targets (liboofem and oofem binary)
+        message(STATUS "Python3_LIBRARY = ${Python3_LIBRARY}") 
+        message(STATUS "Python3_LIBRARIES = ${Python3_LIBRARIES}") 
+        message(STATUS "Python3_LIBRARY_DIRS = ${Python3_LIBRARY_DIRS}") 
+        get_target_property(PYTHON_IMPLIB Python3::Python IMPORTED_IMPLIB) 
+        get_target_property(PYTHON_LOCATION Python3::Python IMPORTED_LOCATION) 
+        message(STATUS "IMPORTED_IMPLIB = ${PYTHON_IMPLIB}") 
+        message(STATUS "IMPORTED_LOCATION = ${PYTHON_LOCATION}")
         link_libraries(pybind11::embed)
-        pybind11_add_module(oofempy THIN_LTO ${oofem_SOURCE_DIR}/bindings/python/oofem.cpp)
-    endif()
+        link_libraries(Python3::Python)
+        link_directories(${Python_LIBRARY_DIRS})
+        pybind11_add_module(oofempy THIN_LTO ${oofem_SOURCE_DIR}/bindings/python/oofem.cpp) #shopuld append python libs
+    endif() 
     if(USE_SHARED_LIB)
         if(EMSCRIPTEN)
             MESSAGE(FATAL_ERROR "USE_SHARED_LIB=1 is incompatible with Emscripten (some unresolved symbols at runtime).")
@@ -710,6 +675,7 @@ if (USE_PYBIND_BINDINGS)
         set_target_properties(oofempy PROPERTIES INSTALL_RPATH "$ORIGIN") # look for liboofem.so (if shared) where the module is installed
         set_target_properties(oofempy PROPERTIES BUILD_RPATH ".") # look for liboofem.so in the build directory (before installation, for tests)
     else()
+        list (APPEND EXT_LIBS ${Python_LIBRARIES})
         target_sources(oofempy PRIVATE ${LIBS} ${EXT_LIBS})
     endif()
     # set_target_properties (oofempy PROPERTIES SUFFIX "${PYTHON_MODULE_EXTENSION}")
@@ -720,18 +686,23 @@ if (USE_PYBIND_BINDINGS)
     if(NOT PYTEST_FOUND)
         execute_process(COMMAND ${Python_EXECUTABLE} -c "import pytest; print(pytest.__version__)"
                         RESULT_VARIABLE pytest_not_found OUTPUT_VARIABLE pytest_version ERROR_QUIET)
-        if(pytest_not_found)
-            message(FATAL_ERROR "Running the tests requires pytest. Please install it manually"
-                    " (try: ${Python_EXECUTABLE} -m pip install pytest)")
-        endif()
-        set(PYBIND11_PYTEST_FOUND TRUE CACHE INTERNAL "")
+        #if(pytest_not_found)
+        #    message(FATAL_ERROR "Running the tests requires pytest. Please install it manually"
+        #            " (try: ${Python_EXECUTABLE} -m pip install pytest)")
+        #endif()
+        #set(PYBIND11_PYTEST_FOUND TRUE CACHE INTERNAL "")
     endif()
 endif()
 
 if(USE_PYTHON_EXTENSION)
-    find_package(Python COMPONENTS Interpreter Development)
-    add_definitions(-D_PYTHON_EXTENSION)
-    link_libraries(Python::Python)
+    #find_package(Python COMPONENTS Interpreter Development.Module Development.Embed)
+    #add_definitions(-D_PYTHON_EXTENSION)
+    #link_libraries(Python::Python) # embedded python
+endif()
+
+if (USE_ONEAPI)
+    include_directories("${MKL_INCLUDE}")
+	message (STATUS "MKL include dir set to ${MKL_INCLUDE}")
 endif()
 
 #######################################################################
@@ -847,6 +818,15 @@ if (USE_SHARED_LIB)
             set_target_properties (mpm PROPERTIES COMPILE_FLAGS ${LIBOOFEM_EXPORT_CFLAGS})
         endif ()
     endif()
+    if (USE_ONEAPI)
+        target_link_libraries(liboofem PUBLIC MKL::MKL)
+    endif()
+    if (USE_PYBIND_BINDINGS)
+        #target_link_libraries(liboofem PUBLIC Python::Python) 
+        target_link_directories(liboofem PUBLIC ${Python_LIBRARY_DIRS})
+    endif()
+    
+
 
     generate_export_header (liboofem
         BASE_NAME OOFEM
@@ -868,6 +848,9 @@ if (USE_OOFEM_EXE)
         find_package (MFrontGenericInterface REQUIRED)
         target_link_libraries(oofem mgis::MFrontGenericInterface)
     endif ()
+    if (USE_ONEAPI)
+        target_link_libraries(oofem PUBLIC MKL::MKL)
+    endif()
 endif()
 
 if (USE_OOFEG)
@@ -943,10 +926,10 @@ if (DOXYGEN_FOUND)
 
     configure_file (
         "${oofem_SOURCE_DIR}/doc/refman/footer.html.in"
-        "${oofem_BINARY_DIR}/footer.html")
+        "${oofem_SOURCE_DIR}/doc/refman/footer.html")
     configure_file (
         "${oofem_SOURCE_DIR}/doc/refman/doxygen.cfg.in"
-        "${oofem_BINARY_DIR}/doxygen.cfg")
+        "${oofem_SOURCE_DIR}/doc/refman/doxygen.cfg")
 
     add_custom_target (
         apidoc
@@ -959,7 +942,9 @@ endif (DOXYGEN_FOUND)
 
 configure_file (
     "${oofem_SOURCE_DIR}/doc/include.tex.in"
-    "${oofem_BINARY_DIR}")
+    "${oofem_SOURCE_DIR}/doc/include/include.tex"
+    )
+message (STATUS "Generating include.tex for manuals")
 
 # TODO: Manuals not done yet
 add_custom_target (
@@ -975,187 +960,20 @@ add_custom_target (
 #######################################################################
 include (CTest)
 
-if(USE_OOFEM_EXE)
-set (oofem_TEST_DIR "${oofem_SOURCE_DIR}/tests/")
-set (oofem_cmd  $<TARGET_FILE:oofem>)
-file(TO_CMAKE_PATH "${oofem_TEST_DIR}/valgrind.supp" MEMORYCHECK_SUPPRESSIONS_FILE)
 
-#set (CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${oofem_TEST_DIR}/tests/valgrind.supp)
-
-if (USE_MPI_PARALLEL)
-    set (par_dir ${oofem_TEST_DIR}/partests)
-    file (GLOB parallel_tests RELATIVE "${par_dir}" "${par_dir}/*/")
-    foreach (case ${parallel_tests})
-        file (GLOB files "${par_dir}/${case}/${case}.oofem.in.*")
-        list (LENGTH files num_files)
-        add_test (NAME "partest_${case}" WORKING_DIRECTORY ${par_dir}/${case} COMMAND "mpirun" "--oversubscribe" "-np" ${num_files} ${oofem_cmd} "-p" "-f" ${case}.oofem.in "-ksp_type" "cg")
-    endforeach (case)
-    # partest_brazil_2d_nl7 requires more time on testing server than default 1500
-    set_tests_properties(partest_brazil_2d_nl7 PROPERTIES TIMEOUT 2500)
+if (BUILD_TESTING)
+    add_subdirectory(${oofem_SOURCE_DIR}/extern/catch2) 
+    add_subdirectory (${oofem_SOURCE_DIR}/tests)
 endif ()
-
-# Sequential test cases
-if (USE_SM)
-    file (GLOB sm_tests RELATIVE "${oofem_TEST_DIR}/sm" "${oofem_TEST_DIR}/sm/*.in")
-    foreach (case ${sm_tests})
-        add_test (NAME "test_sm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/sm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-
-    file (GLOB sm_tests RELATIVE "${oofem_TEST_DIR}/sm" "${oofem_TEST_DIR}/sm/*.sh")
-    foreach (case ${sm_tests})
-        add_test (NAME "test_sm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/sm COMMAND bash ${case} ${oofem_cmd})
-    endforeach (case)
-
-    file (GLOB sm_nafems_tests RELATIVE "${oofem_TEST_DIR}/sm/NAFEMS" "${oofem_TEST_DIR}/sm/NAFEMS/*.in")
-    foreach (case ${sm_nafems_tests})
-        add_test (NAME "test_sm_NAFEMS_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/sm/NAFEMS COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif ()
-
-if (USE_FM)
-    file (GLOB fm_tests RELATIVE "${oofem_TEST_DIR}/fm" "${oofem_TEST_DIR}/fm/*.in")
-    foreach (case ${fm_tests})
-        add_test (NAME "test_fm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/fm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_TM)
-    file (GLOB tm_tests RELATIVE "${oofem_TEST_DIR}/tm" "${oofem_TEST_DIR}/tm/*.in")
-    foreach (case ${tm_tests})
-        add_test (NAME "test_tm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/tm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_AM)
-    file (GLOB tm_tests RELATIVE "${oofem_TEST_DIR}/am" "${oofem_TEST_DIR}/am/*.in")
-    foreach (case ${tm_tests})
-        add_test (NAME "test_am_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/am COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_TM AND USE_SM)
-    file (GLOB tmsm_tests RELATIVE "${oofem_TEST_DIR}/tmsm" "${oofem_TEST_DIR}/tmsm/*.in")
-    foreach (case ${tmsm_tests})
-        add_test (NAME "test_tmsm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/tmsm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_TM AND USE_FM)
-    file (GLOB tmfm_tests RELATIVE "${oofem_TEST_DIR}/tmfm" "${oofem_TEST_DIR}/tmfm/*.in")
-    foreach (case ${tmfm_tests})
-        add_test (NAME "test_tmfm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/tmfm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_TM AND USE_CEMHYD)
-    file (GLOB tmcemhyd_tests RELATIVE "${oofem_TEST_DIR}/tmcemhyd" "${oofem_TEST_DIR}/tmcemhyd/*.in")
-    foreach (case ${tmcemhyd_tests})
-        add_test (NAME "test_tm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/tmcemhyd COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_FM AND USE_PFEM)
-    file (GLOB fmpfem_tests RELATIVE "${oofem_TEST_DIR}/fmpfem" "${oofem_TEST_DIR}/fmpfem/*.in")
-    foreach (case ${fmpfem_tests})
-        add_test (NAME "test_fm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/fmpfem COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_SM AND USE_MFRONT)
-    file (GLOB smmfront_tests RELATIVE "${oofem_TEST_DIR}/smmfront" "${oofem_TEST_DIR}/smmfront/*.in")
-    foreach (case ${smmfront_tests})
-        add_test (NAME "test_sm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/smmfront COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_SM AND USE_PYTHON_EXTENSION)
-    file (GLOB smpython_tests RELATIVE "${oofem_TEST_DIR}/sm/python" "${oofem_TEST_DIR}/sm/python/*.in")
-    foreach (case ${smpython_tests})
-        add_test (NAME "test_sm_python_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/sm/python COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_MPM)
-    file (GLOB mpm_tests RELATIVE "${oofem_TEST_DIR}/mpm" "${oofem_TEST_DIR}/mpm/*.in")
-    foreach (case ${mpm_tests})
-        add_test (NAME "test_mpm_${case}" WORKING_DIRECTORY ${oofem_TEST_DIR}/mpm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-######################## Benchmarks ########################################
-
-set (oofem_BENCHMARK_DIR "${oofem_SOURCE_DIR}/tests/benchmark")
-
-if (USE_TM AND USE_SM AND USE_DSS AND USE_IML)
-    file (GLOB tmsmdssiml_benchmark RELATIVE "${oofem_BENCHMARK_DIR}/tmsmdssiml" "${oofem_BENCHMARK_DIR}/tmsmdssiml/*.in")
-    foreach (case ${tmsmdssiml_benchmark})
-        add_test (NAME "benchmark_tmsm_${case}" WORKING_DIRECTORY ${oofem_BENCHMARK_DIR}/tmsmdssiml COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_FM)
-    file (GLOB fm_benchmark RELATIVE "${oofem_BENCHMARK_DIR}/fm" "${oofem_BENCHMARK_DIR}/fm/*.in")
-    foreach (case ${fm_benchmark})
-        add_test (NAME "benchmark_fm_${case}" WORKING_DIRECTORY ${oofem_BENCHMARK_DIR}/fm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_SM)
-    file (GLOB sm_benchmark RELATIVE "${oofem_BENCHMARK_DIR}/sm" "${oofem_BENCHMARK_DIR}/sm/*.in")
-    foreach (case ${sm_benchmark})
-        add_test (NAME "benchmark_sm_${case}" WORKING_DIRECTORY ${oofem_BENCHMARK_DIR}/sm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_TM)
-    file (GLOB tm_benchmark RELATIVE "${oofem_BENCHMARK_DIR}/tm" "${oofem_BENCHMARK_DIR}/tm/*.in")
-    foreach (case ${tm_benchmark})
-        add_test (NAME "benchmark_tm_${case}" WORKING_DIRECTORY ${oofem_BENCHMARK_DIR}/tm COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-if (USE_FM AND USE_SM AND USE_PFEM)
-    file (GLOB fmpfem_benchmark RELATIVE "${oofem_BENCHMARK_DIR}/fmpfem" "${oofem_BENCHMARK_DIR}/fmpfem/*.in")
-    foreach (case ${fmpfem_benchmark})
-        add_test (NAME "benchmark_fm_${case}" WORKING_DIRECTORY ${oofem_BENCHMARK_DIR}/fmpfem COMMAND ${oofem_cmd} "-f" ${case})
-    endforeach (case)
-endif()
-
-# Custom targets for test and benchmarks (which can conveniently be accessed from IDEs)
-
-#ProcessorCount(N)
-if (N EQUAL 0)
-  set (N 1)
-endif ()
-if (USE_OPENMP_PARALLEL) # OPENMP will use all processors by default
-  set (N 1)
-endif ()
-
-if (MSVC)
-    add_custom_target (tests      COMMAND ${CMAKE_CTEST_COMMAND} "-j${N}" "-R" "^test" "-C" "Debug")
-    add_custom_target (partests   COMMAND ${CMAKE_CTEST_COMMAND} "-R" "^partest" "-C" "Debug")
-    add_custom_target (benchmarks COMMAND ${CMAKE_CTEST_COMMAND} "-j${N}" "-R" "^benchmark" "-C" "Debug")
-else ()
-    add_custom_target (tests      COMMAND ${CMAKE_CTEST_COMMAND} "-j${N}" "-R" "^test")
-    add_custom_target (partests   COMMAND ${CMAKE_CTEST_COMMAND} "-R" "^partest")
-    add_custom_target (benchmarks COMMAND ${CMAKE_CTEST_COMMAND} "-j${N}" "-R" "^benchmark")
-endif ()
-endif(USE_OOFEM_EXE)
-
-######################## Tests of Python bindings ########################################
-if (USE_PYBIND_BINDINGS)
-    add_test (NAME "test_python_pybind11_bindings" WORKING_DIRECTORY ${oofem_SOURCE_DIR}/bindings/python/tests COMMAND ${Python_EXECUTABLE} "-m" "pytest" ${oofem_SOURCE_DIR}/bindings/python/tests)
-    set_tests_properties("test_python_pybind11_bindings" PROPERTIES ENVIRONMENT PYTHONPATH=${CMAKE_BINARY_DIR}:${oofem_SOURCE_DIR}/bindings/python/oofem)
-endif()
 
 
 #######################################################################
 ######################## Packing ######################################
 #######################################################################
 ### versions
-set (CPACK_PACKAGE_VERSION_MAJOR ${oofem_VERSION_MAJOR})
-set (CPACK_PACKAGE_VERSION_MINOR ${oofem_VERSION_MINOR})
-set (CPACK_PACKAGE_VERSION_PATCH ${oofem_VERSION_PATCH})
+set (CPACK_PACKAGE_VERSION_MAJOR ${OOFEM_VERSION_MAJOR})
+set (CPACK_PACKAGE_VERSION_MINOR ${OOFEM_VERSION_MINOR})
+set (CPACK_PACKAGE_VERSION_PATCH ${OOFEM_VERSION_PATCH})
 set (CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
 
 ### general settings
@@ -1190,4 +1008,3 @@ set (CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${CPACK_PACKAGE_VERSION_PATCH}+sid1")
 
 include (CPack)
-

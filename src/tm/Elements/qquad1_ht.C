@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -83,7 +83,7 @@ QQuad1_ht :: computeGaussPoints()
 
 
 void
-QQuad1_ht :: initializeFrom(InputRecord &ir, int priority)
+QQuad1_ht :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     TransportElement :: initializeFrom(ir, priority);
 }
@@ -111,7 +111,7 @@ QQuad1_ht :: computeEdgeVolumeAround(GaussPoint *gp, int iEdge)
 {
     double result = this->interpolation.edgeGiveTransformationJacobian( iEdge, gp->giveNaturalCoordinates(),
                                                                        FEIElementGeometryWrapper(this) );
-    FloatArray gc;
+    Coordinates gc;
     this->interpolation.edgeLocal2global( gc, iEdge, gp->giveNaturalCoordinates(),
                                          FEIElementGeometryWrapper(this) );
     // temporary gauss point on element (not edge) to evaluate thickness

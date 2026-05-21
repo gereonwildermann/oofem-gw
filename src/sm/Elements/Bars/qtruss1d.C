@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -65,7 +65,7 @@ QTruss1d::giveDofManDofIDMask(int inode, IntArray &answer) const
 }
 
 int
-QTruss1d::computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+QTruss1d::computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     this->interpolation.local2global(answer, lcoords, FEIElementGeometryWrapper(this) );
     return 1;

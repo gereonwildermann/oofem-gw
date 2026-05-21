@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -36,6 +36,7 @@
 #include "floatmatrix.h"
 #include "floatarray.h"
 #include "mathfem.h"
+#include "inputrecord.h"
 #include "tensor/tensor2.h"
 #include "tensor/tensor4.h"
 
@@ -50,7 +51,6 @@
 
 
 namespace oofem {
-class InputRecord;
 /**
  * Abstract base class for hyperelastic materials
  * It provides calculation of first and second derivative of principal invariants of the left Cauchy green tensor with respect to deformation gradient
@@ -85,7 +85,7 @@ public:
     ~BaseHyperElasticMaterial() {; }
 
     /// initialization for the input file
-    void initializeFrom(InputRecord &ir);
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir);
 
     /**
      * Compute the first invariant of Cauchy-Green deformation tensor C

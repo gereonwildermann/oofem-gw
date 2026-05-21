@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -40,13 +40,17 @@
 #include <string>
 #include <memory>
 #include <exception>
+#include <regex>
 
 #include "logger.h" // for missing __func__ in MSC
 #include "oofemenv.h"
+#include "enum.h"
+#include "oofemcfg.h"
 
 namespace oofem {
 class IntArray;
 class FloatArray;
+template <std::size_t N> class FloatArrayF;
 class FloatMatrix;
 class Dictionary;
 class Range;
@@ -62,7 +66,7 @@ typedef const char *InputFieldType;
  * field identified by __kwd and stores the  result into __value parameter.
  * Includes also the error reporting.
  */
-#define IR_GIVE_FIELD(__ir, __value, __id) (__ir).giveField(__value, __id);
+#define IR_GIVE_FIELD(__ir, __value, __id) (__ir)->giveField(__value, __id);
 
 /**
  * Macro facilitating the use of input record reading methods.
@@ -70,7 +74,7 @@ typedef const char *InputFieldType;
  * field identified by __kwd and stores the  result into __value parameter.
  * Includes also the error reporting.
  */
-#define IR_GIVE_OPTIONAL_FIELD(__ir, __value, __id) (__ir).giveOptionalField(__value, __id);
+#define IR_GIVE_OPTIONAL_FIELD(__ir, __value, __id) (__ir)->giveOptionalField(__value, __id);
 
 /**
  * Macro facilitating the use of input record reading methods.
@@ -78,9 +82,10 @@ typedef const char *InputFieldType;
  * and its number (__value param). Includes also the error reporting.
  */
 #define IR_GIVE_RECORD_KEYWORD_FIELD(__ir, __name, __value) \
-    (__ir).giveRecordKeywordField(__name, __value);
+    (__ir)->giveRecordKeywordField(__name, __value);
 
 
+// #define _INPUTRECORD_OPTIONAL_OLD
 
 /**
  * Class representing the general Input Record. The input record consists of several fields.
@@ -95,17 +100,16 @@ class OOFEM_EXPORT InputRecord: public std::enable_shared_from_this<InputRecord>
 {
     DataReader* reader = nullptr;
 public:
+
     InputRecord() {}
     InputRecord(DataReader* reader_);
     /// Destructor
     virtual ~InputRecord() = default;
 
-    /** Creates a newly allocated copy of the receiver */
-    virtual std::shared_ptr<InputRecord> clone() const = 0;
-    std::shared_ptr<InputRecord> ptr() { return shared_from_this(); }
-
     /// Returns string representation of record in OOFEMs text format.
     virtual std :: string giveRecordAsString() const = 0;
+    virtual std :: string giveRecordInTXTFormat() const = 0;
+    virtual std :: string giveLocation() const = 0;
 
     /**@name Compulsory field extraction methods
      * Reads the field value identified by keyword
@@ -127,6 +131,8 @@ public:
     virtual void giveField(std :: string &answer, InputFieldType id) = 0;
     /// Reads the FloatArray field value.
     virtual void giveField(FloatArray &answer, InputFieldType id) = 0;
+    /// Reads the Coordinates field value.
+    virtual void giveField(Coordinates &answer, InputFieldType id) = 0;
     /// Reads the IntArray field value.
     virtual void giveField(IntArray &answer, InputFieldType id) = 0;
     /// Reads the FloatMatrix field value.
@@ -139,6 +145,52 @@ public:
     virtual void giveField(std :: list< Range > &answer, InputFieldType id) = 0;
     /// Reads the ScalarFunction field value.
     virtual void giveField(ScalarFunction &function, InputFieldType id) = 0;
+
+    static std::string error_msg_with_hints(const std::string& val, const std::map<int,std::vector<std::string>>& v2nn);
+    static int giveLevenshteinDist(const std::string& word1, const std::string& word2);
+
+    /// Reads enumeration (must be defined via enum-impl.hpp) directly
+    template<typename AnEnum>
+    void giveField(AnEnum& answer, InputFieldType id){
+        typedef EnumTraits<AnEnum> Traits;
+        std::string s;
+        giveField(s,id);
+        #ifdef _USE_TRACE_FIELDS
+            if(InputRecord::TraceFields::active){
+                traceEnum(Traits::enum_name,Traits::all_values_to_names());
+                traceField(id,(std::string("enum:")+Traits::enum_name).c_str());
+            }
+        #endif
+        if(std::regex_match(s,std::regex("\\s*[0-9]+\\s*"))){
+            int val=std::atoi(s.c_str());
+            auto v=Traits::value(val);
+            if(!v) OOFEM_ERROR("%s: %s (enum %s): invalid index '%d'%s",giveLocation().c_str(),id,Traits::enum_name,val,error_msg_with_hints("",Traits::all_values_to_names()).c_str());
+            answer=v.value();
+        } else {
+            auto v=Traits::value(s.c_str());
+            if(!v){ OOFEM_ERROR("%s: %s (enum %s): unrecognized name '%s'%s",giveLocation().c_str(),id,Traits::enum_name,s.c_str(),error_msg_with_hints(s,Traits::all_values_to_names()).c_str()); }
+            answer=v.value();
+        }
+    }
+    #ifdef _USE_TRACE_FIELDS
+        // field access tracing variables, set at startup from main()
+        struct TraceFields {
+            static bool active;
+            static std::ofstream out;
+            static void write(const std::string& s);
+        };
+        static void traceEnum(const std::string& name, const std::map<int,std::vector<std::string>>& val2names);
+        virtual void traceField(InputFieldType id, const char* type) {};
+    #else
+        void traceField(InputFieldType id, const char* type) const { };
+    #endif
+    /**@name Optional field extraction methods
+     * Reads the field value identified by keyword
+     * @param answer contains result
+     * @param id field keyword
+     */
+    template<typename T>
+    void giveOptionalField(T& answer, InputFieldType id){ if(hasField(id)) giveField(answer,id); }
     //@}
 
     /**@name Child reader methods
@@ -148,36 +200,6 @@ public:
     virtual int giveGroupCount(InputFieldType id, const std::string& name, bool optional) = 0;
     // return whether a single child of given type exists
     virtual bool hasChild(InputFieldType id, const std::string& name, bool optional) = 0;
-    //@}
-
-    /**@name Optional field extraction methods
-     * Reads the field value identified by keyword
-     * @param answer contains result
-     * @param id field keyword
-     */
-    //@{
-    /// Reads the integer field value.
-    void giveOptionalField(int &answer, InputFieldType id);
-    /// Reads the double field value.
-    void giveOptionalField(double &answer, InputFieldType id);
-    /// Reads the bool field value.
-    void giveOptionalField(bool &answer, InputFieldType id);
-    /// Reads the string field value.
-    void giveOptionalField(std :: string &answer, InputFieldType id);
-    /// Reads the FloatArray field value.
-    void giveOptionalField(FloatArray &answer, InputFieldType id);
-    /// Reads the IntArray field value.
-    void giveOptionalField(IntArray &answer, InputFieldType id);
-    /// Reads the FloatMatrix field value.
-    void giveOptionalField(FloatMatrix &answer, InputFieldType id);
-    /// Reads the vector of strings.
-    void giveOptionalField(std :: vector< std :: string > &answer, InputFieldType id);
-    /// Reads the Dictionary field value.
-    void giveOptionalField(Dictionary &answer, InputFieldType id);
-    /// Reads the std::list<Range> field value.
-    void giveOptionalField(std :: list< Range > &answer, InputFieldType id);
-    /// Reads the ScalarFunction field value.
-    void giveOptionalField(ScalarFunction &function, InputFieldType id);
     //@}
 
     /// Returns true if record contains field identified by idString keyword.
@@ -193,13 +215,15 @@ public:
 };
 
 
+
+
 class InputException : public std::exception
 {
 public:
     std::string record;
     std::string keyword;
     int number;
-    InputException(const InputRecord &ir, std::string keyword, int number);
+    InputException(const std::shared_ptr<InputRecord>& ir, std::string keyword, int number);
 };
 
 
@@ -209,7 +233,8 @@ protected:
     std::string msg;
 
 public:
-    MissingKeywordInputException(const InputRecord &ir, std::string keyword, int number);
+    MissingKeywordInputException(const std::shared_ptr<InputRecord>& ir, std::string keyword, int number);
+    // MissingKeywordInputException(const InputRecord &ir, std::string keyword, int number);
     const char* what() const noexcept override;
 };
 
@@ -220,7 +245,8 @@ protected:
     std::string msg;
 
 public:
-    BadFormatInputException(const InputRecord &ir, std::string keyword, int number);
+    BadFormatInputException(const std::shared_ptr<InputRecord> &ir, std::string keyword, int number);
+    // BadFormatInputException(const InputRecord &ir, std::string keyword, int number): BadFormatInputException(irshared_from_this(),keyword,number){}
     const char* what() const noexcept override;
 };
 
@@ -231,7 +257,7 @@ protected:
     std::string msg;
 
 public:
-    ValueInputException(const InputRecord &ir, std::string keyword, const std::string &reason);
+    ValueInputException(const std::shared_ptr<InputRecord>& ir, std::string keyword, const std::string &reason);
     const char* what() const noexcept override;
 };
 

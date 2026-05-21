@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ public:
     LIBeam3d(int n, Domain * d);
     virtual ~LIBeam3d() { }
 
-    void initializeFrom(InputRecord &ir, int prio) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int prio) override;
     void postInitialize() override;
 
     void computeLumpedMassMatrix(FloatMatrix &answer, TimeStep *tStep) override;
@@ -81,7 +81,7 @@ public:
     int giveLocalCoordinateSystem(FloatMatrix &answer) override;
     Node* giveReferenceNode(int refNode);
     int giveIPValue(FloatArray &answer, GaussPoint *gp, InternalStateType type, TimeStep *tStep) override;
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     bool isCast(TimeStep *tStep) override {return true;}
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }

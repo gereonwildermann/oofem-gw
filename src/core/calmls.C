@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -678,7 +678,7 @@ CylindricalALM :: checkConvergence(const FloatArray &R, const FloatArray *R0, co
 
 
 void
-CylindricalALM :: initializeFrom(InputRecord &ir)
+CylindricalALM :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     SparseNonLinearSystemNM :: initializeFrom(ir);
 

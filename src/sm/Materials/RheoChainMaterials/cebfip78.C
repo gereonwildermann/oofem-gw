@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -41,7 +41,7 @@ namespace oofem {
 REGISTER_Material(CebFip78Material);
 
 void
-CebFip78Material :: initializeFrom(InputRecord &ir)
+CebFip78Material :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MaxwellChainMaterial :: initializeFrom(ir);
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -35,6 +35,7 @@
 #pragma once
 
 //#include "prescribedgradienthomogenization.h"
+#include "oofemcfg.h"
 #include "activebc.h"
 #include "floatarray.h"
 
@@ -66,7 +67,7 @@ public:
     int giveNumberOfInternalDofManagers() override { return 1; }
     DofManager *giveInternalDofManager(int i) override;
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     void postInitialize() override;
 
@@ -99,7 +100,7 @@ protected:
     std :: unique_ptr< Node > mpFluxHom;
     IntArray mFluxIds;
     FloatArray mGradient;
-    FloatArray mCenterCoord;
+    Coordinates mCenterCoord;
     bool dispControl;
 
     IntArray surfSets;

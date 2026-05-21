@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2012   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ CrackExportModule :: ~CrackExportModule()
 
 
 void
-CrackExportModule :: initializeFrom(InputRecord &ir)
+CrackExportModule :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule :: initializeFrom(ir);
 

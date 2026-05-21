@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -127,11 +127,11 @@ IntElLine1PF :: computeAreaAround(IntegrationPoint *ip)
 
 
 void
-IntElLine1PF :: initializeFrom(InputRecord &ir)
+IntElLine1PF :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceElement :: initializeFrom(ir);
 
-    if ( ir.hasField(_IFT_IntElLine1PF_prescribedDamage) ) {
+    if ( ir->hasField(_IFT_IntElLine1PF_prescribedDamage) ) {
         IR_GIVE_FIELD(ir, this->prescribed_damage, _IFT_IntElLine1PF_prescribedDamage);
         //this->alpha.setValues(2, damage, damage);
     }

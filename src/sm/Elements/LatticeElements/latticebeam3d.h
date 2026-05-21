@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,7 +71,7 @@ public:
 
     virtual int giveLocalCoordinateSystem(FloatMatrix &answer) override;
 
-    virtual int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    virtual int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     virtual double giveLength() override;
 
@@ -94,7 +94,7 @@ public:
 
     const char *giveInputRecordName() const override { return _IFT_LatticeBeam3d_Name; }
     const char *giveClassName() const override { return "LatticeBeam3d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
 
     virtual void giveInternalForcesVector(FloatArray &answer, TimeStep *tStep, int useUpdatedGpRecord = 0) override;

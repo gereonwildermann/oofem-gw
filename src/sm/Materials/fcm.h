@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2016 Borek Patzak
+ *               Copyright (C) 1993 - 2025 Borek Patzak
  *
  *
  *
@@ -205,7 +205,7 @@ public:
 
     const char *giveClassName() const override { return "FCMMaterial"; }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     double give(int aProperty, GaussPoint *gp) const override;
 
@@ -279,6 +279,8 @@ protected:
 
     /// if true = takes shear compliance of all cracks, false = only dominant crack contribution, default value is false
     bool multipleCrackShear;
+
+    int iterLimitGlobal = 20;
 
     /// comutes tensile strength
     virtual double giveTensileStrength(GaussPoint *gp, TimeStep *tStep) const = 0;

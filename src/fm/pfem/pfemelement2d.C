@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -68,7 +68,7 @@ PFEMElement2d :: ~PFEMElement2d()
 
 
 void
-PFEMElement2d :: initializeFrom(InputRecord &ir, int priority)
+PFEMElement2d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     PFEMElement :: initializeFrom(ir, priority);
 }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -478,7 +478,7 @@ Concrete3 :: giveNormalCrackingStress(GaussPoint *gp, double crackStrain, int i)
 
 
 void
-Concrete3 :: initializeFrom(InputRecord &ir)
+Concrete3 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RCM2Material :: initializeFrom(ir);
 

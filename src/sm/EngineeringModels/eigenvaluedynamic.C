@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -78,7 +78,7 @@ NumericalMethod *EigenValueDynamic :: giveNumericalMethod(MetaStep *mStep)
 
 
 void
-EigenValueDynamic :: initializeFrom(InputRecord &ir)
+EigenValueDynamic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     //EngngModel::instanciateFrom (ir);
 
@@ -106,7 +106,7 @@ EigenValueDynamic :: initializeFrom(InputRecord &ir)
     IR_GIVE_OPTIONAL_FIELD(ir, val, _IFT_EngngModel_smtype);
     sparseMtrxType = ( SparseMtrxType ) val;
 
-    suppressOutput = ir.hasField(_IFT_EngngModel_suppressOutput);
+    suppressOutput = ir->hasField(_IFT_EngngModel_suppressOutput);
 
     if ( suppressOutput ) {
         printf("Suppressing output.\n");

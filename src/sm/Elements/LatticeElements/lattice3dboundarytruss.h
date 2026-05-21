@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -83,7 +83,7 @@ public:
     void giveGPCoordinates(FloatArray &coords) override { coords = this->globalCentroid; }
     const char *giveInputRecordName() const override { return _IFT_Lattice3dBoundaryTruss_Name; }
     const char *giveClassName() const override { return "Lattice3dBoundaryTruss"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }
     void saveContext(DataStream &stream, ContextMode mode) override;

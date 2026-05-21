@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -110,6 +110,7 @@ class OOFEM_EXPORT XfemManager
 {
 protected:
     Domain *domain;
+    std::shared_ptr<InputRecord> thisIr;
     /// Enrichment item list.
     std :: vector< std :: unique_ptr< EnrichmentItem > >enrichmentItemList;
 
@@ -192,7 +193,7 @@ public:
     IntArray giveEnrichedDofIDs(const DofManager &iDMan) const;
 
     /// Initializes receiver according to object description stored in input record.
-    virtual void initializeFrom(InputRecord &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
     virtual void giveInputRecord(DynamicInputRecord &input);
 
     virtual int instanciateYourself(DataReader &dr);

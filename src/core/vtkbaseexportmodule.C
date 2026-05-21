@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -185,6 +185,9 @@ VTKBaseExportModule::giveNumberOfNodesPerCell(int cellType)
 
     case 25:
         return 20;
+
+    case 26:
+        return 15;
 
     case 29:
         return 27;
@@ -539,7 +542,7 @@ VTKBaseExportModule::getNodalVariableFromPrimaryField(FloatArray &answer, DofMan
             if ( size == recoveredVal->giveSize() ) {
                 answer.at(j) = recoveredVal->at(j);
             } else {
-                OOFEM_WARNING("Recovered variable size mismatch for \"%s\" for dof id %d. Size is %d, should be %d", __UnknownTypeToString(type), id, recoveredVal->giveSize(), size);
+                OOFEM_WARNING("Recovered variable size mismatch for \"%s\" for dof id %d. Size is %d, should be %d", __UnknownTypeToString(type), id, (int)recoveredVal->giveSize(), (int)size);
                 answer.at(j) = 0.0;
             }
         }

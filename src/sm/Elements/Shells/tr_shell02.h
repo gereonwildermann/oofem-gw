@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -84,7 +84,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_TR_SHELL02_Name; }
     const char *giveClassName() const override { return "TR_SHELL02"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
 
     void giveCharacteristicVector(FloatArray &answer, CharType mtrx, ValueModeType mode, TimeStep *tStep) override;
     void giveCharacteristicMatrix(FloatMatrix &answer, CharType mtrx, TimeStep *tStep) override;
@@ -122,13 +122,13 @@ public:
     void ZZErrorEstimatorI_computeLocalStress(FloatArray &answer, FloatArray &sig) override;
 
     // SpatialLocalizerI
-    void SpatialLocalizerI_giveBBox(FloatArray &bb0, FloatArray &bb1) override;
+    void SpatialLocalizerI_giveBBox(Coordinates &bb0, Coordinates &bb1) override;
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override {
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override {
         return this->plate->computeGlobalCoordinates(answer, lcoords);
     }
 
-    bool computeLocalCoordinates(FloatArray &answer, const FloatArray &gcoords) override {
+    bool computeLocalCoordinates(FloatArray &answer, const Coordinates &gcoords) override {
         return this->plate->computeLocalCoordinates(answer, gcoords);
     }
 

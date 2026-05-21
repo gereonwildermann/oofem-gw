@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -128,23 +128,6 @@ public:
         return * this;
     }
 
-    /**
-     * Checks size of receiver towards requested bounds.
-     * @param i Required number of rows.
-     * @param j Required number of columns.
-     */
-    void checkBounds(std::size_t i, std::size_t j) const
-    {
-        if ( i <= 0 ) {
-            throw std::out_of_range("matrix error on rows : " + std::to_string(i) + " <= 0");
-        } else if ( j <= 0 ) {
-            throw std::out_of_range("matrix error on rows : " + std::to_string(j) + " <= 0");
-        } else if ( i > N ) {
-            throw std::out_of_range("matrix error on rows : " + std::to_string(i) + " < " + std::to_string(N));
-        } else if ( j > M ) {
-            throw std::out_of_range("matrix error on rows : " + std::to_string(j) + " < " + std::to_string(M));
-        }
-    }
 
     /// Returns number of rows of receiver.
     std::size_t rows() const { return N; }
@@ -216,6 +199,19 @@ public:
     }
 #endif
     /**
+    * Checks size of receiver towards requested bounds.
+    * @param i Required number of rows.
+    * @param j Required number of columns.
+    */
+    void checkBounds(std::size_t i, std::size_t j) const
+    {
+        if ( i <= 0 ) OOFEM_ERROR("matrix error on rows : %d <= 0",(int)i);
+        if ( j <= 0 ) OOFEM_ERROR("matrix error on cols : %d <= 0",(int)j);
+        if ( i > N )  OOFEM_ERROR("matrix error on rows : %d < %d",(int)i,(int)N);
+        if ( j > M )  OOFEM_ERROR("matrix error on rows : %d < %d",(int)j,(int)M);
+    }
+
+    /**
     * Coefficient access function. Returns value of coefficient at given
     * position of the receiver. Implements 1-based indexing.
     * @param i Row position of coefficient.
@@ -275,6 +271,18 @@ public:
     {
         for ( std::size_t i = 0; i < N; i++ ) {
             (*this)(i, c) = src[i];
+        }
+    }
+
+    /**
+     * Sets the values of the matrix in specified row.
+     * @param src Array to set at row c.
+     * @param r Column to set.
+     */
+    void setRow(const FloatArrayF<M> &src, int r)
+    {
+        for ( std::size_t i = 0; i < M; i++ ) {
+            (*this)(r, i) = src[i];
         }
     }
     
@@ -1135,7 +1143,7 @@ FloatMatrixF<N,N> inv(const FloatMatrixF<N,N> &mat, double zeropiv=1e-24)
     for ( std::size_t  i = 1; i < N; i++ ) {
         double piv = tmp.at(i, i);
         if ( std::abs(piv) <= zeropiv ) {
-            OOFEM_ERROR("pivot (%d,%d) to close to small", i, i);
+            OOFEM_ERROR("pivot (%d,%d) to close to small", (int)i, (int)i);
         }
         for ( std::size_t j = i + 1; j <= N; j++ ) {
             double linkomb = tmp.at(j, i) / tmp.at(i, i);

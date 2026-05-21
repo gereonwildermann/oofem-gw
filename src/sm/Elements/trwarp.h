@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -65,7 +65,7 @@ public:
     const char *giveClassName() const override { return "Tr_WarpElement"; }
 
     int computeNumberOfDofs() override { return 4; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     MaterialMode giveMaterialMode() override { return _Warping; }
     double giveThicknessAt(const FloatArray &gcoords);
     void computeStressVector(FloatArray &answer, const FloatArray &strain, GaussPoint *gp, TimeStep *tStep) override;
@@ -83,7 +83,7 @@ public:
 
     void ZZNodalRecoveryMI_computeNNMatrix(FloatArray &answer, InternalStateType type) override;
     bool ZZNodalRecoveryMI_computeNValProduct(FloatMatrix &answer, InternalStateType type, TimeStep *tStep) override;
-    int SpatialLocalizerI_containsPoint(const FloatArray &coords) override;
+    int SpatialLocalizerI_containsPoint(const Coordinates &coords) override;
 
     FEInterpolation *giveInterpolation() const override { return & this->interp; }
     Element_Geometry_Type giveGeometryType() const override { return EGT_triangle_1; }
@@ -97,7 +97,7 @@ public:
 protected:
     void computeGaussPoints() override;
     double computeEdgeVolumeAround(GaussPoint *gp, int iEdge) override;
-    void transformCoordinates(FloatArray &answer, FloatArray &c, const int CGnumber);
+    void transformCoordinates(Coordinates &answer, const Coordinates &c, const int CGnumber);
     void postInitialize() override;
 };
 } // end namespace oofem

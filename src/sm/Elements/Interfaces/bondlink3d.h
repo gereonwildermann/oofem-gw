@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -70,7 +70,7 @@ protected:
     int geometryFlag = 0;
     double bondEndLength = 0.;
     FloatArray rigid;
-    FloatArray globalCentroid;
+    Coordinates globalCentroid;
 
     static ParamKey IPK_BondLink3d_length;
     static ParamKey IPK_BondLink3d_diameter;
@@ -93,7 +93,7 @@ public:
      * function as it returns the global coordinates of the gausspoint
      * independent to the value of the lcoords.
      */
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     virtual double giveBondLength();
 
@@ -114,7 +114,7 @@ public:
 
     const char *giveInputRecordName() const override { return _IFT_BondLink3d_Name; }
     const char *giveClassName()  const override { return "BondLink3d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
 
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }

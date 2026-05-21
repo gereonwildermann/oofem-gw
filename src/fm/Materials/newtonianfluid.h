@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -72,7 +72,7 @@ public:
     FloatMatrixF<6,6> computeTangent3D(MatResponseMode, GaussPoint *gp, TimeStep *tStep) const override;
 
     double give(int aProperty, GaussPoint *gp) const override;
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     const char *giveClassName() const override { return "NewtonianFluidMaterial"; }
     const char *giveInputRecordName() const override { return _IFT_NewtonianFluidMaterial_Name; }

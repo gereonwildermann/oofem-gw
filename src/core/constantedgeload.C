@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -42,7 +42,7 @@ namespace oofem {
 REGISTER_BoundaryCondition(ConstantEdgeLoad);
 
 void
-ConstantEdgeLoad :: initializeFrom(InputRecord &ir)
+ConstantEdgeLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     BoundaryLoad :: initializeFrom(ir);
 }

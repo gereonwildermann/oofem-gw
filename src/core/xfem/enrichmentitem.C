@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -81,19 +81,16 @@ EnrichmentItem :: ~EnrichmentItem()
 {
 }
 
-void EnrichmentItem :: initializeFrom(InputRecord &ir)
+void EnrichmentItem :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
-    mEnrFrontIndex = 0;
-    IR_GIVE_OPTIONAL_FIELD(ir, mEnrFrontIndex, _IFT_EnrichmentItem_front);
+    thisIr=ir;
+    mEnrFrontIndex = ir->giveGroupCount(_IFT_EnrichmentItem_front,"EnrichmentFront",/*optional*/true);
+    mPropLawIndex = ir->hasChild(_IFT_EnrichmentItem_propagationlaw,"PropagationLaw",/*optional*/true);
 
-
-    mPropLawIndex = 0;
-    IR_GIVE_OPTIONAL_FIELD(ir, mPropLawIndex, _IFT_EnrichmentItem_propagationlaw);
-
-    if ( ir.hasField(_IFT_EnrichmentItem_inheritbc) ) {
+    if ( ir->hasField(_IFT_EnrichmentItem_inheritbc) ) {
         mInheritBoundaryConditions = true;
     }
-    if ( ir.hasField(_IFT_EnrichmentItem_inheritorderedbc) ) {
+    if ( ir->hasField(_IFT_EnrichmentItem_inheritorderedbc) ) {
         mInheritOrderedBoundaryConditions = true;
     }
 }
@@ -234,7 +231,7 @@ void EnrichmentItem :: givePotentialEIDofIdArray(IntArray &answer) const {
     }
 }
 
-bool EnrichmentItem :: evalLevelSetNormalInNode(double &oLevelSet, int iNodeInd, const FloatArray &iGlobalCoord) const
+bool EnrichmentItem :: evalLevelSetNormalInNode(double &oLevelSet, int iNodeInd, const Coordinates &iGlobalCoord) const
 {
     auto res = mLevelSetNormalDirMap.find(iNodeInd);
     if ( res != mLevelSetNormalDirMap.end() ) {
@@ -246,7 +243,7 @@ bool EnrichmentItem :: evalLevelSetNormalInNode(double &oLevelSet, int iNodeInd,
     }
 }
 
-bool EnrichmentItem :: evalLevelSetTangInNode(double &oLevelSet, int iNodeInd, const FloatArray &iGlobalCoord) const
+bool EnrichmentItem :: evalLevelSetTangInNode(double &oLevelSet, int iNodeInd, const Coordinates &iGlobalCoord) const
 {
     auto res = mLevelSetTangDirMap.find(iNodeInd);
     if ( res != mLevelSetTangDirMap.end() ) {
@@ -393,10 +390,9 @@ double EnrichmentItem :: calcXiZeroLevel(const double &iQ1, const double &iQ2)
 
 void EnrichmentItem :: calcPolarCoord(double &oR, double &oTheta, const FloatArray &iOrigin, const FloatArray &iPos, const FloatArray &iN, const FloatArray &iT, const EfInput &iEfInput, bool iFlipTangent)
 {
-    FloatArray q = Vec2(
-        iPos.at(1) - iOrigin.at(1), iPos.at(2) - iOrigin.at(2)
+    FloatArray q = Vec3(
+        iPos.at(1) - iOrigin.at(1), iPos.at(2) - iOrigin.at(2), iPos.at(3) - iOrigin.at(3)
     );
-
     const double tol = 1.0e-20;
 
     // Compute polar coordinates

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -84,7 +84,7 @@ QClinearStatic :: ~QClinearStatic()
 
 
 void
-QClinearStatic :: initializeFrom(InputRecord &ir)
+QClinearStatic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LinearStatic :: initializeFrom(ir);
 
@@ -287,7 +287,7 @@ void QClinearStatic :: solveYourselfAt(TimeStep *tStep)
 
 
 void
-QClinearStatic :: initializeFullSolvedDomain(InputRecord &ir)
+QClinearStatic :: initializeFullSolvedDomain(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_OPTIONAL_FIELD(ir, FullSolvedDomainNodes, _IFT_FullSolvedDomain_nodes);
     IR_GIVE_OPTIONAL_FIELD(ir, FullSolvedDomainElements, _IFT_FullSolvedDomain_elements);
@@ -706,7 +706,7 @@ QClinearStatic :: findNearestParticle(Domain *d, FloatArray coords)
     if ( p ) {
         return p;
     } else {
-        OOFEM_ERROR( "Neares particle for point [%d, %d] not found", coords.at(1), coords.at(2) );
+        OOFEM_ERROR( "Neares particle for point [%f, %f] not found", coords.at(1), coords.at(2) );
         return nullptr;
     }
 }

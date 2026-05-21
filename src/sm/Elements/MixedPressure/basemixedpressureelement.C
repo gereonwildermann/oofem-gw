@@ -11,7 +11,7 @@
  *             OOFEM : Object Oriented Finite Element Code
  *
  *
- *               Copyright (C) 1993 - 2015   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -367,7 +367,7 @@ BaseMixedPressureElement :: computeStiffnessMatrix_pp(FloatMatrix &answer, MatRe
 
 
 void
-BaseMixedPressureElement :: initializeFrom(InputRecord &ir)
+BaseMixedPressureElement :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // @todo Is this function necessary???
 }

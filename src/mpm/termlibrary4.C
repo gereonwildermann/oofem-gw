@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -67,7 +67,8 @@ void NTN::initializeCell(Element& cell) const  {}
 dnTaN::dnTaN (const Variable *testField, const Variable* unknownField, FieldPtr velocity) : Term(testField, unknownField), velocity(velocity) {}
 
 void dnTaN::evaluate_lin (FloatMatrix& answer, MPElement& e, GaussPoint* gp, TimeStep* tstep) const  {
-    FloatArray n, gc,lc,a;
+    FloatArray n, lc,a;
+    Coordinates gc;
     FloatMatrix dndx;
     this->testField->interpolation->evaldNdx(dndx, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
     this->field->interpolation->evalN(n, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));

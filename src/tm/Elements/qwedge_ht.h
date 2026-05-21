@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -73,7 +73,7 @@ public:
 
 
     int computeNumberOfDofs() override { return 15; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     MaterialMode giveMaterialMode() override { return _3dHeat; }
 
     Interface *giveInterface(InterfaceType t) override;

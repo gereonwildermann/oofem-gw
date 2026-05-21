@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -84,7 +84,7 @@ public:
     /// Destructor
     virtual ~VTKXMLXFemExportModule();
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void doOutput(TimeStep *tStep, bool forcedOutput = false) override;
     void terminate() override {}
     const char *giveClassName() const override { return "VTKXMLXFemExportModule"; }

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -144,10 +144,10 @@ protected:
     std :: vector < std :: vector< Triangle > > crackSubdivisions;
     IntArray numSubDivisionsArray;
 
-    std::vector<FloatArray> giveFictiousNodeCoordsForExport(int layer, int subCell);
-    std::vector<FloatArray> giveFictiousCZNodeCoordsForExport(int layer, int subCell);
-    std::vector<FloatArray> giveFictiousUpdatedNodeCoordsForExport(int layer, TimeStep *tStep, int subCell);
-    std::vector<FloatArray> giveFictiousUpdatedCZNodeCoordsForExport(int layer, TimeStep *tStep, int subCell);
+    std::vector<Coordinates> giveFictiousNodeCoordsForExport(int layer, int subCell);
+    std::vector<Coordinates> giveFictiousCZNodeCoordsForExport(int layer, int subCell);
+    std::vector<Coordinates> giveFictiousUpdatedNodeCoordsForExport(int layer, TimeStep *tStep, int subCell);
+    std::vector<Coordinates> giveFictiousUpdatedCZNodeCoordsForExport(int layer, TimeStep *tStep, int subCell);
     void giveLocalNodeCoordsForExport(FloatArray &nodeLocalXi1Coords, FloatArray &nodeLocalXi2Coords, FloatArray &nodeLocalXi3Coords, int subCell, int layer, FloatMatrix &localNodeCoords);
     void giveLocalCZNodeCoordsForExport(FloatArray &nodeLocalXi1Coords, FloatArray &nodeLocalXi2Coords, FloatArray &nodeLocalXi3Coords, int subCell, FloatMatrix &localNodeCoords);
     void mapXi3FromLocalToShell(FloatArray &answer, FloatArray &local, int layer);
@@ -173,7 +173,7 @@ public:
     std :: string errorInfo(const char *func) const { return std :: string(giveClassName()) + func; }
     Interface *giveInterface(InterfaceType it) override;
 
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
     int giveNumberOfDofs() override;
 

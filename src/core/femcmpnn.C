@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -82,7 +82,7 @@ FEMComponent :: errorInfo(const char *func) const
     return std :: string(this->giveClassName()) + "::" + func + ", number: " + std::to_string(this->giveNumber());
 }
 
-void FEMComponent :: initializeFrom(InputRecord &ir)
+void FEMComponent :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
 }
 

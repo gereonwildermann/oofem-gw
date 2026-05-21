@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -76,7 +76,7 @@ public:
     { computeLumpedMassMatrix(answer, tStep); }
     int giveLocalCoordinateSystem(FloatMatrix &answer) override;
 
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     int computeNumberOfDofs() override { return 4; }
     void giveDofManDofIDMask(int inode, IntArray &answer) const override;
@@ -101,7 +101,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_Truss2d_Name; }
     const char *giveClassName() const override { return "Truss2d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void postInitialize() override;
     ///@todo Introduce interpolator and remove these:
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }

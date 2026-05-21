@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2024   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -185,7 +185,9 @@ void NTaTmTe::evaluate (FloatArray& answer, MPElement& e, GaussPoint* gp, TimeSt
         coords = gp->giveNaturalCoordinates();
     } else {
         //this->computeSurfIpGlobalCoords(gcoords, gp->giveNaturalCoordinates(), iSurf);
-        e.getGeometryInterpolation()->boundarySurfaceLocal2global(coords, this->boundaryID, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
+        Coordinates gc;
+        e.getGeometryInterpolation()->boundarySurfaceLocal2global(gc, this->boundaryID, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(&e));
+        coords = gc;
     }
     this->bl->computeValues(Te, tstep, coords, this->field->dofIDs, VM_TotalIntrinsic);
     answer *= this->bl->giveProperty('a', tstep)*(t-Te.at(1));

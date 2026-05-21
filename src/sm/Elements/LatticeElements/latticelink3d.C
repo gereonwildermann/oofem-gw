@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -273,7 +273,7 @@ LatticeLink3d ::   giveDofManDofIDMask(int inode, IntArray &answer) const
 }
 
 void
-LatticeLink3d :: initializeFrom(InputRecord &ir, int priority)
+LatticeLink3d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     // first call parent
@@ -298,13 +298,13 @@ LatticeLink3d :: postInitialize()
 }
 
 int
-LatticeLink3d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+LatticeLink3d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     if ( geometryFlag == 0 ) {
         computeGeometryProperties();
     }
 
-    answer.resize(3);
+    //answer.resize(3);
     answer = this->globalCentroid;
 
     return 1;

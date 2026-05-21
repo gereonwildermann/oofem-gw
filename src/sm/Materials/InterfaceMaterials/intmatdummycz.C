@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -56,7 +56,7 @@ FloatMatrixF<3,3> IntMatDummyCZ :: give3dStiffnessMatrix_dTdj(MatResponseMode rM
     return zero<3,3>();
 }
 
-void IntMatDummyCZ :: initializeFrom(InputRecord &ir)
+void IntMatDummyCZ :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 }

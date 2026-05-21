@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -34,6 +34,7 @@
 
 #include "feinterpol2d.h"
 #include "floatarray.h"
+#include "floatarrayf.h"
 #include "gaussintegrationrule.h"
 
 namespace oofem {
@@ -52,7 +53,7 @@ double FEInterpolation2d :: boundaryEdgeGiveTransformationJacobian(int boundary,
     return this->edgeGiveTransformationJacobian(boundary, lcoords, cellgeo);
 }
 
-void FEInterpolation2d :: boundaryEdgeLocal2Global(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+void FEInterpolation2d :: boundaryEdgeLocal2Global(Coordinates &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     this->edgeLocal2global(answer, boundary, lcoords, cellgeo);
 }
@@ -70,9 +71,10 @@ double FEInterpolation2d :: giveArea(const FEICellGeometry &cellgeo) const
 
 #define POINT_TOL 1.e-3
 
-int FEInterpolation2d :: global2local(FloatArray &answer, const FloatArray &gcoords, const FEICellGeometry &cellgeo) const
+int FEInterpolation2d :: global2local(FloatArray &answer, const Coordinates &gcoords, const FEICellGeometry &cellgeo) const
 {
-    FloatArray res, delta, guess, lcoords_guess;
+    FloatArray res, delta, lcoords_guess;
+    Coordinates guess;
     FloatMatrix jac;
     double convergence_limit, error = 0.0;
 
@@ -87,7 +89,7 @@ int FEInterpolation2d :: global2local(FloatArray &answer, const FloatArray &gcoo
     for ( int nite = 0; nite < 10; nite++ ) {
         // compute the residual
         this->local2global(guess, lcoords_guess, cellgeo);
-        res = Vec2(gcoords(0) - guess(0), gcoords(1) - guess(1));
+        res = Vec2(gcoords.at(xind) - guess.at(xind), gcoords.at(yind) - guess.at(yind));
 
         // check for convergence
         error = res.computeNorm();
@@ -160,7 +162,7 @@ double FEInterpolation2d :: boundaryGiveTransformationJacobian(int boundary, con
     return this->edgeGiveTransformationJacobian(boundary, lcoords, cellgeo);
 }
 
-void FEInterpolation2d :: boundaryLocal2Global(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const 
+void FEInterpolation2d :: boundaryLocal2Global(Coordinates &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const 
 {
     return this->edgeLocal2global(answer, boundary, lcoords, cellgeo);
 }
@@ -200,7 +202,38 @@ double FEInterpolation2d::boundarySurfaceEvalNormal(FloatArray &answer, int isur
     return this->giveTransformationJacobian(lcoords, cellgeo);
 }
 
-void FEInterpolation2d::boundarySurfaceLocal2global(FloatArray &answer, int isurf,
+
+  FloatArrayF<2> FEInterpolation2d::surfaceEvalBaseVectorsAt(int isurf, const FloatArray & lcoords, const FEICellGeometry & cellgeo) const
+{
+    //Adapted from FEI3dQuadLin
+    // Note: These are not normalized. Returns the two tangent vectors to the surface.
+    FloatMatrix dNdxi;
+    this->surfaceEvaldNdxi(dNdxi, lcoords);
+
+    //Get nodes which correspond to the surface in question
+    auto nodeIndices = this->computeLocalEdgeMapping(isurf);
+    FloatArrayF<2> G1;
+    for (int i = 0; i < nodeIndices.giveSize(); ++i) {
+      G1 += dNdxi(i, 0) * FloatArrayF<2>(cellgeo.giveVertexCoordinates(nodeIndices(i)).at(xind), cellgeo.giveVertexCoordinates(nodeIndices(i)).at(yind));
+    }
+    return G1;
+}
+
+void FEInterpolation2d::surfaceEvaldNdxi(FloatMatrix & answer, const FloatArray & lcoords) const
+{
+    OOFEM_ERROR("Not implemented");
+}
+
+void FEInterpolation2d::surfaceEvald2Ndxi2(FloatMatrix & answer, const FloatArray & lcoords) const
+{
+    OOFEM_ERROR("Not implemented");
+}
+
+
+
+  
+
+void FEInterpolation2d::boundarySurfaceLocal2global(Coordinates &answer, int isurf,
                             const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     this->local2global(answer, lcoords, cellgeo);

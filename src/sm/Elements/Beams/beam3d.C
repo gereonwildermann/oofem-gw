@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -237,7 +237,8 @@ Beam3d :: computeBoundaryEdgeLoadVector(FloatArray &answer, BoundaryLoad *load, 
     }
 
     double l = this->computeLength();
-    FloatArray coords, t;
+    Coordinates coords;
+    FloatArray t;
     FloatMatrix N, T;
 
     for ( GaussPoint *gp : *this->giveDefaultIntegrationRulePtr() ) {
@@ -535,9 +536,9 @@ Beam3d :: giveLocalCoordinateSystem(FloatMatrix &answer)
         help.at(3) = 1.0;         // up-vector
         // here is ly is used as a temp var
         if ( fabs( lx.dotProduct(help) ) > 0.999 ) { // Check if it is vertical
-            ly = {
+            ly = Vec3(
                 0., 1., 0.
-            };
+            );
         } else {
             ly.beVectorProductOf(lx, help);
         }
@@ -561,7 +562,7 @@ Beam3d :: giveLocalCoordinateSystem(FloatMatrix &answer)
 
 
 void
-Beam3d :: initializeFrom(InputRecord &ir, int priority)
+Beam3d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     BeamBaseElement :: initializeFrom(ir, priority);
     ParameterManager &ppm = domain->elementPPM;
@@ -809,7 +810,7 @@ Beam3d :: computeConsistentMassMatrix(FloatMatrix &answer, TimeStep *tStep, doub
 
 
 int
-Beam3d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+Beam3d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     double ksi, n1, n2;
 
@@ -817,7 +818,7 @@ Beam3d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords
     n1  = ( 1. - ksi ) * 0.5;
     n2  = ( 1. + ksi ) * 0.5;
 
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = n1 * this->giveNode(1)->giveCoordinate(1) + n2 *this->giveNode(2)->giveCoordinate(1);
     answer.at(2) = n1 * this->giveNode(1)->giveCoordinate(2) + n2 *this->giveNode(2)->giveCoordinate(2);
     answer.at(3) = n1 * this->giveNode(1)->giveCoordinate(3) + n2 *this->giveNode(2)->giveCoordinate(3);
@@ -1054,7 +1055,7 @@ Beam3d :: computeSubSoilStiffnessMatrix(FloatMatrix &answer,
 }
 
 int
-Beam3d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords, const FloatArray &pCoords)
+Beam3d :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords, const FloatArray &pCoords)
 {
     double ksi, n1, n2;
 
@@ -1062,7 +1063,7 @@ Beam3d :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords
     n1  = ( 1. - ksi ) * 0.5;
     n2  = ( 1. + ksi ) * 0.5;
 
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = n1 * this->giveNode(1)->giveCoordinate(1) + n2 *pCoords.at(1);
     answer.at(2) = n1 * this->giveNode(1)->giveCoordinate(2) + n2 *pCoords.at(2);
     answer.at(3) = n1 * this->giveNode(1)->giveCoordinate(3) + n2 *pCoords.at(3);
@@ -1189,7 +1190,8 @@ Beam3d :: computeInternalForcesFromBoundaryEdgeLoadVectorAtPoint(FloatArray &ans
         return;
     }
 
-    FloatArray coords, t;
+    Coordinates coords;
+    FloatArray t;
     FloatMatrix T;
 
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -129,7 +129,7 @@ UserDefDirichletBC :: give(Dof *dof, ValueModeType mode, double time)
 
 
 void
-UserDefDirichletBC :: initializeFrom(InputRecord &ir)
+UserDefDirichletBC :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 // Sets up the dictionary where the receiver stores the conditions it
 // imposes.
 {

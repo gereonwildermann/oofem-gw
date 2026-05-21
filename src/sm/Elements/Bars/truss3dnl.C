@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -60,7 +60,7 @@ Truss3dnl :: Truss3dnl(int n, Domain *aDomain) : Truss3d(n, aDomain)
 
 
 void
-Truss3dnl :: initializeFrom(InputRecord &ir, int priority)
+Truss3dnl :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
   Truss3d :: initializeFrom(ir, priority);
   ParameterManager &ppm = this->giveDomain()->dofmanPPM;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -33,22 +33,36 @@
  */
 
 #include "datareader.h"
+#include "oofemtxtdatareader.h"
+#ifdef _USE_XML
+    #include "xmldatareader.h"
+#endif
 
 namespace oofem{
 
-InputRecord *DataReader::giveChildRecord( const std::shared_ptr<InputRecord> &ir, InputFieldType ift, const std::string &name, InputRecordType irType, bool optional )
+std::shared_ptr<DataReader> DataReader::makeFromFilename(const std::string& f){
+    #ifdef _USE_XML
+    if(XMLDataReader::canRead(f)) return std::make_shared<XMLDataReader>(f);
+    #endif
+    return std::make_shared<OOFEMTXTDataReader>(f);
+}
+
+std::shared_ptr<InputRecord> DataReader::giveChildRecord( const std::shared_ptr<InputRecord> &ir, InputFieldType ift, InputRecordType irType, bool optional )
 {
-    if ( ir->hasChild( ift, name, optional ) ) return &( this->giveInputRecord( irType, /*recordId*/ 1 ) );
+    std::string name=DataReader::InputRecordTags[irType].tag;
+    if ( ir->hasChild( ift, name, optional ) ) return this->giveNextInputRecord( irType);
     return nullptr;
 };
 
-DataReader::GroupRecords DataReader::giveGroupRecords( const std::shared_ptr<InputRecord> &ir, InputFieldType ift, const std::string &name, InputRecordType irType, bool optional )
+DataReader::GroupRecords DataReader::giveGroupRecords( const std::shared_ptr<InputRecord> &ir, InputFieldType ift, InputRecordType irType, bool optional )
 {
+    std::string name=DataReader::InputRecordTags[irType].group;
     return GroupRecords( *this, name, irType, ir->giveGroupCount( ift, name, optional ) );
 }
 
-DataReader::GroupRecords DataReader::giveGroupRecords(const std::string& name, InputRecordType irType, int numRequired)
+DataReader::GroupRecords DataReader::giveGroupRecords(InputRecordType irType, int numRequired)
 {
+    std::string name=DataReader::InputRecordTags[irType].group;
     int count=giveGroupCount(name);
     if(count>=0 && numRequired>=0 && count!=numRequired) OOFEM_ERROR("Mismatch in %s: %d records of type '%s' required, %d found.",giveReferenceName().c_str(),numRequired,name.c_str(),count);
     return GroupRecords(*this,name,irType,numRequired>=0?numRequired:count);
@@ -63,7 +77,7 @@ DataReader::GroupRecords::Iterator::Iterator( DataReader &dr_, const std::string
             entered = true;
             dr.enterGroup( this->group );
         }
-        irPtr = &dr.giveInputRecord( irType, /*recordId*/ 1 );
+        irPtr = dr.giveNextInputRecord( irType );
         if ( irPtr ) dr.enterRecord( irPtr );
     }
     #if 0
@@ -79,10 +93,10 @@ DataReader::GroupRecords::Iterator &DataReader::GroupRecords::Iterator::operator
     index++;
     /* don't read past the last line, assign nullptr instead */
     if ( index >= size ) {
-        irPtr = nullptr;
+        irPtr = {};
         if ( entered ) dr.leaveGroup( this->group );
     } else {
-        irPtr = &dr.giveInputRecord( irType, /*recordId*/ index + 1 );
+        irPtr = dr.giveNextInputRecord( irType );
         if ( irPtr ) dr.enterRecord( irPtr );
     }
     return *this;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -70,7 +70,7 @@ public:
      * Default implementation using Newton's method to find the local coordinates.
      * Can be overloaded if desired.
      */
-    int global2local(FloatArray &answer, const FloatArray &gcoords, const FEICellGeometry &cellgeo) const override;
+    int global2local(FloatArray &answer, const Coordinates &gcoords, const FEICellGeometry &cellgeo) const override;
 
     void giveJacobianMatrixAt(FloatMatrix &jacobianMatrix, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
 
@@ -86,13 +86,13 @@ public:
     double boundaryEdgeEvalNormal(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
 
     double boundaryEdgeGiveTransformationJacobian(int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void boundaryEdgeLocal2Global(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void boundaryEdgeLocal2Global(Coordinates &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
 
     IntArray boundaryGiveNodes(int boundary, const Element_Geometry_Type) const override;
     void boundaryEvalN(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double boundaryEvalNormal(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double boundaryGiveTransformationJacobian(int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void boundaryLocal2Global(FloatArray &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void boundaryLocal2Global(Coordinates &answer, int boundary, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     //@}
 
     /**@name Surface interpolation services */
@@ -100,9 +100,34 @@ public:
     void boundarySurfaceEvalN(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     void boundarySurfaceEvaldNdx(FloatMatrix &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double boundarySurfaceEvalNormal(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
-    void boundarySurfaceLocal2global(FloatArray &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
+    void boundarySurfaceLocal2global(Coordinates &answer, int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     double boundarySurfaceGiveTransformationJacobian(int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const override;
     IntArray boundarySurfaceGiveNodes(int boundary, const Element_Geometry_Type, bool includeHierarchical=false) const override;
+    /**
+     * Evaluates the tangent vectors of the surface at given point.
+     * @param isurf Determines the surface number.
+     * @param lcoords Array containing (local) coordinates.
+     * @param cellgeo Underlying cell geometry.
+     * @return Surface mapping jacobian .
+     * @return tangent vector
+     */
+    virtual FloatArrayF<2> surfaceEvalBaseVectorsAt(int isurf, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const;
+    /**
+     * Evaluates the matrix of derivatives of surface interpolation functions (shape functions) wrt parametric coordinates at given point.
+     * @param answer Contains resulting matrix of derivatives, the member at i,j position contains value of dNj/dxi.
+     * @param lcoords Array containing (local) coordinates.
+     */
+    virtual void surfaceEvaldNdxi(FloatMatrix & answer, const FloatArray & lcoords) const override;
+    /**
+     * Evaluates the matrix of second derivatives of surface interpolation functions (shape functions) wrt parametric coordinates at given point.
+     * @param answer Contains resulting matrix of derivatives, the member at i,j position contains value of dNj/dxi.
+     * @param lcoords Array containing (local) coordinates.
+     */    
+    virtual void surfaceEvald2Ndxi2(FloatMatrix & answer, const FloatArray & lcoords) const override;
+
+
+
+    
     //@}
 
     /**@name Edge interpolation services. */
@@ -142,7 +167,7 @@ public:
      * @param lcoords Array containing (local) coordinates.
      * @param cellgeo Underlying cell geometry.
      */
-    virtual void edgeLocal2global(FloatArray &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const = 0;
+    virtual void edgeLocal2global(Coordinates &answer, int iedge, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const = 0;
     /**
      * Evaluates the edge Jacobian of transformation between local and global coordinates.
      * @param iedge Determines edge number.

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -211,6 +211,10 @@ public:
     int read(char *dest, std::size_t n) override
     { return __read(dest, n, MPI_CHAR); }
 
+#ifdef _WIN32
+    int read( std::size_t *src, std::size_t n ) override { return __read( src, n, my_MPI_SIZE_T ); }
+    int write( const std::size_t *dest, std::size_t n ) override { return __write( dest, n, my_MPI_SIZE_T ); }
+#endif
 
     int iSend(int dest, int tag) override;
     int iRecv(int source, int tag, std::size_t count = 0) override;

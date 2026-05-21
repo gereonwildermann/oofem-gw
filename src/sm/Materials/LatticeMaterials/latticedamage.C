@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ LatticeDamage :: hasMaterialModeCapability(MaterialMode mode) const
 
 
 void
-LatticeDamage :: initializeFrom(InputRecord &ir)
+LatticeDamage :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LatticeLinearElastic :: initializeFrom(ir);
 
@@ -103,7 +103,7 @@ LatticeDamage :: computeEquivalentStrain(const FloatArrayF< 6 > &strain, GaussPo
     double paramC = 0.5 * ( this->ec * e0 - e0 );
 
     double shearNorm = norm(strain [ { 1, 2 } ]);
-    return norm({ this->alphaOne * shearNorm / paramB, ( strain.at(1) + paramC ) / paramA }) * paramA - paramC;
+    return norm(Vec2( this->alphaOne * shearNorm / paramB, ( strain.at(1) + paramC ) / paramA )) * paramA - paramC;
 }
 
 

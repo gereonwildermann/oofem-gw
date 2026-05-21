@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,6 +53,7 @@
 #include "dofmanager.h"
 #include "node.h"
 #include "activebc.h"
+#include "Contact/contactbc.h"
 #include "timestep.h"
 #include "verbose.h"
 #include "datastream.h"
@@ -69,9 +70,10 @@
 #include "xfem/xfemmanager.h"
 #include "parallelcontext.h"
 #include "unknownnumberingscheme.h"
-#include "contact/contactmanager.h"
 #include "smoothednodalintvarfield.h"
 #include "nodalrecoverymodel.h"
+#include "convergenceexception.h"
+#include "progressbar.h"
 
 
 #ifdef __MPI_PARALLEL_MODE
@@ -98,7 +100,8 @@ namespace oofem {
 EngngModel :: EngngModel(int i, EngngModel *_master) : domainNeqs(), domainPrescribedNeqs(),
     exportModuleManager(this),
     initModuleManager(this),
-    monitorManager(this)
+    monitorManager(this),
+    timeStepController( std::make_unique<TimeStepController>( this ) )
 {
     suppressOutput = false;
 
@@ -196,9 +199,9 @@ EngngModel :: Instanciate_init()
 }
 
 
-int EngngModel :: instanciateYourself(DataReader &dr, InputRecord &ir, const char *dataOutputFileName, const char *desc)
+int EngngModel :: instanciateYourself(DataReader &dr, const std::shared_ptr<InputRecord> &ir, const char *dataOutputFileName, const char *desc)
 {
-    std::shared_ptr<InputRecord> irPtr(ir.clone());
+    // std::shared_ptr<const std::shared_ptr<InputRecord>> irPtr(ir->ptr());
     Timer timer;
     timer.startTimer();
 
@@ -228,30 +231,37 @@ int EngngModel :: instanciateYourself(DataReader &dr, InputRecord &ir, const cha
 
     try {
         // instanciate receiver
-        this->initializeFrom(*irPtr);
+        this->initializeFrom(ir);
 
-        if ( this->nMetaSteps == 0 ) {
+        // initialize the time step controller, its metasptes, and its associated time reduction strategy
+        timeStepController->initializeFrom( ir );
+        if ( timeStepController->giveNumberOfMetaSteps() == 0 ) {
             inputReaderFinish = false;
-            this->instanciateDefaultMetaStep(*irPtr);
+            timeStepController->instanciateDefaultMetaStep( ir );
         } else {
-            this->instanciateMetaSteps(dr);
+            // records for metasteps are under this one (no-op for text reader)
+            DataReader::RecordGuard guard(dr,ir);
+            timeStepController->instanciateMetaSteps( dr );
         }
 
         {
             /* This is somewhat messy since we want the XML input format NOT to nest modules under Analysis, keeping them under the top-level <oofem> tag instead */
-            auto irParent=(dr.hasFlattenedStructure()?dr.giveTopInputRecord()->clone():irPtr->clone());
-            DataReader::RecordGuard scope(dr,irParent.get());
+            auto irParent=(dr.hasFeature(DataReader::FormatFeature::DomainUnderTop)?dr.giveTopInputRecord():ir);
+            DataReader::RecordGuard scope(dr,irParent);
             // instanciate initialization module manager
-            initModuleManager.instanciateYourself(dr, irParent, "ninitmodules", "InitModules",DataReader::IR_expModuleRec);
+            initModuleManager.instanciateYourself(dr, irParent, "ninitmodules",DataReader::IR_initModuleRec);
             // instanciate export module manager
-            exportModuleManager.instanciateYourself(dr, irParent, "nmodules", "ExportModules",DataReader::IR_expModuleRec);
+            exportModuleManager.instanciateYourself(dr, irParent, "nmodules", DataReader::IR_expModuleRec);
             // instanciate monitor manager
-            monitorManager.instanciateYourself(dr, irParent, "nmonitors", "Monitors",DataReader::IR_expModuleRec);
-            this->giveContext()->giveFieldManager()->instanciateYourself(dr, *irPtr);
-            /* on the other hand, MPM stuff *should* be nested under Analysis, so pass irPtr there */
+            monitorManager.instanciateYourself(dr, irParent, "nmonitors",DataReader::IR_monitorRec);
+            {
+                DataReader::RecordGuard scope(dr,ir);
+                this->giveContext()->giveFieldManager()->instanciateYourself(dr, ir);
+            }
+            /* on the other hand, MPM stuff *should* be nested under Analysis, so pass ir there */
             #ifdef __MPM_MODULE
                 // instanciate mpm stuff (variables, terms, and integrals)
-                this->instanciateMPM(dr,*irPtr);
+                this->instanciateMPM(dr,ir);
             #endif
         }
         this->instanciateDomains(dr);
@@ -265,14 +275,12 @@ int EngngModel :: instanciateYourself(DataReader &dr, InputRecord &ir, const cha
 
         if ( this->nMetaSteps == 0 ) {
             inputReaderFinish = false;
-            this->instanciateDefaultMetaStep(*irPtr);
+            this->instanciateDefaultMetaStep(ir);
         } 
 
         // check emodel input record if no default metastep, since all has been read
         if ( inputReaderFinish ) {
-            irPtr->finish();
-        } else {
-            this->metaStepList.at(0).updateAttributesRecord(*irPtr);
+            ir->finish();
         }
     } catch ( InputException &e ) {
         OOFEM_ERROR("Error initializing from user input: %s\n", e.what());
@@ -285,9 +293,10 @@ int EngngModel :: instanciateYourself(DataReader &dr, InputRecord &ir, const cha
 
 
 void
-EngngModel :: initializeFrom(InputRecord &ir)
+EngngModel :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
-    IR_GIVE_FIELD(ir, numberOfSteps, _IFT_EngngModel_nsteps);
+    numberOfSteps = 1;
+    IR_GIVE_OPTIONAL_FIELD( ir, numberOfSteps, _IFT_EngngModel_nsteps );
     if ( numberOfSteps <= 0 ) {
         OOFEM_ERROR("nsteps not specified, bad format");
     }
@@ -302,8 +311,10 @@ EngngModel :: initializeFrom(InputRecord &ir)
     IR_GIVE_OPTIONAL_FIELD(ir, renumberFlag, _IFT_EngngModel_renumberFlag);
     profileOpt = false;
     IR_GIVE_OPTIONAL_FIELD(ir, profileOpt, _IFT_EngngModel_profileOpt);
-    nMetaSteps   = 0;
-    IR_GIVE_OPTIONAL_FIELD(ir, nMetaSteps, _IFT_EngngModel_nmsteps);
+
+    // get explicit nmsteps param (text), or size of the <Metasteps> sub-group (xml)
+    nMetaSteps = ir->giveReader()->giveGroupRecords(ir,_IFT_EngngModel_nmsteps,DataReader::IR_mstepRec,/*optional*/true).size();
+
     int _val = 1;
     IR_GIVE_OPTIONAL_FIELD(ir, _val, _IFT_EngngModel_nonLinFormulation);
     nonLinFormulation = ( fMode ) _val;
@@ -330,7 +341,7 @@ EngngModel :: initializeFrom(InputRecord &ir)
 
 #endif
 
-    suppressOutput = ir.hasField(_IFT_EngngModel_suppressOutput);
+    suppressOutput = ir->hasField(_IFT_EngngModel_suppressOutput);
 
     if ( suppressOutput ) {
         //printf("Suppressing output.\n");
@@ -360,13 +371,12 @@ EngngModel :: instanciateDomains(DataReader &dr)
     int result = 1;
     // read problem domains
     auto Idomain=domainList.begin();
-    auto drecs=dr.giveGroupRecords("Domains",DataReader::IR_domainRec,domainList.size());
-    for(InputRecord& drec: drecs){
-        result&=(*Idomain)->instanciateYourself(dr,drec);
-        Idomain++;
+    for(size_t i=0; i<domainList.size(); i++){
+        const std::shared_ptr<InputRecord>& rec=dr.giveNextInputRecord(DataReader::IR_domainRec);
+        DataReader::RecordGuard guard(dr,rec);
+        result&=(*Idomain)->instanciateYourself(dr,rec);
     }
     this->postInitialize();
-
     return result;
 }
 
@@ -383,9 +393,10 @@ EngngModel :: instanciateMetaSteps(DataReader &dr)
     }
 
     // read problem domains
-    for ( int i = 1; i <= this->nMetaSteps; i++ ) {
-        auto &ir = dr.giveInputRecord(DataReader :: IR_mstepRec, i);
-        metaStepList[i-1].initializeFrom(ir);
+    auto mrecs=dr.giveGroupRecords(DataReader::IR_mstepRec,nMetaSteps);
+    int i=0;
+    for(const std::shared_ptr<InputRecord>& mrec: mrecs){
+        metaStepList[i++].initializeFrom(mrec);
     }
 
     this->numberOfSteps = metaStepList.size();
@@ -394,7 +405,7 @@ EngngModel :: instanciateMetaSteps(DataReader &dr)
 
 
 int
-EngngModel :: instanciateDefaultMetaStep(InputRecord &ir)
+EngngModel :: instanciateDefaultMetaStep(const std::shared_ptr<InputRecord> &ir)
 {
     if ( numberOfSteps == 0 ) {
         OOFEM_ERROR("nsteps cannot be zero");
@@ -411,26 +422,25 @@ EngngModel :: instanciateDefaultMetaStep(InputRecord &ir)
 
 #ifdef __MPM_MODULE
 int 
-EngngModel:: instanciateMPM (DataReader &dr, InputRecord &ir) {
-    std::shared_ptr<InputRecord> irPtr(ir.ptr());
+EngngModel:: instanciateMPM (DataReader &dr, const std::shared_ptr<InputRecord> &ir) {
     std::string name;
     int num=-1;
-    DataReader::RecordGuard scope(dr,irPtr.get());
-    for(auto& mir: dr.giveGroupRecords(irPtr,"nvariables","MPMVariables",DataReader::IR_mpmVarRec,/*optional*/true)){
+    DataReader::RecordGuard scope(dr,ir);
+    for(auto mir: dr.giveGroupRecords(ir,"nvariables",DataReader::IR_mpmVarRec,/*optional*/true)){
         IR_GIVE_FIELD(mir, name, "name");
         std::unique_ptr< Variable > var = std :: make_unique< Variable >();
         var->initializeFrom(mir);
         variableMap[name] = std::move(var);
     }
     //if(variableMap.empty()) OOFEM_ERROR("No MPM Variables defined.");
-    for(auto& mir: dr.giveGroupRecords(irPtr,"nterms","MPMTerms",DataReader::IR_mpmTermRec,/*optional*/true)){
+    for(auto mir: dr.giveGroupRecords(ir,"nterms",DataReader::IR_mpmTermRec,/*optional*/true)){
         IR_GIVE_RECORD_KEYWORD_FIELD(mir, name, num);
         std::unique_ptr< Term > term = classFactory.createTerm(name.c_str());
         term->initializeFrom(mir, this);
         termList.push_back(std::move(term));
     }
     //if(termList.empty()) OOFEM_ERROR("No MPM Terms defined.");
-    for(auto& mir: dr.giveGroupRecords(irPtr,"nintegrals","MPMIntegrals",DataReader::IR_mpmIntegralRec,/*optional*/true)){
+    for(auto mir: dr.giveGroupRecords(ir,"nintegrals",DataReader::IR_mpmIntegralRec,/*optional*/true)){
         std::unique_ptr< Integral > integral = std :: make_unique< Integral >(nullptr, &dummySet, nullptr);
         integral->initializeFrom(mir, this);
         this->addIntegral(std::move(integral));
@@ -565,26 +575,44 @@ EngngModel::initializeYourself (TimeStep *tStep)
 void
 EngngModel :: solveYourself()
 {
-    int smstep = 1, sjstep = 1;
+    int smstep = 1;
+    bool showProgress=true;
+    std::string progressMsg = std::string(PRG_VERSION_SHORT) + " | Solution Progress:";
 
     this->timer.startTimer(EngngModelTimer :: EMTT_AnalysisTimer);
 
-    if ( this->currentStep ) {
-        smstep = this->currentStep->giveMetaStepNumber();
-        sjstep = this->giveMetaStep(smstep)->giveStepRelativeNumber( this->currentStep->giveNumber() ) + 1;
+    TimeStep *timeStep = this->giveCurrentStep();
+    if ( timeStep ) {
+      smstep = timeStepController->giveMetaStepNumber(timeStep->giveTargetTime());
+    }
+    
+    
+    if ( this->master || (( this->giveNumberOfSteps() == 1 ) && ( this->giveNumberOfMetaSteps() == 1 )) ) {
+        showProgress=false;
     }
 
-    for ( int imstep = smstep; imstep <= nMetaSteps; imstep++, sjstep = 1 ) { //loop over meta steps
+    if ( showProgress ) {
+        oofem_ProgressBar.initialize();
+        if ( showProgress ) oofem_ProgressBar.update(0, "OOFEM");
+    }
+
+
+    for ( int imstep = smstep; imstep <= timeStepController->giveNumberOfMetaSteps(); imstep++ ) { //loop over meta steps
         auto activeMStep = this->giveMetaStep(imstep);
         // update state according to new meta step
-        this->initMetaStepAttributes(activeMStep);
+        timeStepController->setCurrentMetaStepNumber( imstep - 1 );
+        timeStepController->initMetaStepAttributes( activeMStep );
+        double msFinalTime = activeMStep->giveFinalTime() - this->giveInitialTime();
+        //
 
-	for ( int jstep = sjstep; jstep <= activeMStep->giveNumberOfSteps(); jstep++ ) { //loop over time steps
+        do {
             this->timer.startTimer(EngngModelTimer :: EMTT_SolutionStepTimer);
             this->timer.initTimer(EngngModelTimer :: EMTT_NetComputationalStepTimer);
 
             this->preInitializeNextStep();
             this->giveNextStep();
+            //hack for nlinear static - should be deleted when the time step controller is fully integrated
+            this->giveCurrentStep()->setMetaStepNumber(imstep);
 
             // renumber equations if necessary. Ensure to call forceEquationNumbering() for staggered problems
             if ( this->requiresEquationRenumbering( this->giveCurrentStep() ) ) {
@@ -594,7 +622,34 @@ EngngModel :: solveYourself()
             OOFEM_LOG_DEBUG("Number of equations %d\n", this->giveNumberOfDomainEquations( 1, EModelDefaultEquationNumbering()) );
 
             this->initializeYourself( this->giveCurrentStep() );
-            this->solveYourselfAt( this->giveCurrentStep() );
+            // solving the step
+            auto repeat = true;
+            auto nReductions = 0;
+            while ( repeat ) {
+                // try to solve the step, ask time step reduction strategy to reduce time step in case of convergence issues
+                this->giveCurrentStep()->numberOfAttempts = 1 + nReductions;
+                try {
+                    this->solveYourselfAt( this->giveCurrentStep() );
+                    auto nIter = this->giveCurrentStep()->numberOfIterations;
+                    this->adaptTimeStep( nIter );
+                    repeat = false;
+                } catch ( ConvergenceException &ce ) {
+                    if ( timeStepController->giveCurrentMetaStep()->giveTimeStepReductionStrategy()->giveReductionFlag() ) {
+                        timeStepController->reduceTimeStep();
+                        OOFEM_LOG_INFO( "--------------------------------------------------------------------------------------\nRestarting step with new time step increment %e due to convergence problem        \n--------------------------------------------------------------------------------------\n", this->giveCurrentStep()->giveTimeIncrement() );
+                        OOFEM_LOG_INFO( "%s\n", ce.what() );
+                        this->initStepIncrements();
+                        this->restartYourself( this->giveCurrentStep() );
+                        nReductions++;
+                        if ( nReductions > activeMStep->giveNumberOfMaxTimeStepReductions() ) {
+                            OOFEM_ERROR( "Maximum number of time step reductions has been reached." );
+                        }
+                    } else { // else: do nothing, i.e., continue with the analysis
+                        repeat = false;
+                    }
+                }
+            }
+            //     this->solveYourselfAt( this->giveCurrentStep() );
             this->updateYourself( this->giveCurrentStep() );
 
             this->timer.stopTimer(EngngModelTimer :: EMTT_SolutionStepTimer);
@@ -602,59 +657,34 @@ EngngModel :: solveYourself()
             this->giveCurrentStep()->solutionTime = _steptime;
             
             this->terminate( this->giveCurrentStep() );
+            // update progress bar
+            if ( showProgress ) oofem_ProgressBar.update( this->giveCurrentStep()->giveTargetTime() / this->giveFinalTime(), progressMsg.c_str() );
 
 
             OOFEM_LOG_INFO("EngngModel info: user time consumed by solution step %d: %.2fs\n",
-                           this->giveCurrentStep()->giveNumber(), _steptime);
+                            this->giveCurrentStep()->giveNumber(), _steptime);
+
 
             if ( !suppressOutput ) {
                 fprintf(this->giveOutputStream(), "\nUser time consumed by solution step %d: %.3f [s]\n\n",
                         this->giveCurrentStep()->giveNumber(), _steptime);
             }
 
-#ifdef __MPI_PARALLEL_MODE
+    #ifdef __MPI_PARALLEL_MODE
             if ( loadBalancingFlag ) {
                 this->balanceLoad( this->giveCurrentStep() );
             }
-
-#endif
-        }
+    #endif
+            
+        }  while ( this->giveCurrentStep()->giveTargetTime() < msFinalTime );
     }
 }
 
-TimeStep* EngngModel :: generateNextStep()
-{
-    int smstep = 1, sjstep = 1;
-    if ( this->currentStep ) {
-        smstep = this->currentStep->giveMetaStepNumber();
-        sjstep = this->giveMetaStep(smstep)->giveStepRelativeNumber( this->currentStep->giveNumber() ) + 1;
-    }
-
-    // test if sjstep still valid for MetaStep
-    if (sjstep > this->giveMetaStep(smstep)->giveNumberOfSteps())
-        smstep++;
-    if (smstep > nMetaSteps) return NULL; // no more metasteps
-
-    this->initMetaStepAttributes(this->giveMetaStep(smstep));
-
-    this->preInitializeNextStep();
-    return this->giveNextStep();
-}
-
-
-void
-EngngModel :: initMetaStepAttributes(MetaStep *mStep)
-{
-    // update attributes
-    this->updateAttributes(mStep); // virtual function
-    // finish data acquiring
-    mStep->giveAttributesRecord().finish();
-}
 
 void
 EngngModel :: updateAttributes(MetaStep *mStep)
 {
-    MetaStep *mStep1 = this->giveMetaStep( mStep->giveNumber() ); //this line ensures correct input file in staggered problem
+    MetaStep *mStep1 =  timeStepController->giveMetaStep( mStep->giveNumber() ); //this line ensures correct input file in staggered problem
     auto &ir = mStep1->giveAttributesRecord();
 
     if ( this->giveNumericalMethod(mStep1) ) {
@@ -710,12 +740,17 @@ EngngModel :: updateYourself(TimeStep *tStep)
 #  ifdef VERBOSE
         VERBOSE_PRINT0("Updated Elements ", domain->giveNumberOfElements())
 #  endif
-    }
 
-    // if there is an error estimator, it should be updated so that values can be exported.
-    if ( this->defaultErrEstimator ) {
-        this->defaultErrEstimator->estimateError(equilibratedEM, tStep);
-    }
+      for ( auto &bc : domain->giveBcs() ) {
+	  bc->updateYourself(tStep);
+      }
+#  ifdef VERBOSE
+        VERBOSE_PRINT0("Updated BCs ", domain->giveNumberOfBoundaryConditions())
+#  endif
+  }
+ 
+ 
+    
 }
 
 void
@@ -1011,11 +1046,6 @@ void EngngModel :: assemble(SparseMtrx &answer, TimeStep *tStep, const MatrixAss
         }
     }
 
-    if ( domain->hasContactManager() ) {
-        OOFEM_ERROR("Contact problems temporarily deactivated");
-        //domain->giveContactManager()->assembleTangentFromContacts(answer, tStep, type, s, s);
-    }
-
     this->timer.pauseTimer(EngngModelTimer :: EMTT_NetComputationalStepTimer);
 
     answer.assembleBegin();
@@ -1080,11 +1110,6 @@ void EngngModel :: assemble(SparseMtrx &answer, TimeStep *tStep, const MatrixAss
             ma.assembleFromActiveBC(answer, *bc, tStep, rs, cs);
 #endif
         }
-    }
-
-    if ( domain->hasContactManager() ) {
-        OOFEM_ERROR("Contant problems temporarily deactivated");
-        //domain->giveContactManager()->assembleTangentFromContacts(answer, tStep, type, rs, cs);
     }
 
     this->timer.pauseTimer(EngngModelTimer :: EMTT_NetComputationalStepTimer);
@@ -1659,14 +1684,6 @@ EngngModel :: assemblePrescribedExtrapolatedForces(FloatArray &answer, TimeStep 
     this->timer.pauseTimer(EngngModelTimer :: EMTT_NetComputationalStepTimer);
 }
 
-void
-EngngModel :: assembleVectorFromContacts(FloatArray &answer, TimeStep *tStep, CharType type, ValueModeType mode,
-                                    const UnknownNumberingScheme &s, Domain *domain, FloatArray *eNorms)
-{
-    if( domain->hasContactManager()) {
-        domain->giveContactManager()->assembleVectorFromContacts(answer, tStep, type, mode, s, domain, eNorms);
-    }
-}
 
 
 void
@@ -1720,6 +1737,28 @@ EngngModel :: initStepIncrements()
         }
     }
 }
+
+
+
+void
+EngngModel :: initForNewIteration(Domain *d, TimeStep *tStep, int niter, const FloatArray &solutionVector)
+//
+// init the data before new iteration
+// needed by contact implementation
+{
+  auto s = solutionVector;
+  if(s.giveSize()) {
+    this->updateSolution(s, tStep, d);
+  }
+  for ( int i = 1; i <= d->giveNumberOfBoundaryConditions(); ++i ) {
+    ContactBoundaryCondition *contact_bc = dynamic_cast< ContactBoundaryCondition * >( d->giveBc(i) );
+    if(contact_bc) {
+      contact_bc->initForNewIteration(tStep, niter);
+    }
+  }
+
+}
+
 
 
 void
@@ -1953,19 +1992,6 @@ EngngModel :: initParallelContexts()
     }
 }
 
-
-MetaStep *
-EngngModel :: giveMetaStep(int i)
-{
-    if ( ( i > 0 ) && ( i <= this->nMetaSteps ) ) {
-        return &this->metaStepList[i-1];
-    } else {
-        OOFEM_ERROR("undefined metaStep (%d)", i);
-    }
-
-    // return NULL;
-}
-
 void
 EngngModel :: letOutputBaseFileNameBe(const std :: string &src)
 {
@@ -2061,11 +2087,7 @@ EngngModel :: checkProblemConsistency()
 void
 EngngModel :: postInitialize()
 {
-    // set meta step bounds
-    int istep = this->giveNumberOfFirstStep(true);
-    for ( auto &metaStep: metaStepList ) {
-        istep = metaStep.setStepBounds(istep);
-    }
+    timeStepController->postInitialize();
 
     for ( auto &domain: domainList ) {
         domain->postInitialize();

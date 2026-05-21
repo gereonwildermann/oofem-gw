@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -64,7 +64,7 @@ Masonry02 :: hasMaterialModeCapability(MaterialMode mode) const
 }
 
 void
-Masonry02 :: initializeFrom(InputRecord &ir)
+Masonry02 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     MPlasticMaterial2 :: initializeFrom(ir);
     linearElasticMaterial->initializeFrom(ir);
@@ -93,7 +93,7 @@ Masonry02 :: initializeFrom(InputRecord &ir)
     IR_GIVE_FIELD(ir, km, _IFT_Masonry02_km);
     IR_GIVE_FIELD(ir, kr, _IFT_Masonry02_kr);
 
-    if ( ir.hasField(_IFT_Masonry02_cplane) ) {
+    if ( ir->hasField(_IFT_Masonry02_cplane) ) {
         this->rmType = mpm_CuttingPlane;
     }
 }

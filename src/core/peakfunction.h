@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -65,7 +65,7 @@ public:
     }
     virtual ~PeakFunction() { }
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     const char *giveClassName() const override { return "PeakFunction"; }
     const char *giveInputRecordName() const override { return _IFT_PeakFunction_Name; }
 

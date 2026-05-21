@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -81,7 +81,7 @@ TrAxisym1_ht :: giveThicknessAt(const FloatArray &gcoords)
 double
 TrAxisym1_ht :: computeEdgeVolumeAround(GaussPoint *gp, int iEdge)
 {
-    FloatArray gcoords;
+    Coordinates gcoords;
     double determinant = fabs( this->interp.edgeGiveTransformationJacobian( iEdge, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(this) ) );
     this->interp.edgeLocal2global( gcoords, iEdge, gp->giveNaturalCoordinates(), FEIElementGeometryWrapper(this) );
     double radius = gcoords.at(1);
@@ -91,7 +91,7 @@ TrAxisym1_ht :: computeEdgeVolumeAround(GaussPoint *gp, int iEdge)
 double
 TrAxisym1_ht :: computeRadiusAt(GaussPoint *gp)
 {
-    FloatArray gcoords;
+    Coordinates gcoords;
     this->computeGlobalCoordinates( gcoords, gp->giveNaturalCoordinates() );
     return gcoords.at(1);
 }

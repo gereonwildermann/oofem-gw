@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -98,7 +98,7 @@ public:
     /// @return Engineering model receiver is connected to.
     EngngModel *giveEngngModel() { return engngModel; }
 
-    virtual void initializeFrom(InputRecord &ir) { }
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir) { }
 
     /**
      * Reinitializes the receiver. This is used, when topology of problem has changed

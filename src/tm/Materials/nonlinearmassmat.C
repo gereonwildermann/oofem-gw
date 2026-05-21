@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,7 +43,7 @@ namespace oofem {
 REGISTER_Material(NonlinearMassTransferMaterial);
 
 void
-NonlinearMassTransferMaterial :: initializeFrom(InputRecord &ir)
+NonlinearMassTransferMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Material :: initializeFrom(ir);
 

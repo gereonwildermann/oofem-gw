@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -44,7 +44,7 @@ REGISTER_Material(HydratingConcreteMat);
 HydratingConcreteMat :: HydratingConcreteMat(int n, Domain *d) : IsotropicHeatTransferMaterial(n, d){ }
         
 void
-HydratingConcreteMat :: initializeFrom(InputRecord &ir)
+HydratingConcreteMat :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // set conductivity k and capacity c
     IsotropicHeatTransferMaterial :: initializeFrom(ir);
@@ -71,7 +71,7 @@ HydratingConcreteMat :: initializeFrom(InputRecord &ir)
         IR_GIVE_FIELD(ir, DoHInf, _IFT_HydratingConcreteMat_DoHInf);
         IR_GIVE_OPTIONAL_FIELD(ir, DoH1, _IFT_HydratingConcreteMat_DoH1);
         IR_GIVE_OPTIONAL_FIELD(ir, P1, _IFT_HydratingConcreteMat_P1);
-    } else if ( hydrationModelType == 3 ) { //Saeed Rahimi-Aghdam, Zdeněk P. Bažant, Gianluca Cusatis: Extended Microprestress-Solidification Theory (XMPS) for Long-Term Creep and Diffusion Size Effect in Concrete at Variable Environment, JEM-ASCE, 2019. Appendix A.
+    } else if ( hydrationModelType == 3 ) { //Saeed Rahimi-Aghdam, Zdeněk P. Bažant, Gianluca Cusatis: Extended Microprestress-Solidification Theory (XMPS) for Long-Term Creep and Diffusion Size Effect in Concrete at Variable Environment, JEM-ASCE, 2019. Appendix A. Still unfinished.
         referenceTemperature = 20.;//according to the authors
         IR_GIVE_FIELD(ir, wc, _IFT_HydratingConcreteMat_wc);
         IR_GIVE_FIELD(ir, ac, _IFT_HydratingConcreteMat_ac);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -68,11 +68,11 @@ void FEI2dLineLin :: evaldNdxi(FloatMatrix &answer, const FloatArray &lcoords, c
     answer(1, 0) =  0.5;
 }
 
-void FEI2dLineLin :: local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+void FEI2dLineLin :: local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     FloatArray n;
     this->evalN(n, lcoords, cellgeo);
-    answer.resize( max(xind, yind) );
+    //answer.resize( 3 );
     answer.zero();
     answer.at(xind) = n(0) * cellgeo.giveVertexCoordinates(1).at(xind) +
                       n(1) * cellgeo.giveVertexCoordinates(2).at(xind);
@@ -80,20 +80,20 @@ void FEI2dLineLin :: local2global(FloatArray &answer, const FloatArray &lcoords,
                       n(1) * cellgeo.giveVertexCoordinates(2).at(yind);
 }
 
-int FEI2dLineLin :: global2local(FloatArray &answer, const FloatArray &gcoords, const FEICellGeometry &cellgeo) const
+int FEI2dLineLin :: global2local(FloatArray &answer, const Coordinates &gcoords, const FEICellGeometry &cellgeo) const
 {
     double x2_x1 = cellgeo.giveVertexCoordinates(2).at(xind) - cellgeo.giveVertexCoordinates(1).at(xind);
     double y2_y1 = cellgeo.giveVertexCoordinates(2).at(yind) - cellgeo.giveVertexCoordinates(1).at(yind);
 
     // Projection of the global coordinate gives the value interpolated in [0,1].
-    double dx = gcoords(0) - cellgeo.giveVertexCoordinates(1).at(xind);
-    double dy = gcoords(1) - cellgeo.giveVertexCoordinates(1).at(yind);
+    double dx = gcoords.at(xind) - cellgeo.giveVertexCoordinates(1).at(xind);
+    double dy = gcoords.at(yind) - cellgeo.giveVertexCoordinates(1).at(yind);
     double xi = (x2_x1) ? ( sqrt( dx*dx*(1 + (y2_y1 / x2_x1)*(y2_y1 / x2_x1) )) ) / ( sqrt(x2_x1 * x2_x1 + y2_y1 * y2_y1) ) : sqrt(dy*dy) / ( sqrt(x2_x1 * x2_x1 + y2_y1 * y2_y1) );
     // Map to [-1,1] domain.
     xi = xi * 2 - 1;
 
-    answer.resize(1);
-    answer(0) = clamp(xi, -1., 1.);
+    answer.zero();
+    answer[0] = clamp(xi, -1., 1.);
     return false;
 }
 
@@ -176,4 +176,22 @@ std::unique_ptr<IntegrationRule> FEI2dLineLin :: giveIntegrationRule(int order, 
     iRule->SetUpPointsOnLine(points, _Unknown);
     return std::move(iRule);
 }
+
+void
+FEI2dLineLin :: surfaceEvaldNdxi(FloatMatrix &answer, const FloatArray &lcoords) const 
+{
+  answer.resize(2, 1);
+  answer(0, 0) = -0.5;
+  answer(1, 0) =  0.5;
+}
+
+void
+FEI2dLineLin :: surfaceEvald2Ndxi2(FloatMatrix &answer, const FloatArray &lcoords) const
+{
+  answer.resize(2, 1);
+  answer(0, 0) = 0;
+  answer(1, 0) = 0;
+}
+
+  
 } // end namespace oofem

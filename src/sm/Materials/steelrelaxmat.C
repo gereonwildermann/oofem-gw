@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -57,7 +57,7 @@ SteelRelaxMat::hasMaterialModeCapability(MaterialMode mode) const
 
 // reads the model parameters from the input file
 void
-SteelRelaxMat::initializeFrom(InputRecord &ir)
+SteelRelaxMat::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralMaterial::initializeFrom(ir);
 

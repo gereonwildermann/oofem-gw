@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -213,7 +213,7 @@ ZZErrorEstimator :: giveRemeshingCrit()
 
 
 void
-ZZErrorEstimator :: initializeFrom(InputRecord &ir)
+ZZErrorEstimator :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     int n;
 
@@ -453,7 +453,7 @@ ZZRemeshingCriteria :: estimateMeshDensities(TimeStep *tStep)
 }
 
 void
-ZZRemeshingCriteria :: initializeFrom(InputRecord &ir)
+ZZRemeshingCriteria :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, this->requiredError, _IFT_ZZRemeshingCriteria_requirederror);
     IR_GIVE_FIELD(ir, this->minElemSize, _IFT_ZZRemeshingCriteria_minelemsize);

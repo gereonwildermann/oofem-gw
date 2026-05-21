@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -199,7 +199,7 @@ BondLink3dBoundary ::   giveDofManDofIDMask(int inode, IntArray &answer) const
 }
 
 void
-BondLink3dBoundary :: initializeFrom(InputRecord &ir, int priority)
+BondLink3dBoundary :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     // first call parent
     StructuralElement :: initializeFrom(ir, priority);
@@ -281,7 +281,7 @@ BondLink3dBoundary :: computeGeometryProperties()
     this->rigid.beProductOf(localCoordinateSystem, rigidGlobal);
 
 
-    this->globalCentroid.resize(3);
+    //this->globalCentroid.resize(3);
     for ( int i = 1; i <= 3; i++ ) {
         this->globalCentroid.at(i) = nodeB->giveCoordinate(i);
         ;

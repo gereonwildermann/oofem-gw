@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2021   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -66,7 +66,7 @@ TransverseReinfConstraint :: ~TransverseReinfConstraint()
 }
 
 
-void TransverseReinfConstraint :: initializeFrom(InputRecord &ir)
+void TransverseReinfConstraint :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, steelElSet, _IFT_TransverseReinfConstraint_SteelElSet);
     IR_GIVE_FIELD(ir, conElBoundSet, _IFT_TransverseReinfConstraint_ConElBoundSet);

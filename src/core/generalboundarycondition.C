@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -63,7 +63,7 @@ Function *GeneralBoundaryCondition :: giveTimeFunction()
 
 
 void
-GeneralBoundaryCondition :: initializeFrom(InputRecord &ir)
+GeneralBoundaryCondition :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, timeFunction, _IFT_GeneralBoundaryCondition_timeFunct);
     if ( timeFunction <= 0 ) {

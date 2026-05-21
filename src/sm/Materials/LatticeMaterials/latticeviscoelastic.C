@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -47,7 +47,7 @@ LatticeViscoelastic::LatticeViscoelastic(int n, Domain *d) : LatticeLinearElasti
 
 
 void
-LatticeViscoelastic::initializeFrom(InputRecord &ir)
+LatticeViscoelastic::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     LatticeLinearElastic::initializeFrom(ir);
 

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -91,7 +91,7 @@ public:
 
     std :: string inputFileNameMicro;
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
 
     const char *giveInputRecordName() const override { return _IFT_MicroMaterial_Name; }
     const char *giveClassName() const override { return "MicroMaterial"; }
@@ -120,7 +120,7 @@ public:
     int giveRequiredNumberOfDomainEquation() const override;
     //friend class EngngModel;-not here but define in EngngModel class
     /// Array containing coordinates of 8 master nodes of microproblem.
-    std::vector< FloatArray >microMasterCoords;
+    std::vector< Coordinates >microMasterCoords;
     /// Array containing equation numbers for boundary nodes [DofManagerNumber][DOF].
     std::vector<IntArray> microBoundaryDofs;
     /// Array of equation numbers associated to boundary nodes.

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -89,7 +89,7 @@ VTKHDF5ExportModule::~VTKHDF5ExportModule() {}
 
 
 void
-VTKHDF5ExportModule::initializeFrom(InputRecord &ir)
+VTKHDF5ExportModule::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     ExportModule::initializeFrom(ir);
 

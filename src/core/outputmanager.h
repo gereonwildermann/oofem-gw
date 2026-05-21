@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -109,7 +109,7 @@ public:
     /// Creates empty Output Manager. By default all components are selected.
     OutputManager(Domain * d);
     /// Initializes receiver according to object description stored in input record.
-    void initializeFrom(InputRecord &ir);
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir);
 
     /**
      * Does the dofmanager output.

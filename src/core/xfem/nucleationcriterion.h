@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -38,6 +38,7 @@
 
 #include <memory>
 #include <vector>
+#include "inputrecord.h"
 
 namespace oofem {
 
@@ -45,7 +46,6 @@ class EnrichmentItem;
 class Domain;
 class DataReader;
 class DynamicDataReader;
-class InputRecord;
 class EnrichmentFunction;
 
 class NucleationCriterion
@@ -56,7 +56,7 @@ public:
 
     virtual std::vector<std::unique_ptr<EnrichmentItem>> nucleateEnrichmentItems();
 
-    virtual void initializeFrom(InputRecord &ir);
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir);
     virtual int instanciateYourself(DataReader &dr);
     virtual void postInitialize() {}
 

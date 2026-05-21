@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -137,7 +137,7 @@ PlaneStress2d :: computeBHmatrixAt(GaussPoint *gp, FloatMatrix &answer)
 
 
 void
-PlaneStress2d :: initializeFrom(InputRecord &ir, int priority)
+PlaneStress2d :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     PlaneStressElement :: initializeFrom(ir, priority);
 }

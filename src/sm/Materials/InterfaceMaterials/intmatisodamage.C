@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -121,7 +121,7 @@ IntMatIsoDamage :: give2dStiffnessMatrix_Eng(MatResponseMode rMode, GaussPoint *
     }
 
     const auto &jump3d = status->giveTempJump();
-    FloatArray jump2d = {jump3d.at(1),jump3d.at(2)};
+    FloatArray jump2d = Vec2(jump3d.at(1),jump3d.at(2));
     double om = min(status->giveTempDamage(), maxOmega);
     double un = jump2d.at(1);
 
@@ -230,7 +230,7 @@ IntMatIsoDamage :: giveIPValue(FloatArray &answer, GaussPoint *gp, InternalState
 
 
 void
-IntMatIsoDamage :: initializeFrom(InputRecord &ir)
+IntMatIsoDamage :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

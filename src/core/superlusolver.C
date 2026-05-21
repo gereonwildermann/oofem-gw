@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -71,7 +71,7 @@ SuperLUSolver :: ~SuperLUSolver() {
 
 
 void
-SuperLUSolver :: initializeFrom(InputRecord &ir)
+SuperLUSolver :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
   /*
    * Get column permutation vector perm_c[], according to permc_spec:

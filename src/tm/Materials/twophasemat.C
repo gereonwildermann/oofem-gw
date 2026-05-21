@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -43,7 +43,7 @@ namespace oofem {
 REGISTER_Material(TwoPhaseMaterial);
 
 void
-TwoPhaseMaterial :: initializeFrom(InputRecord &ir)
+TwoPhaseMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, this->slaveMaterial, _IFT_TwoPhaseMaterial_mat);
     if ( this->slaveMaterial.giveSize() != 2 ) {

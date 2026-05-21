@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -41,7 +41,7 @@
 
 namespace oofem {
 void
-Integral::initializeFrom (InputRecord &ir, EngngModel *emodel) {
+Integral::initializeFrom (const std::shared_ptr<InputRecord> &ir, EngngModel *emodel) {
     int di;
     IR_GIVE_FIELD (ir, di, "domain");
     this->domain = emodel->giveDomain(di);

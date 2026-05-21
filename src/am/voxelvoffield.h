@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -51,7 +51,7 @@ class VoxelVOFField : public oofem::Field
     public:
     VoxelVOFField(VoxelGrid *vg = nullptr) : Field (oofem::FieldType::FT_VOF), voxelGrid(vg) {}
     void setGrid(VoxelGrid *vg) { voxelGrid = vg; }
-    int evaluateAt(FloatArray &answer, const FloatArray &coords, ValueModeType mode, TimeStep *tStep) override {
+    int evaluateAt(FloatArray &answer, const Coordinates &coords, ValueModeType mode, TimeStep *tStep) override {
         answer.resize(1);
         auto indices = voxelGrid->get_indices_from_point({coords[0], coords[1], coords[2]});
         int indx = voxelGrid->get_index( std::get<0>(indices),
@@ -104,7 +104,7 @@ class VoxelVOFField : public oofem::Field
     }
 
     // for Field classes supporting instantiation from input record
-    virtual void initializeFrom(InputRecord &ir) override { };
+    virtual void initializeFrom(const std::shared_ptr<InputRecord> &ir) override { };
 };
 } // end namespace oofem
 #endif // fvoxelvoffield_h

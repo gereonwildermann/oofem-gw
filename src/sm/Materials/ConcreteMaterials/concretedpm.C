@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -308,7 +308,7 @@ ConcreteDPM::ConcreteDPM(int n, Domain *d) :
 
 
 void
-ConcreteDPM::initializeFrom(InputRecord &ir)
+ConcreteDPM::initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     // call the corresponding service for the linear elastic material
     StructuralMaterial::initializeFrom(ir);
@@ -335,7 +335,7 @@ ConcreteDPM::initializeFrom(InputRecord &ir)
 
     // damage parameters - only exponential softening
     // [in ef variable the wf (crack opening) is stored]
-    if ( ir.hasField(_IFT_ConcreteDPM_wf) ) {
+    if ( ir->hasField(_IFT_ConcreteDPM_wf) ) {
         IR_GIVE_FIELD(ir, ef, _IFT_ConcreteDPM_wf);
         // fracture energy
     } else {

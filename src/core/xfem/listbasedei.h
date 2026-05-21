@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -67,7 +67,7 @@ public:
 
     bool giveElementTipCoord(FloatArray &oCoord, double &oArcPos,  Element &iEl, const FloatArray &iElCenter) const override;
 
-    void giveBoundingSphere(FloatArray &oCenter, double &oRadius) override { OOFEM_ERROR("Not implemented.") }
+    void giveBoundingSphere(Coordinates &oCenter, double &oRadius) override { OOFEM_ERROR("Not implemented.") }
 
 protected:
     std :: vector< int >dofManList;

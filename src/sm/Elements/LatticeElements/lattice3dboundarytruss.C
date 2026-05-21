@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -423,7 +423,7 @@ Lattice3dBoundaryTruss ::   giveDofManDofIDMask(int inode, IntArray &answer) con
 }
 
 void
-Lattice3dBoundaryTruss :: initializeFrom(InputRecord &ir, int priority)
+Lattice3dBoundaryTruss :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->giveDomain()->elementPPM;
     Lattice3d :: initializeFrom(ir, priority);

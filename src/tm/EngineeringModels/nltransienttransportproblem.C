@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -52,7 +52,7 @@ NLTransientTransportProblem :: NLTransientTransportProblem(int i, EngngModel *_m
 }
 
 void
-NLTransientTransportProblem :: initializeFrom(InputRecord &ir)
+NLTransientTransportProblem :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
      NonStationaryTransportProblem :: initializeFrom(ir);
 

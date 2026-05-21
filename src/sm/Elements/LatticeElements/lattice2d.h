@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2019   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -79,7 +79,7 @@ public:
      * function as it returns the global coordinates of the gausspoint
      * independent to the value of the lcoords.
      */
-    int computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords) override;
+    int computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords) override;
 
     double giveLength() override;
 
@@ -109,7 +109,7 @@ public:
     //
     const char *giveInputRecordName() const override { return _IFT_Lattice2d_Name; }
     const char *giveClassName() const override { return "Lattice2d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     
     Element_Geometry_Type giveGeometryType() const override { return EGT_line_1; }
 
@@ -131,7 +131,8 @@ protected:
     void computeStressVector(FloatArray &answer, const FloatArray &strain, GaussPoint *gp, TimeStep *tStep) override;
     void computeConstitutiveMatrixAt(FloatMatrix &answer, MatResponseMode rMode, GaussPoint *gp, TimeStep *tStep) override;
     void computeStiffnessMatrix(FloatMatrix &answer, MatResponseMode rMode, TimeStep *tStep) override;
-
+    void giveInternalForcesVector(FloatArray &answer, TimeStep *tStep, int useUpdatedGpRecord) override;
+  
     int giveNumberOfCrossSectionNodes() override { return 2; }
     double givePitch();
     void computeGaussPoints() override;

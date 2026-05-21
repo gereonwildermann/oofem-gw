@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -117,7 +117,7 @@ public:
      * - pressure p (required)
      * The gradient should be in Voigt notation (only the deviatoric part will be used)
      */
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void giveInputRecord(DynamicInputRecord &input) override;
 
     void scale(double s) override;
@@ -149,7 +149,7 @@ protected:
     void integrateTractionVelocityTangent(FloatMatrix &answer, Element *el, int boundary);
     void integrateTractionXTangent(FloatMatrix &answer, Element *el, int boundary);
     void integrateTractionDev(FloatArray &answer, Element *el, int boundary, const FloatMatrix &ddev);
-    void constructMMatrix(FloatMatrix &mMatrix, FloatArray &coords, FloatArray &normal);
+    void constructMMatrix(FloatMatrix &mMatrix, Coordinates &coords, FloatArray &normal);
     void evaluateTractionBasisFunctions(FloatArray &answer, const FloatArray &coords);
     void constructFullMatrixForm(FloatMatrix &d, const FloatArray &d_voigt) const;
 };

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -37,6 +37,8 @@
 
 #include "exportmodule.h"
 #include "floatarray.h"
+#include "oofemcfg.h"
+#include "floatarrayf.h"
 
 #include <unordered_map>
 #include <memory>
@@ -89,7 +91,7 @@ public:
     GnuplotExportModule(int n, EngngModel *e);
     virtual ~GnuplotExportModule();
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir) override;
     void doOutput(TimeStep *tStep, bool forcedOutput = false) override;
     void initialize() override;
     void terminate() override;
@@ -103,7 +105,7 @@ public:
     void outputXFEM(EnrichmentItem &iEI, TimeStep *tStep);
     void outputXFEM(Crack &iCrack, TimeStep *tStep);
 
-    void outputXFEMGeometry(const std::vector< std::vector<FloatArray> > &iEnrItemPoints);
+    void outputXFEMGeometry(const std::vector< std::vector<Coordinates>> &iEnrItemPoints);
 
     /**
      * Boundary condition output
@@ -134,6 +136,7 @@ public:
     void outputInterfaceEl(Domain &d, TimeStep *tStep);
 
     static void WritePointsToGnuplot(const std :: string &iName, const std :: vector< std::vector<FloatArray> > &iPoints);
+    static void WriteCoordsToGnuplot(const std :: string &iName, const std :: vector< std::vector<Coordinates> > &iPoints);
 
 protected:
     bool mExportReactionForces;

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2014   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -41,7 +41,7 @@
 namespace oofem {
 
 void
-SparseNonLinearSystemNM :: initializeFrom(InputRecord &ir)
+SparseNonLinearSystemNM :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     randPertAmplitude = 0.;
     IR_GIVE_OPTIONAL_FIELD(ir, randPertAmplitude, _IFT_NonLinearStatic_randPertAmplitude);

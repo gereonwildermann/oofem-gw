@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2015   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -45,7 +45,7 @@ ConcreteFCM :: ConcreteFCM(int n, Domain *d) : FCMMaterial(n, d), RandomMaterial
 {}
 
 void
-ConcreteFCM :: initializeFrom(InputRecord &ir)
+ConcreteFCM :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     FCMMaterial :: initializeFrom(ir);
     RandomMaterialExtensionInterface :: initializeFrom(ir);

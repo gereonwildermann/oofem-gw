@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -88,7 +88,7 @@ NumericalMethod *LinearStatic :: giveNumericalMethod(MetaStep *mStep)
 }
 
 void
-LinearStatic :: initializeFrom(InputRecord &ir)
+LinearStatic :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralEngngModel :: initializeFrom(ir);
 

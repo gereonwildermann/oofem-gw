@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -54,7 +54,7 @@ PointLoad :: computeValueAt(FloatArray &answer, TimeStep *tStep, const FloatArra
 }
 
 void
-PointLoad :: initializeFrom(InputRecord &ir)
+PointLoad :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     Load :: initializeFrom(ir);
 

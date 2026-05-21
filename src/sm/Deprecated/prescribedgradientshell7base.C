@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -277,7 +277,7 @@ void PrescribedGenStrainShell7 :: computeTangent(FloatMatrix &tangent, EquationI
 }
 
 
-void PrescribedGenStrainShell7 :: initializeFrom(InputRecord &ir)
+void PrescribedGenStrainShell7 :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     GeneralBoundaryCondition :: initializeFrom(ir);
 

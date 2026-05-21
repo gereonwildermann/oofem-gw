@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -236,7 +236,7 @@ DirectErrorIndicatorRC :: giveRequiredDofManDensity(int num, TimeStep *tStep, in
 
 
 void
-DirectErrorIndicatorRC :: initializeFrom(InputRecord &ir)
+DirectErrorIndicatorRC :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     IR_GIVE_FIELD(ir, minIndicatorLimit, _IFT_DirectErrorIndicatorRC_minlim);
     IR_GIVE_FIELD(ir, maxIndicatorLimit, _IFT_DirectErrorIndicatorRC_maxlim);

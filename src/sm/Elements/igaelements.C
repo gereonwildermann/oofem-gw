@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -62,7 +62,7 @@ REGISTER_Element(NURBSSpace3dElement);
 BsplinePlaneStressElement :: BsplinePlaneStressElement(int n, Domain *aDomain) : IGAElement(n, aDomain), PlaneStressStructuralElementEvaluator(), interpolation(2) { }
 
 
-void BsplinePlaneStressElement :: initializeFrom(InputRecord &ir, int priority)
+void BsplinePlaneStressElement :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     //PlaneStressStructuralElementEvaluator::initializeFrom(ir);
     IGAElement :: initializeFrom(ir, priority);
@@ -84,7 +84,7 @@ int BsplinePlaneStressElement :: checkConsistency()
 NURBSPlaneStressElement :: NURBSPlaneStressElement(int n, Domain *aDomain) : IGAElement(n, aDomain), PlaneStressStructuralElementEvaluator(), interpolation(2) { }
 
 
-void NURBSPlaneStressElement :: initializeFrom(InputRecord &ir, int priority)
+void NURBSPlaneStressElement :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     //PlaneStressStructuralElementEvaluator::initializeFrom(ir);
     IGAElement :: initializeFrom(ir, priority);
@@ -110,7 +110,7 @@ TSplinePlaneStressElement :: TSplinePlaneStressElement(int n, Domain *aDomain) :
 NURBSSpace3dElement :: NURBSSpace3dElement(int n, Domain *aDomain) : IGAElement(n, aDomain), Space3dStructuralElementEvaluator(), interpolation(3) { }
 
 
-void NURBSSpace3dElement :: initializeFrom(InputRecord &ir, int priority)
+void NURBSSpace3dElement :: initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     //PlaneStressStructuralElementEvaluator::initializeFrom(ir);
     IGAElement :: initializeFrom(ir, priority);

@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,7 +53,7 @@ SmoothedNodalInternalVariableField :: SmoothedNodalInternalVariableField(Interna
 SmoothedNodalInternalVariableField :: ~SmoothedNodalInternalVariableField() { }
 
 int
-SmoothedNodalInternalVariableField :: evaluateAt(FloatArray &answer, const FloatArray &coords, ValueModeType mode, TimeStep *tStep)
+SmoothedNodalInternalVariableField :: evaluateAt(FloatArray &answer, const Coordinates &coords, ValueModeType mode, TimeStep *tStep)
 {
     int result = 0; // assume ok
     FloatArray lc, n;

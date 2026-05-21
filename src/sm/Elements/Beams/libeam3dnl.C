@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -349,7 +349,7 @@ LIBeam3dNL::computeGaussPoints()
 
 
 void
-LIBeam3dNL::initializeFrom(InputRecord &ir, int priority)
+LIBeam3dNL::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     // first call parent
     NLStructuralElement::initializeFrom(ir, priority);
@@ -489,7 +489,7 @@ LIBeam3dNL::giveDofManDofIDMask(int inode, IntArray &answer) const
 
 
 int
-LIBeam3dNL::computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+LIBeam3dNL::computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     double ksi, n1, n2;
 
@@ -497,7 +497,7 @@ LIBeam3dNL::computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoor
     n1  = ( 1. - ksi ) * 0.5;
     n2  = ( 1. + ksi ) * 0.5;
 
-    answer.resize(3);
+    //answer.resize(3);
     answer.at(1) = n1 * this->giveNode(1)->giveCoordinate(1) + n2 * this->giveNode(2)->giveCoordinate(1);
     answer.at(2) = n1 * this->giveNode(1)->giveCoordinate(2) + n2 * this->giveNode(2)->giveCoordinate(2);
     answer.at(3) = n1 * this->giveNode(1)->giveCoordinate(3) + n2 * this->giveNode(2)->giveCoordinate(3);

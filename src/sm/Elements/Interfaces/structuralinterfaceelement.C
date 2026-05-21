@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -53,13 +53,13 @@ StructuralInterfaceElement :: StructuralInterfaceElement(int n, Domain *aDomain)
 {
 }
 
-int StructuralInterfaceElement :: computeGlobalCoordinates(FloatArray &answer, const FloatArray &lcoords)
+int StructuralInterfaceElement :: computeGlobalCoordinates(Coordinates &answer, const FloatArray &lcoords)
 {
     FloatArray N;
     FEInterpolation *interp = this->giveInterpolation();
     interp->evalN( N, lcoords, FEIElementGeometryWrapper(this) );
 
-    answer.resize(this->giveDofManager(1)->giveCoordinates().giveSize());
+    //answer.resize(this->giveDofManager(1)->giveCoordinates().giveSize());
     answer.zero();
 
     int numNodes = this->giveNumberOfNodes();
@@ -202,7 +202,7 @@ StructuralInterfaceElement :: computeTraction(FloatArray &traction, IntegrationP
     }
 
     StructuralInterfaceMaterialStatus *status = static_cast< StructuralInterfaceMaterialStatus * >( ip->giveMaterialStatus() );
-    FloatArray normal = {rotationMatGtoL.at(2,1), rotationMatGtoL.at(2,2), 0.};
+    FloatArray normal = Vec3(rotationMatGtoL.at(2,1), rotationMatGtoL.at(2,2), 0.);
 //    printf("normal: "); normal.printYourself();
     status->letNormalBe(normal);
 

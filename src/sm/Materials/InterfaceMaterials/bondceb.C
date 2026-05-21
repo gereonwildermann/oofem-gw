@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -174,7 +174,7 @@ BondCEBMaterial :: giveIPValue(FloatArray &answer, GaussPoint *gp, InternalState
 }
 
 void
-BondCEBMaterial :: initializeFrom(InputRecord &ir)
+BondCEBMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     StructuralInterfaceMaterial :: initializeFrom(ir);
 

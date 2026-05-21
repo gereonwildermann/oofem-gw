@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -166,6 +166,9 @@ public:
 
     void _resize_internal(int nr, int nc);
     FloatMatrix(std :: initializer_list< std :: initializer_list< double > > ini){ (*this)=FloatMatrix::fromIniList(ini); }
+    /**
+     * Assignment operator from initializer list. The initializer list contains nested initializer lists of columns
+     */
     FloatMatrix &operator=(std :: initializer_list< std :: initializer_list< double > >mat){ (*this)=fromIniList(mat); return *this; }
     static FloatMatrix fromIniList(std :: initializer_list< std :: initializer_list< double > >);
     static FloatMatrix fromCols(std :: initializer_list< FloatArray >mat);
@@ -180,7 +183,13 @@ public:
      * will be created and initialized, if true then a matrix of size (1,vector->giveSize())
      * will be created.
      */
+    static FloatMatrix fromMatrix(const FloatMatrix &matrix, bool transpose = false);
     static FloatMatrix fromArray(const FloatArray &vector, bool transpose = false);
+    static FloatMatrix fromScalar(double scalar){
+        FloatMatrix ret(1,1);
+        ret(0,0)=scalar;
+        return ret;
+    }
 
     template<std::size_t N, std::size_t M>
     FloatMatrix &operator=(const FloatMatrixF<N,M> &mat) {
@@ -232,6 +241,21 @@ public:
     {
         return (*this)(i-1,j-1);
     }
+
+    /** return receiver row as matrix */
+    FloatMatrix row (std::size_t r) const {
+        FloatMatrix ret(1, cols());
+        for (std::size_t c = 0; c < (std::size_t)cols(); c++)
+            ret(0, c) = (*this)(r, c);
+        return ret;
+    }
+    /** return receiver column as matrix */
+    FloatMatrix col (std::size_t c) const {
+        FloatMatrix ret(rows(), 1);
+        for (std::size_t r = 0; r < (std::size_t)rows(); r++)
+            ret(r, 0) = (*this)(r, c);
+        return ret;
+    }   
     /**
      * Assembles the contribution using localization array into receiver. The receiver must
      * have dimensions large enough to localize contribution.
@@ -335,6 +359,11 @@ public:
      * Grows or shrinks if necessary.
      */
     void beProductTOf(const FloatMatrix &a, const FloatMatrix &b);
+    /**
+     * Assigns to the receiver product of @f$ a^{\mathrm{T}} \cdot b^{\mathrm{T}}@f$ .
+     * Grows or shrinks if necessary.
+     */
+    void beTProductTOf(const FloatMatrix &a, const FloatMatrix &b);
     /**
      * Assigns to the receiver the dyadic product @f$ v_1 \cdot v_2^{\mathrm{T}} @f$ .
      * Grows or shrinks if necessary.
@@ -472,6 +501,16 @@ public:
     void plusDyadUnsym(const FloatArray &a, const FloatArray &b, double dV);
 
     /**
+     * Adds to the receiver the product @f$Nt a \otimes b B \mathrm{d}V@f$. If the receiver has zero size, it is expanded.
+     * @param N matrix N in equation.
+     * @param a Array a in equation.
+     * @param b Array b in equation.
+     * @param B matrix N in equation.
+     * @param dV Scaling factor.
+     */
+    void plus_Nt_a_otimes_b_B(const FloatMatrix &N, const FloatArray &a, const FloatArray &b, const FloatMatrix &B, double dV = 1);
+
+    /**
      * Adds matrix to the receiver.
      * If receiver has zero size, size is accordingly adjusted.
      * @param a Matrix to be added.
@@ -599,6 +638,8 @@ public:
     //@{
     /// Vector multiplication by scalar
     OOFEM_EXPORT FloatMatrix &operator *= ( FloatMatrix & x, const double & a );
+    OOFEM_EXPORT FloatMatrix operator * ( const FloatMatrix & x, const double & a );
+    OOFEM_EXPORT FloatMatrix operator * ( const double & a, const FloatMatrix & x);
     OOFEM_EXPORT FloatMatrix operator *( const FloatMatrix & a, const FloatMatrix & b ) ;
     OOFEM_EXPORT FloatArray operator *( const FloatMatrix & a, const FloatArray & b ) ;
     OOFEM_EXPORT FloatMatrix operator +( const FloatMatrix & a, const FloatMatrix & b ) ;

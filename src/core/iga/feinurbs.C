@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -46,7 +46,7 @@ namespace oofem {
 ParamKey NURBSInterpolation::IPK_NURBSInterpolation_weights("weights");
 
 void
-NURBSInterpolation :: initializeFrom(InputRecord &ir, ParameterManager&pm, int elnum, int priority)
+NURBSInterpolation :: initializeFrom(const std::shared_ptr<InputRecord> &ir, ParameterManager&pm, int elnum, int priority)
 {
     BSplineInterpolation :: initializeFrom(ir, pm, elnum, priority);
     PM_UPDATE_PARAMETER(weights, pm, ir, elnum, IPK_NURBSInterpolation_weights, priority);
@@ -556,7 +556,7 @@ double NURBSInterpolation :: evaldNdx(FloatMatrix &answer, const FloatArray &lco
 }
 
 
-void NURBSInterpolation :: local2global(FloatArray &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
+void NURBSInterpolation :: local2global(Coordinates &answer, const FloatArray &lcoords, const FEICellGeometry &cellgeo) const
 {
     /* Based on SurfacePoint A4.3 implementation*/
     const FEIIGAElementGeometryWrapper &gw = static_cast< const FEIIGAElementGeometryWrapper& >(cellgeo);
@@ -576,7 +576,7 @@ void NURBSInterpolation :: local2global(FloatArray &answer, const FloatArray &lc
         this->basisFuns(N [ i ], span[i], lcoords[i], degree [ i ], knotVector [ i ]);
     }
 
-    answer.resize(nsd);
+    //answer.resize(3);
     answer.zero();
 
     if ( nsd == 1 ) {
@@ -649,7 +649,7 @@ void NURBSInterpolation :: local2global(FloatArray &answer, const FloatArray &lc
         OOFEM_ERROR("lnot implemented for nsd = %d", nsd);
     }
 
-    answer.times(1.0 / weight);
+    answer*=(1.0 / weight);
 }
 
 

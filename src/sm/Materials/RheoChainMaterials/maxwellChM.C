@@ -10,7 +10,7 @@
  *
  *             OOFEM : Object Oriented Finite Element Code
  *
- *               Copyright (C) 1993 - 2013   Borek Patzak
+ *               Copyright (C) 1993 - 2025   Borek Patzak
  *
  *
  *
@@ -273,7 +273,7 @@ MaxwellChainMaterial :: CreateStatus(GaussPoint *gp) const
 
 
 void
-MaxwellChainMaterial :: initializeFrom(InputRecord &ir)
+MaxwellChainMaterial :: initializeFrom(const std::shared_ptr<InputRecord> &ir)
 {
     RheoChainMaterial :: initializeFrom(ir);
 }
