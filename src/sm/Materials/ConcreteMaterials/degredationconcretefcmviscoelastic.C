@@ -53,9 +53,11 @@ double evaluateDegreeOfDegradation(oofem::Domain *domain, oofem::GaussPoint *gp,
         return 0.;
     }
 
-    oofem::FloatArray gcoords, dod;
+    oofem::Coordinates gcoords, lcoords;
+    oofem::FloatArray dod;
+    lcoords = gp->giveNaturalCoordinates();
     int err = 0;
-    static_cast< oofem::StructuralElement * >( gp->giveElement() )->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates());
+    static_cast< oofem::StructuralElement * >( gp->giveElement() )->computeGlobalCoordinates(gcoords, lcoords);
     if ( ( err = ddf->evaluateAt(dod, gcoords, oofem::VM_Total, tStep) ) ) {
         throw oofem::RuntimeException(__func__, __FILE__, __LINE__, "ddf->evaluateAt failed, element %d, error code %d", gp->giveElement()->giveNumber(), err);
     }
@@ -76,7 +78,7 @@ DegredationConcreteFCMViscoElastic::DegredationConcreteFCMViscoElastic(int n, Do
 
 
 void
-DegredationConcreteFCMViscoElastic::initializeFrom(InputRecord &ir)
+DegredationConcreteFCMViscoElastic::initializeFrom(const std::shared_ptr< InputRecord > &ir)
 {
     DegredationConcreteFCM::initializeFrom(ir);
 
@@ -84,7 +86,7 @@ DegredationConcreteFCMViscoElastic::initializeFrom(InputRecord &ir)
 
     this->fib = false;
 
-    if ( ir.hasField(_IFT_ConcreteFCMViscoElastic_timedepfracturing) ) {
+    if ( ir->hasField(_IFT_ConcreteFCMViscoElastic_timedepfracturing) ) {
         this->fib = true;
         //
         IR_GIVE_FIELD(ir, fib_s, _IFT_ConcreteFCMViscoElastic_fib_s);

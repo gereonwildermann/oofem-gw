@@ -533,7 +533,7 @@ Rebar3d::computeStiffnessMatrix_withIRulesAsSubcells(FloatMatrix &answer,
 }
 
 void
-Rebar3d::initializeFrom(InputRecord &ir, int priority)
+Rebar3d::initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority)
 {
     ParameterManager &ppm = this->domain->elementPPM;
     StructuralElement::initializeFrom(ir, priority);

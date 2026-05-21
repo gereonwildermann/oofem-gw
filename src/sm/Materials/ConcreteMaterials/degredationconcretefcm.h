@@ -102,7 +102,7 @@ class DegredationConcreteFCM : public FCMMaterial, public RandomMaterialExtensio
 public:
     DegredationConcreteFCM(int n, Domain *d);
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr< InputRecord > &ir) override;
     const char *giveClassName() const override { return "DegredationConcreteFCM"; }
     const char *giveInputRecordName() const override { return _IFT_DegredationConcreteFCM_Name; }
 

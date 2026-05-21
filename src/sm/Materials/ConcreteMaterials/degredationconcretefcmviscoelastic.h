@@ -85,7 +85,7 @@ class DegredationConcreteFCMViscoElastic : public DegredationConcreteFCM
 public:
     DegredationConcreteFCMViscoElastic(int n, Domain *d);
 
-    void initializeFrom(InputRecord &ir) override;
+    void initializeFrom(const std::shared_ptr< InputRecord > &ir) override;
     const char *giveClassName() const override { return "DegredationConcreteFCMViscoElastic"; }
     const char *giveInputRecordName() const override { return _IFT_DegredationConcreteFCMViscoElastic_Name; }
 

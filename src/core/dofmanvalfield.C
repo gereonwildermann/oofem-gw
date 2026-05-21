@@ -175,7 +175,7 @@ DofManValueField::stashCurrentValues()
     this->hasPrevValues = true;
 }
 
-const FloatArray &DofManValueField::getNodeCoordinates(int i)
+const Coordinates &DofManValueField::getNodeCoordinates(int i)
 {
     return this->domain->dofManagerList [ i - 1 ]->giveCoordinates();
 }

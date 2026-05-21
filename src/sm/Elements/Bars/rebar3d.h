@@ -233,7 +233,7 @@ public:
     // definition & identification
     const char *giveInputRecordName() const override { return _IFT_Rebar3d_Name; }
     const char *giveClassName() const override { return "Rebar3d"; }
-    void initializeFrom(InputRecord &ir, int priority) override;
+    void initializeFrom(const std::shared_ptr<InputRecord> &ir, int priority) override;
     void giveInputRecord(DynamicInputRecord &input) override;
     MaterialMode giveMaterialMode() override { return _1dMat; }
     Element_Geometry_Type giveGeometryType() const override {return EGT_line_1;}

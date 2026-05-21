@@ -23,7 +23,10 @@ if (USE_MPI_PARALLEL)
         add_test (NAME "${test_rel_dir}/${case}" WORKING_DIRECTORY ${test_dir}/${case} COMMAND "mpirun" "--oversubscribe" "-np" ${num_files} ${oofem_cmd} "-p" "-f" ${case}.oofem.in "-ksp_type" "cg")
     endforeach (case)
     # partest_brazil_2d_nl7 requires more time on testing server than default 1500
-    set_tests_properties(partest_brazil_2d_nl7 PROPERTIES TIMEOUT 2500)
+    set(partest_brazil_2d_nl7_name "${test_rel_dir}/brazil_2d_nl7")
+    if(TEST "${partest_brazil_2d_nl7_name}")
+        set_tests_properties("${partest_brazil_2d_nl7_name}" PROPERTIES TIMEOUT 2500)
+    endif()
 endif ()
 
 

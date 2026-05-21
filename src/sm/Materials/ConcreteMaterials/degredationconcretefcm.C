@@ -52,9 +52,11 @@ double evaluateDegreeOfDegradation(oofem::Domain *domain, oofem::GaussPoint *gp,
         return 0.;
     }
 
-    oofem::FloatArray gcoords, dod;
+    oofem::Coordinates gcoords, lcoords;
+    oofem::FloatArray dod;
+    lcoords = gp->giveNaturalCoordinates();
     int err = 0;
-    static_cast< oofem::StructuralElement * >( gp->giveElement() )->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates());
+    static_cast< oofem::StructuralElement * >( gp->giveElement() )->computeGlobalCoordinates(gcoords, lcoords);
     if ( ( err = ddf->evaluateAt(dod, gcoords, mode, tStep) ) ) {
         throw oofem::RuntimeException(__func__, __FILE__, __LINE__, "ddf->evaluateAt failed, element %d, error code %d", gp->giveElement()->giveNumber(), err);
     }
@@ -74,7 +76,7 @@ DegredationConcreteFCM :: DegredationConcreteFCM(int n, Domain *d) : FCMMaterial
 {}
 
 void
-DegredationConcreteFCM :: initializeFrom(InputRecord &ir)
+DegredationConcreteFCM :: initializeFrom(const std::shared_ptr< InputRecord > &ir)
 {
     FCMMaterial :: initializeFrom(ir);
     RandomMaterialExtensionInterface :: initializeFrom(ir);
@@ -83,12 +85,12 @@ DegredationConcreteFCM :: initializeFrom(InputRecord &ir)
     beta_f = 1.;
     beta_E = 1.;
     IR_GIVE_OPTIONAL_FIELD(ir, beta_Gf, _IFT_ConcreteFCM_beta_Gf);
-    if ( ir.hasField("beta_gf") ) {
+    if ( ir->hasField("beta_gf") ) {
         IR_GIVE_FIELD(ir, beta_Gf, "beta_gf");
     }
     IR_GIVE_OPTIONAL_FIELD(ir, beta_f, _IFT_ConcreteFCM_beta_f);
     IR_GIVE_OPTIONAL_FIELD(ir, beta_E, _IFT_ConcreteFCM_beta_E);
-    if ( ir.hasField("beta_e") ) {
+    if ( ir->hasField("beta_e") ) {
         IR_GIVE_FIELD(ir, beta_E, "beta_e");
     }
 
