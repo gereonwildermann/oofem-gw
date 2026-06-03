@@ -826,15 +826,35 @@ double Rebar3d::giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Value
 {
     double area_0 = this->giveCrossSection()->give(CS_Area, gp);
     double diameter_0 = 2.0 * sqrt(area_0 / M_PI);
-    // get corrosion mass loss from the field
+    // Access to externally managed fields is serialized for OpenMP safety.
     FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
     FieldPtr cf;
-    if ( (cf = fm->giveField(FT_CorrosionMassLoss))) {
-        FloatArray mloss, mloss1, mloss2;
-        DofManager *dm1 = this->domain->giveDofManager(1);
-        DofManager *dm2 = this->domain->giveDofManager(2);
-        cf->evaluateAt(mloss1, dm1, mode, tStep);
-        cf->evaluateAt(mloss2, dm2, mode, tStep);
+    int err1 = 0, err2 = 0;
+    FloatArray mloss1, mloss2;
+    DofManager *dm1 = this->domain->giveDofManager(1);
+    DofManager *dm2 = this->domain->giveDofManager(2);
+#ifdef _OPENMP
+    #pragma omp critical (OOFEM_FieldAccess_FT_CorrosionMassLoss)
+#endif
+    {
+        cf = fm->giveField(FT_CorrosionMassLoss);
+        if ( cf ) {
+            err1 = cf->evaluateAt(mloss1, dm1, mode, tStep);
+            err2 = cf->evaluateAt(mloss2, dm2, mode, tStep);
+            // Some field implementations may not support DofManager-based lookup.
+            if ( err1 ) {
+                err1 = cf->evaluateAt(mloss1, dm1->giveCoordinates(), mode, tStep);
+            }
+            if ( err2 ) {
+                err2 = cf->evaluateAt(mloss2, dm2->giveCoordinates(), mode, tStep);
+            }
+        }
+    }
+    if ( cf ) {
+        if ( err1 || err2 ) {
+            return 0.0;
+        }
+        FloatArray mloss;
         mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
         double density = this->giveCrossSection()->giveMaterial(gp)->give('d', gp);
         double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
@@ -843,7 +863,7 @@ double Rebar3d::giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Value
         // Clamp Q_c to the range [0, 1]
         Q_c = std::min(std::max(Q_c, 0.0), 1.0);
         return Q_c;
-        }
+    }
     return 0.0;
 }    
 

@@ -2241,15 +2241,26 @@ StructuralMaterial::computeStressIndependentStrainVector(GaussPoint *gp, TimeSte
         }
     }
     
-        //Add external eigenstrain if defined
-    if ( ( tf = fm->giveField(FT_EigenStrain)) && (tf->hasElementInSets(selem->giveNumber(), this->giveDomain() )) ) {
+    // Add external eigenstrain if defined.
+    bool useExternalEigenstrain = false;
+    FloatArray eigStrain;
+    int eigErr = 0;
+    if ( selem ) {
         Coordinates gcoords;
-        FloatArray eigStrain;
-        int err;
         elem->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
-        if ( ( err = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep) ) ) {
-            OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), err);
+#ifdef _OPENMP
+        #pragma omp critical (OOFEM_FieldAccess_FT_EigenStrain)
+#endif
+        {
+            tf = fm->giveField(FT_EigenStrain);
+            if ( tf && tf->hasElementInSets(selem->giveNumber(), this->giveDomain() ) ) {
+                eigErr = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep);
+                useExternalEigenstrain = ( eigErr == 0 );
+            }
         }
+    }
+
+    if ( useExternalEigenstrain ) {
         if ( answer.giveSize() ) {
             if ( eigStrain.giveSize() ) {
                 if ( answer.giveSize() != eigStrain.giveSize() ) {
@@ -2262,6 +2273,8 @@ StructuralMaterial::computeStressIndependentStrainVector(GaussPoint *gp, TimeSte
                 answer = eigStrain;
             }
         }
+    } else if ( eigErr ) {
+        OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), eigErr);
     }
     
     return answer;
@@ -2327,18 +2340,31 @@ StructuralMaterial::computeStressIndependentStrainVector_3d(GaussPoint *gp, Time
         answer += FloatArrayF< 6 >(eigenstrain);
     }
     
-    //Add external eigenstrain if defined
-    if ( ( tf = fm->giveField(FT_EigenStrain)) && (tf->hasElementInSets(selem->giveNumber(), this->giveDomain() )) ) {
+    // Add external eigenstrain if defined.
+    bool useExternalEigenstrain = false;
+    FloatArray eigStrain;
+    int eigErr = 0;
+    if ( selem ) {
         Coordinates gcoords;
-        FloatArray eigStrain;
-        int err;
         elem->computeGlobalCoordinates(gcoords, gp->giveNaturalCoordinates() );
-        if ( ( err = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep) ) ) {
-            OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), err);
+#ifdef _OPENMP
+        #pragma omp critical (OOFEM_FieldAccess_FT_EigenStrain)
+#endif
+        {
+            tf = fm->giveField(FT_EigenStrain);
+            if ( tf && tf->hasElementInSets(selem->giveNumber(), this->giveDomain() ) ) {
+                eigErr = tf->evaluateAt(eigStrain, gcoords, VM_Total, tStep);
+                useExternalEigenstrain = ( eigErr == 0 );
+            }
         }
+    }
+
+    if ( useExternalEigenstrain ) {
         if ( answer.giveSize() ) {
             answer += FloatArrayF< 6 >(eigStrain);
         }
+    } else if ( eigErr ) {
+        OOFEM_ERROR("tf->evaluateAt failed, element %d, error code %d", elem->giveNumber(), eigErr);
     }
     return answer;
 }

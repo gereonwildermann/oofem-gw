@@ -82,11 +82,17 @@ BondCEBMaterial :: giveEngTraction_3d(const FloatArrayF<3> &jump, GaussPoint *gp
     double tempKappa = status->giveKappa() + dKappa;
 
     // maximum allowed norm of shear traction
-    // get corrosion mass loss from the field
+    // Access to externally managed fields is serialized for OpenMP safety.
     FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
-    FieldPtr cf;
+    bool hasCorrosionFraction = false;
+#ifdef _OPENMP
+    #pragma omp critical (OOFEM_FieldAccess_FT_CorrosionFraction)
+#endif
+    {
+        hasCorrosionFraction = static_cast< bool >( fm->giveField(FT_CorrosionFraction) );
+    }
     double smax;
-    if ( (cf = fm->giveField(FT_CorrosionFraction))) {
+    if ( hasCorrosionFraction ) {
         double Qc = const_cast<BondCEBMaterial*>(this)->giveCrossSectionReduction(gp, tStep, VM_Total);
         double seq = 0.0029*Qc; // EC2020 13.6 mm*Qc with stirups, 2.9 mm without stirups
         double smax1 = evaluateBondStress(tempKappa); 
@@ -127,12 +133,32 @@ BondCEBMaterial :: giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Va
     // get corrosion mass loss from the field
     FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
     FieldPtr cf;
-    if ( (cf = fm->giveField(FT_CorrosionMassLoss))) {
-        FloatArray mloss, mloss1, mloss2;
-        DofManager *dm1 = this->domain->giveDofManager(1);
-        DofManager *dm2 = this->domain->giveDofManager(2);
-        cf->evaluateAt(mloss1, dm1, mode, tStep);
-        cf->evaluateAt(mloss2, dm2, mode, tStep);
+    int err1 = 0, err2 = 0;
+    FloatArray mloss1, mloss2;
+    DofManager *dm1 = this->domain->giveDofManager(1);
+    DofManager *dm2 = this->domain->giveDofManager(2);
+#ifdef _OPENMP
+    #pragma omp critical (OOFEM_FieldAccess_FT_CorrosionMassLoss)
+#endif
+    {
+        cf = fm->giveField(FT_CorrosionMassLoss);
+        if ( cf ) {
+            err1 = cf->evaluateAt(mloss1, dm1, mode, tStep);
+            err2 = cf->evaluateAt(mloss2, dm2, mode, tStep);
+            // Some field implementations may not support DofManager-based lookup.
+            if ( err1 ) {
+                err1 = cf->evaluateAt(mloss1, dm1->giveCoordinates(), mode, tStep);
+            }
+            if ( err2 ) {
+                err2 = cf->evaluateAt(mloss2, dm2->giveCoordinates(), mode, tStep);
+            }
+        }
+    }
+    if ( cf ) {
+        if ( err1 || err2 ) {
+            return 0.0;
+        }
+        FloatArray mloss;
         mloss= 0.5 * (mloss1 + mloss2); // average mass loss at the two nodes
         double density = 7850; // density of steel in kg/m3
         double x = mloss.at(1) / density; // corrosion mass loss to corrosion volume loss
@@ -141,7 +167,7 @@ BondCEBMaterial :: giveCrossSectionReduction(GaussPoint *gp, TimeStep *tStep, Va
         // Clamp Q_c to the range [0, 1]
         Q_c = std::min(std::max(Q_c, 0.0), 1.0);
         return Q_c;
-        }
+    }
     return 0.0;
 }
 

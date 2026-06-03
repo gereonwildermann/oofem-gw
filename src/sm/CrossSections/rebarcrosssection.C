@@ -61,7 +61,13 @@ double RebarCrossSection::give(CrossSectionProperty aProperty, GaussPoint *gp) c
         // get corrosion mass loss from the field
         FieldManager *fm = domain->giveEngngModel()->giveContext()->giveFieldManager();
         FieldPtr cf;
-        if ( ( cf = fm->giveField(FT_CorrosionMassLoss)) ) {
+    #ifdef _OPENMP
+        #pragma omp critical (OOFEM_FieldAccess_FT_CorrosionMassLoss)
+    #endif
+        {
+            cf = fm->giveField(FT_CorrosionMassLoss);
+        }
+        if ( cf ) {
             FloatArray gcoords, mloss;
             int err;
             Element *elem = gp->giveElement()
